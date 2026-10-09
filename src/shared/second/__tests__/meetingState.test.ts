@@ -113,6 +113,16 @@ describe('meeting state reducer', () => {
     expect(a.endedAt).toBe(T0 + 40)
   })
 
+  it('records capture gaps and tells the coach not to assume what was said', () => {
+    const s = replayMeeting([
+      start,
+      { type: 'gap', at: T0 + 200_000, gap: { from: T0 + 120_000, to: T0 + 180_000, reason: 'network' } },
+      { type: 'gap', at: T0 + 200_001, gap: { from: T0 + 5, to: T0 + 5, reason: 'sleep' } },
+    ])
+    expect(s.gaps).toEqual([{ from: T0 + 120_000, to: T0 + 180_000, reason: 'network' }])
+    expect(formatStateForPrompt(s)).toContain('2:00 to 3:00 (network)')
+  })
+
   it('formats a compact prompt view and omits empty sections', () => {
     const s = replayMeeting([start])
     const text = formatStateForPrompt(s)

@@ -29,6 +29,8 @@ export interface LiveStateView {
   commitments: Array<{ who: string; action: string; due?: string }>
   contradictions: Array<{ metric: string; previous: number; current: number }>
   objectionsOpen: string[]
+  gaps: Array<{ from: number; to: number; reason: string }>
+  startedAt: number
   turnCount: number
 }
 

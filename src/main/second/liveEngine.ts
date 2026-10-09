@@ -214,6 +214,13 @@ export class LiveEngine {
     this.deps.onCard(held)
   }
 
+  /** Record a period that was not captured, so state and report stay honest. */
+  markGap(from: number, to: number, reason: 'sleep' | 'network' | 'capture'): void {
+    if (!this.active || to <= from) return
+    this.apply({ type: 'gap', at: this.deps.now(), gap: { from, to, reason } })
+    this.deps.diag('error', { reason: `gap_${reason}`, durationS: Math.round((to - from) / 1000) })
+  }
+
   applyUserUpdates(updates: StateUpdates): void {
     if (!this.active) return
     this.apply({ type: 'state_updates', at: this.deps.now(), origin: 'user', updates })

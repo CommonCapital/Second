@@ -149,6 +149,14 @@ describe('LiveEngine', () => {
     expect(t.calls[0].input.trigger.kind).toBe('think_deeper')
   })
 
+  it('marks capture gaps only while a meeting is active', () => {
+    const t = setup()
+    t.engine.markGap(1, 2, 'sleep')
+    t.engine.start({ sessionId: 's' })
+    t.engine.markGap(1_000_000, 1_060_000, 'sleep')
+    expect(t.engine.getState().gaps).toEqual([{ from: 1_000_000, to: 1_060_000, reason: 'sleep' }])
+  })
+
   it('does nothing when coaching is disabled', async () => {
     const t = setup({ coachEnabled: () => false })
     t.engine.start({ sessionId: 's' })

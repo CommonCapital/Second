@@ -6,7 +6,7 @@
  * report -> transcript retention) and the preflight self test.
  */
 
-import { app, BrowserWindow, dialog, ipcMain, net } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, net, powerMonitor } from 'electron'
 import { writeFile } from 'fs/promises'
 import { createLogger } from '../logger'
 import { getSetting, saveSetting } from '../store'
@@ -58,6 +58,10 @@ let lastReadinessLevel = ''
 let audioManagerRef: { getSttConnection(): { recording: boolean; mic: boolean; system: boolean }; getIsRecording(): boolean } | null = null
 let selfTest: { startedAt: number; micPeak: number; systemPeak: number; timer: ReturnType<typeof setTimeout> } | null = null
 let initialized = false
+let suspendedAt: number | null = null
+let offlineSince: number | null = null
+/** Network outages shorter than this are not worth a gap marker. */
+const NETWORK_GAP_MIN_MS = 3_000
 
 function windows(): BrowserWindow[] {
   return [getOverlayWindow(), getDashboardWindow()].filter(
@@ -107,6 +111,8 @@ export function toStateView(state: MeetingState): LiveStateView {
     commitments: state.commitments.slice(-6).map((c) => ({ who: c.who, action: c.action, due: c.due })),
     contradictions: state.contradictions.slice(-3).map((c) => ({ metric: c.metric, previous: c.previous, current: c.current })),
     objectionsOpen: state.objections.filter((o) => !o.resolved).slice(-4).map((o) => o.topic),
+    gaps: state.gaps.slice(-4),
+    startedAt: state.startedAt,
     turnCount: state.turnCount,
   }
 }
@@ -126,6 +132,14 @@ function currentHealth(): HealthView {
 
 function broadcastHealth(): void {
   const view = currentHealth()
+  // Network loss while recording: mark the missing period when it returns.
+  const online = view.snapshot.network.status !== 'down'
+  const now = Date.now()
+  if (!online && offlineSince === null && engine?.isActive()) offlineSince = now
+  if (online && offlineSince !== null) {
+    if (engine?.isActive() && now - offlineSince >= NETWORK_GAP_MIN_MS) engine.markGap(offlineSince, now, 'network')
+    offlineSince = null
+  }
   if (view.readiness.level !== lastReadinessLevel) {
     diagnostics.record('health_change', { from: lastReadinessLevel || 'none', to: view.readiness.level })
     lastReadinessLevel = view.readiness.level
@@ -388,6 +402,7 @@ function finishSelfTest(): { micPeakRms: number; systemPeakRms: number; micOk: b
     systemOk: (t?.systemPeak ?? 0) > ENERGY_RMS_FLOOR * 2,
   }
   diagnostics.record('self_test', { micOk: out.micOk, systemOk: out.systemOk, micPeak: out.micPeakRms, systemPeak: out.systemPeakRms })
+  if (t) saveSetting('secondLastSelfTest' as never, { at: Date.now(), micOk: out.micOk, systemOk: out.systemOk } as never)
   return out
 }
 
@@ -451,6 +466,23 @@ export function initSecond(): void {
   })
   addRawAudioTap(onRawAudio)
   sweepPendingPurges()
+
+  // Computer sleep mid-meeting: resume with an explicit timeline gap.
+  powerMonitor.on('suspend', () => {
+    if (engine?.isActive()) suspendedAt = Date.now()
+  })
+  powerMonitor.on('resume', () => {
+    if (suspendedAt !== null && engine?.isActive()) {
+      engine.markGap(suspendedAt, Date.now(), 'sleep')
+      send('overlay:notification', {
+        id: `gap-${Date.now()}`,
+        title: 'Second was asleep',
+        body: 'The computer slept during the meeting. That stretch was not captured and is marked as a gap.',
+        type: 'warning',
+      })
+    }
+    suspendedAt = null
+  })
 
   ipcMain.handle('second:get-snapshot', () => ({
     active: !!engine?.isActive(),

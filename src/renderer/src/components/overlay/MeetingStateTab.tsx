@@ -25,6 +25,17 @@ export function MeetingStateTab({ state }: { state: LiveStateView | null }) {
         <span>{state.phase}</span>
         <span className="ml-auto">{state.turnCount} turns</span>
       </div>
+      {state.gaps.length > 0 && (
+        <Section title="Not captured">
+          {state.gaps.map((g, i) => {
+            const rel = (t: number) => {
+              const sec = Math.max(0, Math.round((t - state.startedAt) / 1000))
+              return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+            }
+            return <p key={i} className="text-amber-300/90">{rel(g.from)} – {rel(g.to)} ({g.reason})</p>
+          })}
+        </Section>
+      )}
       {state.objective && <Section title="Objective"><p>{state.objective}</p></Section>}
       {state.currentTopic && <Section title="Topic"><p>{state.currentTopic}</p></Section>}
       {state.contradictions.length > 0 && (

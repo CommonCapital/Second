@@ -60,6 +60,19 @@ function BriefView({ brief }: { brief: MeetingBrief }) {
   )
 }
 
+function SelfTestStatus({ result }: { result: { at: number; micOk: boolean; systemOk: boolean } | null }) {
+  const days = result ? Math.floor((Date.now() - result.at) / 86_400_000) : null
+  const ok = !!result && result.micOk && result.systemOk
+  const label = !result
+    ? 'Audio self test not run (Settings → Second)'
+    : ok
+      ? `Audio self test passed ${days === 0 ? 'today' : `${days}d ago`}`
+      : `Last self test failed: ${!result.micOk ? 'mic' : ''}${!result.micOk && !result.systemOk ? ' + ' : ''}${!result.systemOk ? 'meeting audio' : ''} not heard`
+  return (
+    <span className={`ml-3 text-[11px] ${ok && (days ?? 99) <= 7 ? 'text-emerald-600' : 'text-amber-600'}`}>{label}</span>
+  )
+}
+
 export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
   const [playbooks, setPlaybooks] = useState<PlaybookSummary[]>([])
   const [setup, setSetup] = useState<MeetingSetupInput>(EMPTY)
@@ -68,11 +81,15 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
   const [brief, setBrief] = useState<MeetingBrief | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selfTest, setSelfTest] = useState<{ at: number; micOk: boolean; systemOk: boolean } | null>(null)
 
   useEffect(() => {
     if (!isOpen) return
     setError(null)
     void window.second.live.playbooks().then(setPlaybooks).catch(() => {})
+    void window.second.storeGet('secondLastSelfTest').then((v) => {
+      setSelfTest(v && typeof v === 'object' ? (v as { at: number; micOk: boolean; systemOk: boolean }) : null)
+    }).catch(() => {})
     void window.second.live.getPendingSetup().then((pending) => {
       if (pending?.setup) {
         setSetup(pending.setup)
@@ -178,6 +195,7 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
 
         <div className="flex items-center gap-2 px-6 py-4 border-t border-gray-100">
           <button onClick={() => { void clear() }} className="text-sm text-gray-500 hover:text-gray-800">Clear</button>
+          <SelfTestStatus result={selfTest} />
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => { void generate() }}

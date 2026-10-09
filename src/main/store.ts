@@ -107,6 +107,8 @@ export interface LocalSettings {
    * and action items are kept; the raw transcript is deleted once they exist.
    */
   retainTranscripts: boolean;
+  /** Last dual-audio self test result: { at, micOk, systemOk }. */
+  secondLastSelfTest: unknown;
 
   // Pro extensions store arbitrary keys via saveSetting()
   // (e.g. auth_tokens, auth_user, sync_queue, backendUrl)
@@ -155,6 +157,7 @@ const STORE_DEFAULTS: LocalSettings = {
   secondDynamicStaleDays: 30,
   secondPendingSetup: null,
   retainTranscripts: false,
+  secondLastSelfTest: null,
 };
 
 function createStore(): Store<LocalSettings> {
@@ -250,6 +253,7 @@ export function getAllSettings(): LocalSettings {
     secondDynamicStaleDays: store.get('secondDynamicStaleDays'),
     secondPendingSetup: null,
     retainTranscripts: store.get('retainTranscripts'),
+    secondLastSelfTest: store.get('secondLastSelfTest'),
     proOnboardingComplete: store.get('proOnboardingComplete'),
     proOnboardingStep: store.get('proOnboardingStep'),
     cachedUserProfile: store.get('cachedUserProfile' as keyof LocalSettings) || null,

@@ -90,6 +90,13 @@ export interface Signal {
   confidence: Confidence
 }
 
+/** A period the meeting was not fully captured (sleep, network loss, capture loss). */
+export interface CaptureGap {
+  from: number
+  to: number
+  reason: 'sleep' | 'network' | 'capture'
+}
+
 export interface MeetingSetup {
   objective?: string
   idealOutcome?: string
@@ -125,6 +132,7 @@ export interface MeetingState {
   currentCard: Card | null
   closeTarget: string
   nextBestAction: string
+  gaps: CaptureGap[]
   turnCount: number
   lastTurnAt: number
   endedAt: number | null
@@ -158,6 +166,7 @@ export type MeetingEvent =
   | { type: 'card_published'; at: number; card: Card }
   | { type: 'card_cleared'; at: number; reason: 'expired' | 'dismissed' | 'replaced' | 'topic_moved' }
   | { type: 'phase'; at: number; phase: MeetingPhase }
+  | { type: 'gap'; at: number; gap: CaptureGap }
   | { type: 'meeting_ended'; at: number }
 
 /** Opening phase lasts this long unless the coach moves it on sooner. */
@@ -194,6 +203,7 @@ export function createMeetingState(meetingId = '', startedAt = 0, mode = 'genera
     currentCard: null,
     closeTarget: '',
     nextBestAction: '',
+    gaps: [],
     turnCount: 0,
     lastTurnAt: 0,
     endedAt: null,
@@ -445,6 +455,9 @@ export function reduceMeeting(state: MeetingState, event: MeetingEvent): Meeting
       return { ...state, currentCard: null }
     case 'phase':
       return { ...state, phase: event.phase }
+    case 'gap':
+      if (event.gap.to <= event.gap.from) return state
+      return { ...state, gaps: [...state.gaps, event.gap].slice(-MAX_LIST) }
     case 'meeting_ended':
       return { ...state, endedAt: event.at, currentCard: null }
     default:
@@ -515,6 +528,16 @@ export function formatStateForPrompt(state: MeetingState): string {
   if (state.signals.length) {
     lines.push('signals (inferred, not facts):')
     for (const s of recent(state.signals, 6)) lines.push(`  - ${s.type}: ${s.evidence}`)
+  }
+  if (state.gaps.length) {
+    lines.push('capture_gaps (not heard; do not assume what was said):')
+    for (const g of recent(state.gaps, 4)) {
+      const rel = (t: number) => {
+        const sec = Math.max(0, Math.round((t - state.startedAt) / 1000))
+        return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+      }
+      lines.push(`  - ${rel(g.from)} to ${rel(g.to)} (${g.reason})`)
+    }
   }
   if (state.currentCard) {
     lines.push(`current_card: ${state.currentCard.mode} "${state.currentCard.text}"`)
