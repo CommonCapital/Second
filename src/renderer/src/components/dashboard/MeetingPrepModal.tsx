@@ -69,7 +69,7 @@ function SelfTestStatus({ result }: { result: { at: number; micOk: boolean; syst
       ? `Audio self test passed ${days === 0 ? 'today' : `${days}d ago`}`
       : `Last self test failed: ${!result.micOk ? 'mic' : ''}${!result.micOk && !result.systemOk ? ' + ' : ''}${!result.systemOk ? 'meeting audio' : ''} not heard`
   return (
-    <span className={`ml-3 text-[11px] ${ok && (days ?? 99) <= 7 ? 'text-emerald-600' : 'text-amber-600'}`}>{label}</span>
+    <span className={`block mt-0.5 text-[11px] ${ok && (days ?? 99) <= 7 ? 'text-emerald-600' : 'text-amber-600'}`}>{label}</span>
   )
 }
 
@@ -144,6 +144,7 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Prepare meeting</h2>
             <p className="text-xs text-gray-500">Second uses this to know what matters before the call starts.</p>
+            <SelfTestStatus result={selfTest} />
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100"><X size={18} /></button>
         </div>
@@ -195,25 +196,24 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
 
         <div className="flex items-center gap-2 px-6 py-4 border-t border-gray-100">
           <button onClick={() => { void clear() }} className="text-sm text-gray-500 hover:text-gray-800">Clear</button>
-          <SelfTestStatus result={selfTest} />
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => { void generate() }}
               disabled={busy}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-800 hover:bg-gray-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-800 hover:bg-gray-50 disabled:opacity-50"
             >
               {busy ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
               {brief ? 'Regenerate brief' : 'Generate brief'}
             </button>
             <button
               onClick={() => { void save().then(onClose) }}
-              className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-800 hover:bg-gray-50"
+              className="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-800 hover:bg-gray-50"
             >
-              Save for next meeting
+              Save for later
             </button>
             <button
               onClick={() => { void save().then(() => { onClose(); onStart() }) }}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#141B2D] hover:bg-[#222b42]"
+              className="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#141B2D] hover:bg-[#222b42]"
             >
               Start meeting
             </button>
