@@ -41,13 +41,13 @@ See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what leaves your machine and 
 ## Download
 
 <p>
-  <a href="https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.dmg"><img src="https://img.shields.io/badge/Download-macOS%20(Apple%20Silicon)-141B2D?logo=apple&logoColor=white" alt="Download Second for macOS" /></a>
+  <a href="https://github.com/CommonCapital/Second/releases/download/v0.2.0/Second-Mac-0.2.0-Installer.dmg"><img src="https://img.shields.io/badge/Download-macOS%20(Apple%20Silicon)-141B2D?logo=apple&logoColor=white" alt="Download Second for macOS" /></a>
 </p>
 
 | Platform | Installer | Size |
 |----------|-----------|------|
-| **macOS 12+ (Apple Silicon)** | [Second-Mac-0.1.0-Installer.dmg](https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.dmg) | 235 MB |
-| **macOS 12+ (Apple Silicon)**, zip | [Second-Mac-0.1.0-Installer.zip](https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.zip) | 227 MB |
+| **macOS 12+ (Apple Silicon)** | [Second-Mac-0.2.0-Installer.dmg](https://github.com/CommonCapital/Second/releases/download/v0.2.0/Second-Mac-0.2.0-Installer.dmg) | 236 MB |
+| **macOS 12+ (Apple Silicon)**, zip | [Second-Mac-0.2.0-Installer.zip](https://github.com/CommonCapital/Second/releases/download/v0.2.0/Second-Mac-0.2.0-Installer.zip) | 228 MB |
 
 All builds: [GitHub Releases](https://github.com/CommonCapital/Second/releases). Second runs on macOS 12+ with Apple Silicon. Intel Macs: build from source ([Getting Started](#getting-started)).
 
@@ -58,7 +58,9 @@ All builds: [GitHub Releases](https://github.com/CommonCapital/Second/releases).
 3. Follow onboarding: add your own API keys (Deepgram or AssemblyAI for transcription; Anthropic or OpenAI for intelligence) and allow **Microphone** and **Screen Recording** (Screen Recording is how macOS exposes system audio).
 4. **Settings → Second → Run test** to confirm both *You* and *Them* are heard before your first real meeting.
 
-> **Early build (0.1.0).** Echo cancellation uses GStreamer. On a Mac without Homebrew's GStreamer (`brew install gstreamer`), Second still works but runs without echo cancellation; use headphones so the other side doesn't leak into your own transcript. A fully self-contained build is on the roadmap.
+Everything Second needs is inside the app, including echo cancellation. No Homebrew or other installs required.
+
+**Optional:** connect Google (Calendar, Gmail, Drive) to build meeting prep from your invites, email, and docs. See [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md).
 
 Installed copies check GitHub Releases for updates (`latest-mac.yml`) and only offer a build **newer** than the one you have. Maintainers: see [Releasing](CONTRIBUTING.md#releasing).
 
@@ -73,10 +75,11 @@ Installed copies check GitHub Releases for updates (`latest-mac.yml`) and only o
 - **Intervention engine** — Coaching runs only after meaningful finalized turns. Cards are held back when confidence is low, they repeat, the current card is still being used, the other side is mid-answer, or a question you just asked is still pending.
 - **Meeting modes** — General executive, Founder / investment, LP / allocator, Interview, Banker / sponsor, Negotiation, IC / portfolio, Relationship. A mode changes the objective, guardrails, close target, and how often Second speaks.
 - **Prepare meeting** — Type, who, objective, ideal outcome, what must not happen, and pasted context produce a 90-second brief: three facts to remember, three questions to land, likely hard questions, and the close target.
+- **Google Calendar, Gmail, Drive (optional)** — Connect your own Google OAuth client and Prepare meeting can start from an upcoming calendar meeting: it fills in who you're meeting and their organization, then gathers the invite, recent email threads with the attendees, and matching Drive docs. You review and untick anything before it's used; each item stays tagged with its source. A notification ~10 minutes before calendar meetings opens the prep. Read-only; [setup guide](docs/GOOGLE_SETUP.md).
 - **Your professional profile** — Edited in Settings, versioned on every save. Dynamic context (deals, workstreams) is used only when a meeting mentions it, and flagged stale after 30 days.
 - **Post-meeting report** — Outcome, decisions, commitments, open questions, risks, next step, a short follow-up draft, and proposed profile updates you approve before anything is saved.
 - **No false green** — A status rail per channel (mic, meeting audio, both transcripts, coach, network) with plain-English failures ("I can hear you, not the meeting"). A dual-audio self test in Settings proves both sides before a call. Sleep and network loss are marked as gaps.
-- **Private by default** — Transcripts are deleted after notes are written unless you turn retention on. API keys never reach the UI process. Diagnostics carry no content.
+- **Private by default** — Transcripts are deleted after notes are written unless you turn retention on. API keys and Google tokens never reach the UI process. Diagnostics carry no content.
 
 ### Capture, transcription, and history
 
@@ -319,10 +322,10 @@ node -v
 
 ---
 
-**Step 3 — Install GStreamer**
+**Step 3 — Install GStreamer and build tools**
 
 ```bash
-brew install gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad
+brew install gstreamer meson ninja abseil cmake pkg-config
 ```
 
 > Don't have Homebrew? Install it first from [brew.sh](https://brew.sh).
@@ -364,20 +367,13 @@ ls node_modules/.package-lock.json && echo "OK"
 
 ---
 
-**Step 5 — Build the GStreamer echo-cancellation addon**
+**Step 5 — Build echo cancellation**
 
 ```bash
-cd src/native/aec
-npm install
-./build-deps.sh
-npx cmake-js compile
-cd ../../..
+./scripts/build-aec-mac.sh
 ```
 
-What this does:
-1. Installs the addon's build tools (`cmake-js`, `node-addon-api`)
-2. Verifies all GStreamer libraries and builds the WebRTC DSP plugin from source (Homebrew doesn't ship it)
-3. Compiles the C++ echo-cancellation native module
+This builds WebRTC audio processing, the GStreamer `webrtcdsp` plugin (Homebrew doesn't ship it), and the `second-aec.node` addon for your Electron version. Takes a few minutes the first time; safe to re-run.
 
 Verify:
 ```bash
@@ -385,9 +381,7 @@ ls src/native/aec/build/Release/second-aec.node && echo "OK"
 # Expected: OK
 ```
 
-> **If `build-deps.sh` fails with "gstreamer-1.0 not found":** Revisit Step 3 and make sure `pkg-config --modversion gstreamer-1.0` works.
->
-> **If `cmake-js compile` fails with "cmake not found":** cmake is bundled with cmake-js. Run `npx cmake-js --version` — if that fails, delete `node_modules` inside `src/native/aec/` and re-run `npm install`.
+> **If it says a tool or `gstreamer-1.0` is missing:** re-run Step 3 and check `pkg-config --modversion gstreamer-1.0`.
 
 ---
 
@@ -424,13 +418,25 @@ The Electron app opens. On first launch you'll be prompted to enter your API key
 
 ---
 
+**Step 8 (optional) — Package an installer**
+
+```bash
+./scripts/bundle-gstreamer-mac.sh
+npx tsc && npx vite build
+CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac dmg zip --publish never
+```
+
+Produces `release/<version>/Second-Mac-<version>-Installer.dmg`. Packaging copies every GStreamer dependency into the app and rewrites it to load from there (`scripts/relocate-gstreamer-mac.cjs`), so the DMG runs on Macs without Homebrew. Without a Developer ID it is ad-hoc signed (first launch: right-click → Open).
+
+---
+
 ### Setup Troubleshooting Quick Reference
 
 | Symptom | Likely Cause | Fix |
 |---------|-------------|-----|
 | `npm install` fails with `node-gyp` errors | Missing C/C++ build tools | `xcode-select --install` |
 | `NODE_MODULE_VERSION mismatch` at runtime | Native module built for wrong Electron version | `npx @electron/rebuild -f -w better-sqlite3` from the project root |
-| `build-deps.sh`: "gstreamer-1.0 not found" | GStreamer not installed or `pkg-config` can't find it | **macOS:** Install via Homebrew and check `PKG_CONFIG_PATH` (see macOS Step 3) |
+| `build-aec-mac.sh`: "gstreamer-1.0" missing | GStreamer not installed or `pkg-config` can't find it | `brew install gstreamer` and check `PKG_CONFIG_PATH` (see Step 3) |
 | cmake-js: "CMake is not installed" | CMake not on PATH | `brew install cmake` |
 | AEC addon crashes Electron on startup | Built for Node.js instead of Electron | Rebuild with `--runtime electron --runtime-version <your-electron-version>` (macOS Step 5) |
 | `swift build` fails | Swift toolchain too old (need 5.9+) | `sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install` |

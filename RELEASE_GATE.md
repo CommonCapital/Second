@@ -54,6 +54,8 @@ Record each run in the release PR: build version, prompt version (`prompts/secon
 23. Editing the profile in Settings changes behavior on the next meeting without a code change.
 24. Works with an empty profile (no external memory attached).
 25. The full automated suite and eval replay were run for this release candidate.
+26. On a Mac **without Homebrew**, the self test hears both sides and the log shows the GStreamer AEC pipeline initialized (echo cancellation works from the bundled libraries).
+27. Google (if shipped in this release): connect with a fresh OAuth client following docs/GOOGLE_SETUP.md; Prepare meeting lists upcoming meetings, gathers invite/email/docs, and unticked items are not in the brief prompt; the 10-minute reminder fires once and opens prep; Disconnect revokes access.
 
 ## Signing and distribution
 

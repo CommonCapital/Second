@@ -11,6 +11,7 @@ Second is a desktop app with **no Second server**. There is no account, no hoste
 | Full transcript, overlay chat, Ask index, Assist memory | Same database, **only if** Settings → Second → *Keep full transcripts* is on (off by default) | Deleted right after notes and the report are written; otherwise until you delete the session |
 | Your professional profile and its earlier versions | Encrypted settings file | Until you edit or reset it |
 | Meeting setup and brief for the next meeting | Encrypted settings file | Consumed by the next recording, or discarded after 12 hours |
+| Google OAuth client secret and refresh token (only if you connect Google) | Encrypted settings file; never sent to the app's UI | Until you disconnect |
 | Mode documents you upload (RAG) | Parsed, chunked, and embedded on-device; chunks stored in SQLite | Until you remove the file from the mode |
 | Raw audio | **Not written to disk.** PCM is streamed in memory only | Never retained |
 
@@ -32,6 +33,18 @@ Second only talks to the providers *you* configure, using *your* API keys:
 | A screenshot of your screen (Second's own windows excluded) | Anthropic or OpenAI | With **Assist** (Cmd/Ctrl+Enter). Other actions do not attach a screenshot |
 
 Each provider's own terms and retention policy apply to what you send them. Check them before using Second in confidential settings.
+
+### Google (optional, off unless you connect it)
+
+If you add your own Google OAuth client and connect, Second reads, **read-only** and only when you prepare a meeting or for reminders:
+
+| Read from | What | Then |
+|-----------|------|------|
+| Google Calendar | Upcoming events (next 2 days): title, time, attendees, description, video link | Shown in Prepare meeting; used for the 10-minute reminder |
+| Gmail | Up to 5 recent messages with the meeting's attendees: subject, sender, date, body without quoted history | Shown to you; ticked items become meeting context |
+| Google Drive | Up to 4 recently modified files matching the organization or meeting title, as text | Shown to you; ticked items become meeting context |
+
+Ticked items are sent to **your AI provider** with the brief and used by the live coach for that meeting. Nothing is written to your Google account. **Disconnect** revokes access at Google and deletes the token. Details: [GOOGLE_SETUP.md](GOOGLE_SETUP.md).
 
 Other network traffic:
 

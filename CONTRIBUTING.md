@@ -4,58 +4,9 @@ Thanks for your interest in contributing to Second! This guide will help you get
 
 ## Development Setup
 
-### Prerequisites
+Second is a macOS app. Follow the step-by-step [Getting Started](README.md#getting-started) guide in the README: Xcode tools, Node 22, GStreamer and build tools, `npm install`, `./scripts/build-aec-mac.sh` (echo cancellation), the Swift capture helper, then `npm run dev`.
 
-- Node.js 22+ (use `nvm use` -- the repo includes `.nvmrc`)
-- npm 10+
-- API keys: [Deepgram](https://deepgram.com), and [Anthropic](https://anthropic.com) or [OpenAI](https://openai.com)
-- **macOS**: Xcode Command Line Tools (`xcode-select --install`)
-- **Windows**: Rust toolchain ([rustup](https://rustup.rs/)), Visual Studio Build Tools with "Desktop development with C++" workload
-
-### Getting Started (macOS)
-
-```bash
-# Clone the repo
-git clone https://github.com/CommonCapital/Second.git
-cd Second
-
-# Install dependencies
-npm install
-
-# Build the native Swift audio capture module
-cd src/native/swift/AudioCapture
-swift build -c release
-cd ../../../..
-
-# Start the dev server
-npm run dev
-```
-
-### Getting Started (Windows)
-
-```bash
-# Clone the repo
-git clone https://github.com/CommonCapital/Second.git
-cd Second
-
-# Install dependencies
-npm install
-
-# Install the NAPI-RS CLI globally
-npm install -g @napi-rs/cli
-
-# Build the native Rust audio module
-cd src/native/windows
-napi build --platform --release
-cd ../../..
-
-# Start the dev server
-npm run dev
-```
-
-> **Note**: The Rust module requires the Windows SDK. Install Visual Studio Build Tools with the "Desktop development with C++" workload. See [`src/native/windows/README.md`](src/native/windows/README.md) for detailed build instructions.
-
-The app will open with an onboarding flow where you can enter your API keys.
+You'll need your own API keys: [Deepgram](https://deepgram.com) or [AssemblyAI](https://www.assemblyai.com) for transcription, and [Anthropic](https://anthropic.com) or [OpenAI](https://openai.com) for intelligence. Google Calendar/Gmail/Drive is optional ([setup](docs/GOOGLE_SETUP.md)).
 
 ## Making Changes
 
@@ -221,10 +172,6 @@ To retry without a new tag: **Actions → Release macOS → Run workflow** with 
 | `APPLE_TEAM_ID` | 10-character Apple Developer Team ID |
 
 If notarytool returns **HTTP 403 agreement missing or expired**, the Account Holder must re-accept the agreements in [App Store Connect → Agreements](https://appstoreconnect.apple.com/agreements).
-
-### Windows
-
-NSIS is packed on a **local Windows machine** (GStreamer + WASAPI). Optional EV signing runs through `build/win-sign.cjs` when `WIN_SIGN_THUMBPRINT` is set. Upload `Second-Windows-{version}-Setup.exe`, its `.blockmap`, and `latest.yml` to the same GitHub Release.
 
 ### What this does not do
 

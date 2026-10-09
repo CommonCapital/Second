@@ -42,7 +42,7 @@ When priorities conflict, protect reliability, latency, judgment quality, privac
 
 ## The meeting, end to end
 
-**Before (Prepare meeting).** Pick the meeting type, who, the objective, the ideal outcome, what must not happen, and optionally paste context. Second writes a 90-second brief: who they are, what matters, three facts to remember, three questions to land, two likely hard questions with answer shapes, the close target, and anything not to say. Run the dual-audio self test (Settings → Second); the last result shows in Prepare meeting.
+**Before (Prepare meeting).** Optionally start from an upcoming Google Calendar meeting: Second fills in the attendees and organization and gathers the invite, recent email with the attendees, and matching Drive docs for you to review. Pick the meeting type, who, the objective, the ideal outcome, what must not happen, and optionally paste context. Second writes a 90-second brief: who they are, what matters, three facts to remember, three questions to land, two likely hard questions with answer shapes, the close target, and anything not to say. Run the dual-audio self test (Settings → Second); the last result shows in Prepare meeting.
 
 **During.** The overlay shows a status rail (mic, meeting audio, both transcripts, coach, network), one dominant card with an expiry line, and a State tab (objective, open questions, objections, commitments with missing dates flagged, numbers that changed, capture gaps, close target, next best action). Cmd/Ctrl+Shift+Enter asks for the best card now; the card's brain button asks the deeper model.
 
@@ -97,7 +97,7 @@ User corrections win immediately. Dynamic facts expire or prompt a refresh rathe
 | 1. Consolidate: one production code path | Done. The live loop runs inside the desktop app. |
 | 2. Stabilize capture: permissions, meters, self test, recovery | Partly done. Shipped: usage strings, truthful status rail, meters, self test, sleep/network gaps. Still needs manual validation on real devices (release gate items 6 to 13). |
 | 3. Meeting state | Done. Deterministic reducer, schemas, replay tests. |
-| 4. Context | Done for profile, playbooks, brief, and scoped dynamic context. Calendar, Gmail, and Drive integrations are deferred until the core loop passes the gate. |
+| 4. Context | Done: profile, playbooks, brief, scoped dynamic context, and optional Google Calendar/Gmail/Drive packet (bring-your-own OAuth client, read-only, provenance-tagged, user-reviewed). CRM is deferred. |
 | 5. Coaching | Shipped. Needs calibration against a larger human-scored corpus (`evals/`). |
-| 6. Hardening | Partly done. Shipped: masked keys, retention, diagnostics, typecheck in CI. Still needed: Developer ID signing secrets on this repo. |
+| 6. Hardening | Mostly done. Shipped: masked keys and Google tokens, retention, diagnostics, typecheck in CI, self-contained macOS build (no Homebrew needed). Still needed: Developer ID signing and notarization secrets on this repo. |
 | 7. Ship and learn | Not started. |
