@@ -15,6 +15,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Wand2, MessageSquareText, RotateCcw, ChevronRight } from 'lucide-react'
 import { ControllerPill } from './ControllerPill'
 import { TranscriptTab } from './TranscriptTab'
+import { LiveCard } from './LiveCard'
+import { StatusRail } from './StatusRail'
+import { MeetingStateTab } from './MeetingStateTab'
+import { useLive } from '../../lib/useLive'
 import { OverlayNotification, type NotificationData } from './OverlayNotification'
 import { useOverlayResize } from './useOverlayResize'
 import { useOverlayDrag } from './useOverlayDrag'
@@ -155,7 +159,11 @@ export function OverlayWindow() {
   const [hoveredResponseId, setHoveredResponseId] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<NotificationData[]>([])
   const [limitInfo, setLimitInfo] = useState<{ type: 'ai' | 'session'; used: number; limit: number; resetAt: string } | null>(null)
-  const [activeTab, setActiveTab] = useState<'responses' | 'transcript'>('transcript')
+  const [activeTab, setActiveTab] = useState<'responses' | 'transcript' | 'state'>('transcript')
+  const live = useLive()
+  useEffect(() => {
+    if (!isRecording && activeTab === 'state') setActiveTab('transcript')
+  }, [isRecording, activeTab])
   const scrollHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Refs
@@ -1038,6 +1046,16 @@ export function OverlayWindow() {
           }}
         >
 
+          {/* Second live surface: status rail + one dominant card while recording */}
+          {isRecording && (
+            <div className="shrink-0 border-b border-white/10">
+              <StatusRail health={live.health} />
+              {live.coachEnabled && (
+                <LiveCard card={live.card} shortcutLabel={`${assistModKey}⇧↵`} />
+              )}
+            </div>
+          )}
+
           {/* Tab Bar - visible when panel is expanded (recording or has responses) */}
           {isPanelExpanded && (
             <div className="flex px-4 border-b border-white/10 shrink-0">
@@ -1065,6 +1083,26 @@ export function OverlayWindow() {
               >
                 Transcript
               </button>
+              {isRecording && (
+                <button
+                  onClick={() => setActiveTab('state')}
+                  className={`px-3 py-2 text-xs font-medium transition-colors border-b-2 ${
+                    activeTab === 'state'
+                      ? 'text-white border-[#B08A4A]'
+                      : 'text-white/50 border-transparent hover:text-white/70'
+                  }`}
+                  style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}
+                >
+                  State
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Meeting state drawer */}
+          {isPanelExpanded && activeTab === 'state' && (
+            <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden">
+              <MeetingStateTab state={live.state} />
             </div>
           )}
 

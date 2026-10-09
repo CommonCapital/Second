@@ -1,4 +1,18 @@
 import type { AskConversationState } from '../lib/useAskConversation';
+import type { Card } from '../../../shared/second/card';
+import type { MeetingBrief, MeetingSetupInput, PostMeetingReport } from '../../../shared/second/briefing';
+import type { UserProfile } from '../../../shared/second/profile';
+import type {
+  CardRequestOutcome,
+  HealthView,
+  LiveSnapshot,
+  LiveStateView,
+  PendingSetup,
+  PlaybookSummary,
+  ProfileResponse,
+  SecondSessionData,
+  SelfTestResult,
+} from '../../../shared/second/views';
 
 interface TranscriptEntry {
   id: string;
@@ -324,6 +338,31 @@ declare global {
         args?: { sessionId?: string; metadata?: Record<string, unknown> },
       ) => Promise<{ accepted: boolean; reason?: string }>;
       on: (channel: string, callback: (...args: unknown[]) => void) => () => void;
+
+      live: {
+        getSnapshot: () => Promise<LiveSnapshot>;
+        requestCard: (kind: 'user_requested' | 'think_deeper', prompt?: string) => Promise<CardRequestOutcome>;
+        dismissCard: () => Promise<boolean>;
+        holdCard: () => Promise<boolean>;
+        playbooks: () => Promise<PlaybookSummary[]>;
+        getProfile: () => Promise<ProfileResponse>;
+        saveProfile: (profile: UserProfile) => Promise<UserProfile>;
+        getPendingSetup: () => Promise<PendingSetup | null>;
+        setPendingSetup: (setup: MeetingSetupInput | null, brief?: MeetingBrief | null) => Promise<PendingSetup | null>;
+        generateBrief: (setup: MeetingSetupInput) => Promise<{ ok: true; brief: MeetingBrief } | { ok: false; error: string }>;
+        getSessionData: (sessionId: string) => Promise<SecondSessionData | null>;
+        regenerateReport: (sessionId: string) => Promise<{ ok: boolean; report?: PostMeetingReport | null; error?: string }>;
+        applyContextUpdate: (sessionId: string, index: number) => Promise<{ ok: boolean }>;
+        diagnosticsPreview: () => Promise<string>;
+        diagnosticsExport: () => Promise<{ ok: boolean; path?: string }>;
+        selfTestStart: () => Promise<{ ok: boolean; error?: string }>;
+        selfTestLevels: () => Promise<{ micPeakRms: number; systemPeakRms: number }>;
+        selfTestFinish: () => Promise<SelfTestResult>;
+        onCard: (callback: (card: Card | null) => void) => () => void;
+        onState: (callback: (state: LiveStateView) => void) => () => void;
+        onHealth: (callback: (health: HealthView) => void) => () => void;
+        onSessionUpdated: (callback: (sessionId: string) => void) => () => void;
+      };
 
       // Legacy overlay API (used by Settings.tsx, TitleBar.tsx, InputBar.tsx)
       getAiSuggestion: (apiKey: string, transcript: string, question?: string) => Promise<{ success: boolean; text: string; error?: string }>;

@@ -5,6 +5,7 @@ import secondLogo from '../../../../../logo/second.svg'
 import { createLogger } from '../../lib/logger'
 import { isPlaceholderSessionTitle } from '../../../../shared/sessionDisplay'
 import { parseActionItems, type ActionItem } from '../../../../shared/actionItems'
+import { SecondReportCard } from './SecondReportCard'
 import { computeTalkRatio } from '../../../../shared/talkRatio'
 import {
   findSegmentBreaks,
@@ -561,6 +562,8 @@ export function SessionDetail({ session, onBack, onUpdateTitle, isRecording = fa
                   )}
 
                   {activeTab === 'summary' && (
+                    <>
+                    <div className="mb-6"><SecondReportCard sessionId={session.id} /></div>
                     <SummaryTab
                       summary={session.summary}
                       actionItemsJson={session.actionItemsJson ?? null}
@@ -575,6 +578,7 @@ export function SessionDetail({ session, onBack, onUpdateTitle, isRecording = fa
                         void generateNotes()
                       }}
                     />
+                    </>
                   )}
                   {activeTab === 'transcript' && (
                     <TranscriptTab
@@ -744,7 +748,8 @@ function SummaryTab({
     )
   }
 
-  if (!savedSummary || !hasTranscript) {
+  // Retention off deletes the transcript but keeps the summary: show it.
+  if (!savedSummary) {
     return (
       <button
         onClick={() => setEditing(true)}

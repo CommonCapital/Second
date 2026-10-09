@@ -12,8 +12,9 @@ import { AudioTab } from './settings/AudioTab'
 import { LanguageTab } from './settings/LanguageTab'
 import { HotkeysTab } from './settings/HotkeysTab'
 import { AboutTab } from './settings/AboutTab'
+import { SecondTab } from './settings/SecondTab'
 
-type SettingsTab = 'general' | 'profile' | 'api-keys' | 'models' | 'audio' | 'language' | 'hotkeys' | 'about'
+type SettingsTab = 'second' | 'general' | 'profile' | 'api-keys' | 'models' | 'audio' | 'language' | 'hotkeys' | 'about'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -22,6 +23,16 @@ interface SettingsModalProps {
 }
 
 const tabs: { id: SettingsTab; label: string; icon: JSX.Element }[] = [
+  {
+    id: 'second',
+    label: 'Second',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <circle cx="11" cy="13" r="6.5" strokeWidth={1.8} />
+        <circle cx="16.5" cy="7.5" r="2.5" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
   {
     id: 'general',
     label: 'General',
@@ -169,6 +180,7 @@ export function SettingsModal({ isOpen, onClose, initialTab }: SettingsModalProp
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
+            {activeTab === 'second' && <SecondTab />}
             {activeTab === 'general' && <GeneralTab />}
             {activeTab === 'profile' && <ProfileTab />}
             {activeTab === 'api-keys' && <ApiKeysTab />}

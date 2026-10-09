@@ -14,20 +14,15 @@ import {
   pcmRms,
   type ChannelHealth,
   type HealthSnapshot,
-  type Readiness,
 } from '../../shared/second/health'
+import type { HealthView } from '../../shared/second/views'
 
 type Source = 'mic' | 'system'
 
 /** STT disconnected longer than this while recording => down (not reconnecting). */
 export const STT_RECONNECT_GRACE_MS = 20_000
 
-export interface HealthView {
-  snapshot: HealthSnapshot
-  readiness: Readiness
-  /** 0..1 meter levels for the UI. */
-  levels: { mic: number; system: number }
-}
+export type { HealthView } from '../../shared/second/views'
 
 export class HealthMonitor {
   private active = false

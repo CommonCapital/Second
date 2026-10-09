@@ -400,6 +400,50 @@ contextBridge.exposeInMainWorld('second', {
     ipcRenderer.on('hotkey:move', handler)
     return () => ipcRenderer.removeListener('hotkey:move', handler)
   },
+  // ---- Second live engine ----
+  live: {
+    getSnapshot: () => ipcRenderer.invoke('second:get-snapshot'),
+    requestCard: (kind: 'user_requested' | 'think_deeper', prompt?: string) =>
+      ipcRenderer.invoke('second:request-card', kind, prompt),
+    dismissCard: () => ipcRenderer.invoke('second:dismiss-card'),
+    holdCard: () => ipcRenderer.invoke('second:hold-card'),
+    playbooks: () => ipcRenderer.invoke('second:playbooks'),
+    getProfile: () => ipcRenderer.invoke('second:get-profile'),
+    saveProfile: (profile: unknown) => ipcRenderer.invoke('second:save-profile', profile),
+    getPendingSetup: () => ipcRenderer.invoke('second:get-pending-setup'),
+    setPendingSetup: (setup: unknown, brief?: unknown) =>
+      ipcRenderer.invoke('second:set-pending-setup', setup, brief ?? null),
+    generateBrief: (setup: unknown) => ipcRenderer.invoke('second:generate-brief', setup),
+    getSessionData: (sessionId: string) => ipcRenderer.invoke('second:get-session-data', sessionId),
+    regenerateReport: (sessionId: string) => ipcRenderer.invoke('second:regenerate-report', sessionId),
+    applyContextUpdate: (sessionId: string, index: number) =>
+      ipcRenderer.invoke('second:apply-context-update', sessionId, index),
+    diagnosticsPreview: () => ipcRenderer.invoke('second:diagnostics-preview'),
+    diagnosticsExport: () => ipcRenderer.invoke('second:diagnostics-export'),
+    selfTestStart: () => ipcRenderer.invoke('second:self-test-start'),
+    selfTestLevels: () => ipcRenderer.invoke('second:self-test-levels'),
+    selfTestFinish: () => ipcRenderer.invoke('second:self-test-finish'),
+    onCard: (callback: (card: unknown) => void) => {
+      const handler = (_e: unknown, card: unknown) => callback(card)
+      ipcRenderer.on('second:card', handler)
+      return () => ipcRenderer.removeListener('second:card', handler)
+    },
+    onState: (callback: (state: unknown) => void) => {
+      const handler = (_e: unknown, state: unknown) => callback(state)
+      ipcRenderer.on('second:state', handler)
+      return () => ipcRenderer.removeListener('second:state', handler)
+    },
+    onHealth: (callback: (health: unknown) => void) => {
+      const handler = (_e: unknown, health: unknown) => callback(health)
+      ipcRenderer.on('second:health', handler)
+      return () => ipcRenderer.removeListener('second:health', handler)
+    },
+    onSessionUpdated: (callback: (sessionId: string) => void) => {
+      const handler = (_e: unknown, sessionId: string) => callback(sessionId)
+      ipcRenderer.on('second:session-updated', handler)
+      return () => ipcRenderer.removeListener('second:session-updated', handler)
+    },
+  },
   on: (channel: string, callback: (...args: unknown[]) => void) => {
     const ALLOWED_CHANNELS = [
       'overlay:notification',

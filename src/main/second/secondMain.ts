@@ -17,12 +17,12 @@ import { addRawAudioTap, isCaptureRunning, startCapture, stopCapture } from '../
 import { getDashboardWindow, getOverlayWindow } from '../windowManager'
 import { LiveEngine, type LiveEngineResult } from './liveEngine'
 import { runCoach } from './coachService'
-import { HealthMonitor, type HealthView } from './healthMonitor'
+import { HealthMonitor } from './healthMonitor'
 import { diagnostics, latencyStats } from './diagnostics'
 import { generateBrief, generateReport } from './briefingService'
 import { PROMPT_VERSION } from './prompts'
 import type { Card } from '../../shared/second/card'
-import type { MeetingEvent, MeetingState, Turn } from '../../shared/second/meetingState'
+import type { MeetingState, Turn } from '../../shared/second/meetingState'
 import { ENERGY_RMS_FLOOR } from '../../shared/second/health'
 import { PLAYBOOKS, PLAYBOOK_IDS, getPlaybook, type Playbook } from '../../shared/second/playbooks'
 import type { Sensitivity } from '../../shared/second/interventionGate'
@@ -32,12 +32,12 @@ import {
   selectRelevantDynamic,
   type UserProfile,
 } from '../../shared/second/profile'
+import type { HealthView, LiveStateView, PendingSetup, SecondSessionData } from '../../shared/second/views'
 import {
   isSetupEmpty,
   normalizeSetup,
   type MeetingBrief,
   type MeetingSetupInput,
-  type PostMeetingReport,
 } from '../../shared/second/briefing'
 
 const log = createLogger('Second')
@@ -48,44 +48,6 @@ const STATE_BROADCAST_MS = 400
 const PENDING_SETUP_MAX_AGE_MS = 12 * 60 * 60_000
 const PROFILE_HISTORY_LIMIT = 20
 const SELF_TEST_MAX_MS = 30_000
-
-export interface SecondSessionData {
-  version: 1
-  promptVersion: string
-  modeId: string
-  retention: 'on' | 'off'
-  setup: MeetingSetupInput | null
-  brief: MeetingBrief | null
-  state: MeetingState | null
-  metrics: { cards: number; suppressed: number; rejected: number; coachRuns: number; coachErrors: number; p50Ms: number | null; p95Ms: number | null } | null
-  report: PostMeetingReport | null
-  reportStatus: 'none' | 'pending' | 'ready' | 'failed'
-  reportError?: string
-  /** Event log, only kept when transcripts are retained (it contains turns). */
-  events?: MeetingEvent[]
-}
-
-interface PendingSetup {
-  setup: MeetingSetupInput
-  brief: MeetingBrief | null
-  createdAt: number
-}
-
-/** Compact state view for the live surface's meeting-state drawer. */
-export interface LiveStateView {
-  mode: string
-  modeLabel: string
-  phase: string
-  objective: string
-  currentTopic: string
-  closeTarget: string
-  nextBestAction: string
-  questionsOpen: Array<{ question: string; owner: string }>
-  commitments: Array<{ who: string; action: string; due?: string }>
-  contradictions: Array<{ metric: string; previous: number; current: number }>
-  objectionsOpen: string[]
-  turnCount: number
-}
 
 const health = new HealthMonitor()
 let engine: LiveEngine | null = null

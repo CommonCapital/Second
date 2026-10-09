@@ -11,6 +11,7 @@ import { SearchResultsView } from './SearchResultsView'
 import { AskView } from './AskView'
 import { UpdateBanner } from './UpdateBanner'
 import { MacUpdateModal } from './MacUpdateModal'
+import { MeetingPrepModal } from './MeetingPrepModal'
 import { OverlayTour } from '../OverlayTour'
 import { detectMacPlatform } from '../../lib/shortcutLabels'
 
@@ -179,6 +180,8 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
     setStealth(newValue)
   }
 
+  const [prepOpen, setPrepOpen] = useState(false)
+
   const handleStartSecond = async () => {
     if (!isRecording) {
       await window.second.windowShowOverlay()
@@ -250,6 +253,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
         stealth={stealth}
         onToggleStealth={handleToggleStealth}
         onStartSecond={handleStartSecond}
+        onPrepareMeeting={() => setPrepOpen(true)}
         isRecording={isRecording}
         onOpenSettings={handleOpenSettings}
         onReplayTour={() => setShowOverlayTour(true)}
@@ -312,6 +316,11 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
         />
       )}
 
+      <MeetingPrepModal
+        isOpen={prepOpen}
+        onClose={() => setPrepOpen(false)}
+        onStart={() => { void handleStartSecond() }}
+      />
       <SettingsModal
         isOpen={settingsOpen}
         onClose={() => { setSettingsOpen(false); setSettingsInitialTab(undefined) }}

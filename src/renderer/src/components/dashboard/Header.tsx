@@ -16,6 +16,7 @@ interface HeaderProps {
   stealth: boolean
   onToggleStealth: () => void
   onStartSecond: () => void
+  onPrepareMeeting: () => void
   isRecording: boolean
   onOpenSettings: () => void
   onReplayTour?: () => void
@@ -49,7 +50,7 @@ function getInitials(name: string): string {
   return parts[0][0].toUpperCase()
 }
 
-export function Header({ stealth, onToggleStealth, onStartSecond, isRecording, onOpenSettings, onReplayTour, initialUserProfile, searchQuery, onSearchChange, onSearchSubmit, onSessionSelect, onOpenAsk }: HeaderProps) {
+export function Header({ stealth, onToggleStealth, onStartSecond, onPrepareMeeting, isRecording, onOpenSettings, onReplayTour, initialUserProfile, searchQuery, onSearchChange, onSearchSubmit, onSessionSelect, onOpenAsk }: HeaderProps) {
   const [modeEditorOpen, setModeEditorOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -220,6 +221,15 @@ export function Header({ stealth, onToggleStealth, onStartSecond, isRecording, o
               <span>Session in Progress</span>
             </div>
           ) : (
+            <>
+            <button
+              onClick={onPrepareMeeting}
+              title="Prepare the next meeting: type, who, objective, brief"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
+            >
+              <FileText size={15} />
+              <span>Prepare</span>
+            </button>
             <button
               onClick={onStartSecond}
               className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white shadow-sm transition-all"
@@ -227,6 +237,7 @@ export function Header({ stealth, onToggleStealth, onStartSecond, isRecording, o
               <img src={secondMark} alt="" className="w-4 h-4 brightness-0 invert" draggable={false} />
               <span>Start Second</span>
             </button>
+            </>
           )}
 
           {/* User avatar + dropdown */}
