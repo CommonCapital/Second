@@ -87,6 +87,8 @@ export function registerIpcHandlers(): void {
     'mode', 'auth_tokens', 'auth_user',
     'deepgramApiKey', 'anthropicApiKey', 'openaiApiKey',
     'assemblyaiApiKey', 'recallApiKey', 'apiKeysConfigured',
+    // Google credentials are written only by the google:* handlers.
+    'googleClientSecret', 'googleRefreshToken', 'googleAccountEmail', 'googleGrantedScopes',
   ]
 
   safeHandle(

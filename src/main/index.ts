@@ -81,6 +81,7 @@ import { registerPermissionHandlers, getPermissionStatus, permissionsAllowOverla
 import { createLogger } from './logger'
 import { trustSystemCAs } from './trustSystemCAs'
 import { initSecond, requestSecondCard, setSecondAudioManager, shutdownSecond } from './second/secondMain'
+import { initGoogle, shutdownGoogle } from './integrations/google/googleMain'
 
 const log = createLogger('Second')
 const ipcLog = createLogger('IPC')
@@ -447,6 +448,7 @@ app.whenReady().then(() => {
   registerPermissionHandlers()
   setSecondAudioManager(audioManager)
   initSecond()
+  initGoogle()
   void initializeVendorFeatures()
   boot()
 
@@ -1258,6 +1260,7 @@ app.on('before-quit', () => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
   shutdownSecond()
+  shutdownGoogle()
 })
 
 app.on('window-all-closed', () => {

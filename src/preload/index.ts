@@ -444,6 +444,26 @@ contextBridge.exposeInMainWorld('second', {
       return () => ipcRenderer.removeListener('second:session-updated', handler)
     },
   },
+  // ---- Optional Google integration ----
+  google: {
+    status: () => ipcRenderer.invoke('google:status'),
+    saveClient: (clientId: string, clientSecret: string) => ipcRenderer.invoke('google:save-client', clientId, clientSecret),
+    connect: () => ipcRenderer.invoke('google:connect'),
+    disconnect: () => ipcRenderer.invoke('google:disconnect'),
+    setOptions: (opts: Record<string, boolean>) => ipcRenderer.invoke('google:set-options', opts),
+    upcoming: () => ipcRenderer.invoke('google:upcoming'),
+    gather: (req: unknown) => ipcRenderer.invoke('google:gather', req),
+    onStatus: (callback: (status: unknown) => void) => {
+      const handler = (_e: unknown, status: unknown) => callback(status)
+      ipcRenderer.on('google:status-changed', handler)
+      return () => ipcRenderer.removeListener('google:status-changed', handler)
+    },
+    onPrepareEvent: (callback: (event: unknown) => void) => {
+      const handler = (_e: unknown, event: unknown) => callback(event)
+      ipcRenderer.on('second:prepare-event', handler)
+      return () => ipcRenderer.removeListener('second:prepare-event', handler)
+    },
+  },
   on: (channel: string, callback: (...args: unknown[]) => void) => {
     const ALLOWED_CHANNELS = [
       'overlay:notification',

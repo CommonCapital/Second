@@ -8,6 +8,7 @@ import type { HealthSnapshot, Readiness } from './health'
 import type { MeetingEvent, MeetingState } from './meetingState'
 import type { MeetingBrief, MeetingSetupInput, PostMeetingReport } from './briefing'
 import type { UserProfile } from './profile'
+import type { CalendarEvent, ContextSource } from './google'
 
 export interface HealthView {
   snapshot: HealthSnapshot
@@ -86,4 +87,32 @@ export interface PlaybookSummary {
 export interface ProfileResponse {
   profile: UserProfile
   historyCount: number
+}
+
+export interface GoogleServiceState {
+  enabled: boolean
+  granted: boolean
+}
+
+/** Optional Google integration state (no secrets). */
+export interface GoogleStatus {
+  clientId: string
+  hasClientSecret: boolean
+  connected: boolean
+  email: string
+  services: { calendar: GoogleServiceState; gmail: GoogleServiceState; drive: GoogleServiceState }
+  reminders: boolean
+}
+
+export interface GatherRequest {
+  eventId?: string
+  emails?: string[]
+  terms?: string[]
+}
+
+export interface GatherResult {
+  event: CalendarEvent | null
+  organization: string
+  sources: ContextSource[]
+  errors: string[]
 }

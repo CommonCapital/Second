@@ -2,8 +2,12 @@ import type { AskConversationState } from '../lib/useAskConversation';
 import type { Card } from '../../../shared/second/card';
 import type { MeetingBrief, MeetingSetupInput, PostMeetingReport } from '../../../shared/second/briefing';
 import type { UserProfile } from '../../../shared/second/profile';
+import type { CalendarEvent } from '../../../shared/second/google';
 import type {
   CardRequestOutcome,
+  GatherRequest,
+  GatherResult,
+  GoogleStatus,
   HealthView,
   LiveSnapshot,
   LiveStateView,
@@ -362,6 +366,18 @@ declare global {
         onState: (callback: (state: LiveStateView) => void) => () => void;
         onHealth: (callback: (health: HealthView) => void) => () => void;
         onSessionUpdated: (callback: (sessionId: string) => void) => () => void;
+      };
+
+      google: {
+        status: () => Promise<GoogleStatus>;
+        saveClient: (clientId: string, clientSecret: string) => Promise<{ ok: boolean; error?: string; status?: GoogleStatus }>;
+        connect: () => Promise<{ ok: boolean; error?: string; warning?: string; status?: GoogleStatus }>;
+        disconnect: () => Promise<{ ok: boolean; status: GoogleStatus }>;
+        setOptions: (opts: { calendar?: boolean; gmail?: boolean; drive?: boolean; reminders?: boolean }) => Promise<GoogleStatus>;
+        upcoming: () => Promise<{ ok: boolean; events: CalendarEvent[]; error?: string }>;
+        gather: (req: GatherRequest) => Promise<GatherResult>;
+        onStatus: (callback: (status: GoogleStatus) => void) => () => void;
+        onPrepareEvent: (callback: (event: CalendarEvent) => void) => () => void;
       };
 
       // Legacy overlay API (used by Settings.tsx, TitleBar.tsx, InputBar.tsx)

@@ -110,6 +110,20 @@ export interface LocalSettings {
   /** Last dual-audio self test result: { at, micOk, systemOk }. */
   secondLastSelfTest: unknown;
 
+  // ---- Optional Google integration (user's own OAuth client) ----
+  googleClientId: string;
+  /** Encrypted; never returned to the renderer. */
+  googleClientSecret: string;
+  /** Encrypted; never returned to the renderer. */
+  googleRefreshToken: string;
+  googleAccountEmail: string;
+  googleGrantedScopes: string[];
+  googleCalendarEnabled: boolean;
+  googleGmailEnabled: boolean;
+  googleDriveEnabled: boolean;
+  /** Notify ~10 minutes before calendar meetings to prepare. */
+  googleMeetingReminders: boolean;
+
   // Pro extensions store arbitrary keys via saveSetting()
   // (e.g. auth_tokens, auth_user, sync_queue, backendUrl)
   [key: string]: unknown;
@@ -158,6 +172,15 @@ const STORE_DEFAULTS: LocalSettings = {
   secondPendingSetup: null,
   retainTranscripts: false,
   secondLastSelfTest: null,
+  googleClientId: '',
+  googleClientSecret: '',
+  googleRefreshToken: '',
+  googleAccountEmail: '',
+  googleGrantedScopes: [],
+  googleCalendarEnabled: true,
+  googleGmailEnabled: true,
+  googleDriveEnabled: true,
+  googleMeetingReminders: true,
 };
 
 function createStore(): Store<LocalSettings> {
@@ -254,6 +277,15 @@ export function getAllSettings(): LocalSettings {
     secondPendingSetup: null,
     retainTranscripts: store.get('retainTranscripts'),
     secondLastSelfTest: store.get('secondLastSelfTest'),
+    googleClientId: store.get('googleClientId'),
+    googleClientSecret: '',
+    googleRefreshToken: '',
+    googleAccountEmail: store.get('googleAccountEmail'),
+    googleGrantedScopes: store.get('googleGrantedScopes'),
+    googleCalendarEnabled: store.get('googleCalendarEnabled'),
+    googleGmailEnabled: store.get('googleGmailEnabled'),
+    googleDriveEnabled: store.get('googleDriveEnabled'),
+    googleMeetingReminders: store.get('googleMeetingReminders'),
     proOnboardingComplete: store.get('proOnboardingComplete'),
     proOnboardingStep: store.get('proOnboardingStep'),
     cachedUserProfile: store.get('cachedUserProfile' as keyof LocalSettings) || null,
@@ -295,6 +327,8 @@ const API_KEY_FIELDS = [
   'openaiApiKey',
   'assemblyaiApiKey',
   'recallApiKey',
+  'googleClientSecret',
+  'googleRefreshToken',
 ] as const;
 
 function encryptValue(value: string): string {

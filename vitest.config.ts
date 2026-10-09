@@ -9,6 +9,7 @@ export default defineConfig({
       'src/shared/**/__tests__/**/*.test.ts',
       'src/main/second/__tests__/**/*.test.ts',
       'evals/**/*.test.ts',
+      'src/main/integrations/**/__tests__/**/*.test.ts',
     ],
     environment: 'node',
     globals: true,
