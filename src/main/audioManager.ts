@@ -28,6 +28,7 @@ interface TranscriptionProvider {
   getTranscriptEntries(): Array<{ id: string; source: string; text: string; speaker: string; timestamp: number; isFinal: boolean }>
   getTranscriptBySource(source: 'mic' | 'system' | 'all'): string
   setWindows(dashboard: BrowserWindow | null, overlay: BrowserWindow | null): void
+  isSourceConnected?(source: 'mic' | 'system'): boolean
 }
 
 // If no AEC-processed audio chunk has arrived in this long during an
@@ -644,6 +645,17 @@ export class AudioManager {
       }
     } catch (err) {
       log.error('Failed to send to overlay:', err)
+    }
+  }
+
+  /** Live STT connection per source, for the health rail. */
+  getSttConnection(): { recording: boolean; provider: 'assemblyai' | 'deepgram' | null; mic: boolean; system: boolean } {
+    const p = this.activeProvider
+    return {
+      recording: this.isRecording,
+      provider: p ? (this.usingAssemblyAI ? 'assemblyai' : 'deepgram') : null,
+      mic: !!p?.isSourceConnected?.('mic'),
+      system: !!p?.isSourceConnected?.('system'),
     }
   }
 

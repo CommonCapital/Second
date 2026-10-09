@@ -79,6 +79,7 @@ import { initSentry, captureException } from './sentry'
 import { registerPermissionHandlers, getPermissionStatus, permissionsAllowOverlay } from './permissions'
 import { createLogger } from './logger'
 import { trustSystemCAs } from './trustSystemCAs'
+import { initSecond, requestSecondCard, setSecondAudioManager, shutdownSecond } from './second/secondMain'
 
 const log = createLogger('Second')
 const ipcLog = createLogger('IPC')
@@ -186,6 +187,12 @@ function registerGlobalHotkeys(
         overlayWindow.setAlwaysOnTop(true, 'screen-saver', 1)
       }
     }
+  })
+
+  // Second live card now: Cmd/Ctrl + Shift + Enter. Bypasses the
+  // intervention gates and returns the single best card for this moment.
+  globalShortcut.register(`${modifier}+Shift+Return`, () => {
+    requestSecondCard()
   })
 
   // Ask Second (AI Suggestion): Cmd/Ctrl + Enter
@@ -437,6 +444,8 @@ app.whenReady().then(() => {
   registerIpcHandlers()
   registerSystemAudioHandlers()
   registerPermissionHandlers()
+  setSecondAudioManager(audioManager)
+  initSecond()
   void initializeVendorFeatures()
   boot()
 
@@ -1247,6 +1256,7 @@ app.on('before-quit', () => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
+  shutdownSecond()
 })
 
 app.on('window-all-closed', () => {

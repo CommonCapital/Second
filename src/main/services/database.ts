@@ -66,6 +66,11 @@ export interface Session {
    * so a resumed session can restore what the model already knew.
    */
   assistMemoryJson: string | null;
+  /**
+   * Second meeting artifacts as JSON (SecondSessionData): setup, brief,
+   * final meeting state, post-meeting report, prompt version, metrics.
+   */
+  secondJson?: string | null;
   modeId: string | null;
   durationSeconds: number;
   startedAt: number;
@@ -86,6 +91,7 @@ export interface SessionRow {
   follow_up_email: string | null;
   segments_json: string | null;
   assist_memory_json: string | null;
+  second_json?: string | null;
   mode_id: string | null;
   duration_seconds: number;
   started_at: number;
@@ -531,6 +537,14 @@ class DatabaseService {
           ALTER TABLE sessions ADD COLUMN assist_memory_json TEXT DEFAULT NULL;
         `,
       },
+      {
+        // Second live engine artifacts: meeting setup, pre-meeting brief,
+        // final meeting state, and the structured post-meeting report.
+        name: '020_add_second_json',
+        sql: `
+          ALTER TABLE sessions ADD COLUMN second_json TEXT DEFAULT NULL;
+        `,
+      },
     ];
 
     // Capture `this.db` to a local after the !null guard above so the
@@ -638,6 +652,10 @@ class DatabaseService {
     if (updates.assistMemoryJson !== undefined) {
       setClauses.push('assist_memory_json = ?');
       values.push(updates.assistMemoryJson);
+    }
+    if (updates.secondJson !== undefined) {
+      setClauses.push('second_json = ?');
+      values.push(updates.secondJson);
     }
     if (updates.modeId !== undefined) {
       setClauses.push('mode_id = ?');
@@ -981,6 +999,7 @@ class DatabaseService {
       followUpEmail: row.follow_up_email || null,
       segmentsJson: row.segments_json || null,
       assistMemoryJson: row.assist_memory_json || null,
+      secondJson: row.second_json || null,
       modeId: row.mode_id,
       durationSeconds: row.duration_seconds,
       startedAt: row.started_at,
@@ -1400,6 +1419,39 @@ class DatabaseService {
       `INSERT INTO session_context_chunks (id, session_id, chunk_index, chunk_text, embedding_json, created_at)
        VALUES (?, ?, ?, ?, ?, ?)`
     ).run(params.id, params.sessionId, params.chunkIndex, params.chunkText, params.embeddingJson, Date.now());
+  }
+
+  /**
+   * Transcript retention off: delete the raw conversation for a session
+   * while keeping its derived artifacts (title, summary, action items,
+   * follow-up, Second report). Removes transcript, AI responses, overlay
+   * chat, Assist memory, the Ask index, and the per-session Ask thread.
+   */
+  purgeSessionTranscript(sessionId: string): void {
+    if (!this.db) throw new Error('Database not initialized');
+    const db = this.db;
+    db.transaction(() => {
+      db.prepare(
+        `UPDATE sessions SET transcript_json = '[]', ai_responses_json = '[]', assist_memory_json = NULL, updated_at = ? WHERE id = ?`
+      ).run(Date.now(), sessionId);
+      db.prepare('DELETE FROM session_messages WHERE session_id = ?').run(sessionId);
+      db.prepare('DELETE FROM session_context_chunks WHERE session_id = ?').run(sessionId);
+      db.prepare('DELETE FROM session_ask_conversation WHERE session_id = ?').run(sessionId);
+    })();
+  }
+
+  /**
+   * Ended sessions recorded with transcript retention off that still hold a
+   * transcript (e.g. the app quit before cleanup ran).
+   */
+  findSessionsPendingTranscriptPurge(): string[] {
+    if (!this.db) throw new Error('Database not initialized');
+    const rows = this.db
+      .prepare(
+        `SELECT id FROM sessions WHERE ended_at IS NOT NULL AND second_json LIKE '%"retention":"off"%' AND transcript_json != '[]'`
+      )
+      .all() as Array<{ id: string }>;
+    return rows.map((r) => r.id);
   }
 
   deleteSessionChunks(sessionId: string): void {

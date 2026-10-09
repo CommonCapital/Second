@@ -71,6 +71,17 @@ type AssistSessionHook = (ctx: AssistResumeContext | null) => void
 /** Reasons resumeSession can refuse; surfaced to the user by audioManager. */
 export type ResumeFailure = 'not_found' | 'incognito'
 
+/**
+ * Observer for the live engine (Second coach). Notified when a recording
+ * starts or resumes, for every transcript update, and when it ends. Listener
+ * failures are isolated: they never affect the recording itself.
+ */
+export interface LiveSessionListener {
+  onStart?(session: Session, info: { resumed: boolean; incognito: boolean }): void
+  onEntry?(entry: TranscriptEntry, sessionId: string): void
+  onEnd?(session: Session, info: { incognito: boolean }): void
+}
+
 class SessionManager {
   private activeSession: Session | null = null;
   private autoSaveInterval: NodeJS.Timeout | null = null;
@@ -80,6 +91,7 @@ class SessionManager {
   private _queueForSync: QueueFn | null = null;
   private notesJobs = new Map<string, Promise<boolean>>();
   private assistSessionHook: AssistSessionHook | null = null;
+  private liveListeners = new Set<LiveSessionListener>();
 
   /**
    * Resume bookkeeping. For a session recorded in one sitting these are
@@ -106,6 +118,25 @@ class SessionManager {
    * resumed one. Kept as an injected callback (same pattern as
    * setSyncFunction) because ClaudeService imports this module.
    */
+  addLiveListener(listener: LiveSessionListener): () => void {
+    this.liveListeners.add(listener);
+    return () => this.liveListeners.delete(listener);
+  }
+
+  private notifyLive<K extends keyof LiveSessionListener>(
+    kind: K,
+    ...args: Parameters<NonNullable<LiveSessionListener[K]>>
+  ): void {
+    for (const l of this.liveListeners) {
+      try {
+        const fn = l[kind] as ((...a: unknown[]) => void) | undefined;
+        fn?.apply(l, args as unknown[]);
+      } catch (err) {
+        log.error(`Live listener ${String(kind)} failed (non-fatal):`, err);
+      }
+    }
+  }
+
   setAssistSessionHook(fn: AssistSessionHook | null): void {
     this.assistSessionHook = fn;
   }
@@ -185,6 +216,7 @@ class SessionManager {
     this.notifyAssist(null);
 
     this.broadcastSessionUpdate();
+    this.notifyLive('onStart', this.activeSession, { resumed: false, incognito: this.isIncognito });
 
     // Server-attributed product event. Dynamic-import keeps this
     // free of a hard dependency on the clientEvents module (so
@@ -294,6 +326,7 @@ class SessionManager {
       } catch { /* OSS or module unavailable */ }
     })();
 
+    this.notifyLive('onStart', this.activeSession, { resumed: true, incognito: false });
     return { session: this.activeSession };
   }
 
@@ -371,6 +404,7 @@ class SessionManager {
     }
 
     this.activeSession.transcript.sort((a, b) => a.timestamp - b.timestamp);
+    this.notifyLive('onEntry', entry, this.activeSession.id);
   }
 
   /**
@@ -425,6 +459,7 @@ class SessionManager {
         endedAt,
       };
       log.info('Incognito session ended (discarded):', this.activeSession.id, 'duration:', durationSeconds, 's');
+      this.notifyLive('onEnd', endedSession, { incognito: true });
       this.activeSession = null;
       this.isIncognito = false;
       this.broadcastSessionUpdate();
@@ -454,6 +489,7 @@ class SessionManager {
       .map((e) => `${e.source === 'mic' ? displayName : 'Them'}: ${e.text}`)
       .join('\n');
     log.info('Session ended:', sessionId, 'duration:', durationSeconds, 's');
+    this.notifyLive('onEnd', endedSession, { incognito: false });
 
     // Server-attributed product event. Mirrors the start path
     // above; same dynamic-import shape to keep tests free of
@@ -513,6 +549,12 @@ class SessionManager {
     });
     this.notesJobs.set(sessionId, job);
     return job;
+  }
+
+  /** Resolves when any in-flight notes job for this session has finished. */
+  async waitForNotes(sessionId: string): Promise<void> {
+    const job = this.notesJobs.get(sessionId);
+    if (job) await job.catch(() => false);
   }
 
   /**
@@ -601,9 +643,12 @@ class SessionManager {
 
       // Fire-and-forget local transcript indexing for ask-my-meetings. Never
       // awaited or allowed to affect the notes result; embeddings are local.
-      void indexSession(sessionId).catch((err) => {
-        log.error('Session indexing failed (non-fatal):', err);
-      });
+      // Skipped when transcripts are not retained: the index is transcript text.
+      if (getSetting('retainTranscripts') === true) {
+        void indexSession(sessionId).catch((err) => {
+          log.error('Session indexing failed (non-fatal):', err);
+        });
+      }
 
       this.syncSessionToCloud(sessionId);
       return notesOk;

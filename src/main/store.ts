@@ -85,6 +85,29 @@ export interface LocalSettings {
   /** Last Mac DMG version the user tapped Later on. Empty = never dismissed. */
   macUpdateDismissedVersion: string;
 
+  // ---- Second live engine ----
+  /** Live coaching cards on/off. Transcript and notes work either way. */
+  secondCoachEnabled: boolean;
+  /** 'auto' follows the meeting mode's playbook default. */
+  secondSensitivity: 'auto' | 'quiet' | 'balanced' | 'active';
+  /** Fast model for live cards. Empty = provider default fast model. */
+  secondCoachModel: string;
+  /** Deeper model for briefs, "think deeper", and post-meeting reports. */
+  secondDeepModel: string;
+  /** Canonical professional profile (UserProfile JSON). */
+  secondProfile: unknown;
+  /** Previous profile versions, newest last (bounded). */
+  secondProfileHistory: unknown[];
+  /** Days before dynamic context is considered stale. */
+  secondDynamicStaleDays: number;
+  /** Setup + brief prepared before the next recording starts. */
+  secondPendingSetup: unknown;
+  /**
+   * Keep full transcripts after a meeting. Off by default: notes, report,
+   * and action items are kept; the raw transcript is deleted once they exist.
+   */
+  retainTranscripts: boolean;
+
   // Pro extensions store arbitrary keys via saveSetting()
   // (e.g. auth_tokens, auth_user, sync_queue, backendUrl)
   [key: string]: unknown;
@@ -123,6 +146,15 @@ const STORE_DEFAULTS: LocalSettings = {
   displayName: '',
   profilePicturePath: '',
   macUpdateDismissedVersion: '',
+  secondCoachEnabled: true,
+  secondSensitivity: 'auto',
+  secondCoachModel: '',
+  secondDeepModel: '',
+  secondProfile: null,
+  secondProfileHistory: [],
+  secondDynamicStaleDays: 30,
+  secondPendingSetup: null,
+  retainTranscripts: false,
 };
 
 function createStore(): Store<LocalSettings> {
@@ -208,6 +240,16 @@ export function getAllSettings(): LocalSettings {
     displayName: store.get('displayName'),
     profilePicturePath: store.get('profilePicturePath'),
     macUpdateDismissedVersion: store.get('macUpdateDismissedVersion'),
+    secondCoachEnabled: store.get('secondCoachEnabled'),
+    secondSensitivity: store.get('secondSensitivity'),
+    secondCoachModel: store.get('secondCoachModel'),
+    secondDeepModel: store.get('secondDeepModel'),
+    // Profile content is served by second:get-profile; history stays in main.
+    secondProfile: null,
+    secondProfileHistory: [],
+    secondDynamicStaleDays: store.get('secondDynamicStaleDays'),
+    secondPendingSetup: null,
+    retainTranscripts: store.get('retainTranscripts'),
     proOnboardingComplete: store.get('proOnboardingComplete'),
     proOnboardingStep: store.get('proOnboardingStep'),
     cachedUserProfile: store.get('cachedUserProfile' as keyof LocalSettings) || null,

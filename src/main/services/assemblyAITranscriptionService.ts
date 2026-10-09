@@ -440,6 +440,10 @@ export class AssemblyAITranscriptionService {
       .join('\n')
   }
 
+  isSourceConnected(source: AudioSource): boolean {
+    return (source === 'mic' ? this.micState : this.systemState).isConnected
+  }
+
   private broadcastTranscript(data: {
     entry: TranscriptEntry
     isFinal: boolean

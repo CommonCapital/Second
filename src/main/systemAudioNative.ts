@@ -38,6 +38,30 @@ let parseBuffer = Buffer.alloc(0)
 let processedAudioCallback: ProcessedAudioCallback | null = null
 
 /**
+ * Raw (pre-AEC, pre-echo-gate) PCM observers. Used for health/energy meters
+ * and the preflight self test, which must see real capture even when the
+ * echo gate withholds mic chunks and even when no session is recording.
+ */
+type RawAudioTap = (buffer: Buffer, source: AudioSource) => void
+const rawAudioTaps = new Set<RawAudioTap>()
+
+export function addRawAudioTap(tap: RawAudioTap): () => void {
+  rawAudioTaps.add(tap)
+  return () => rawAudioTaps.delete(tap)
+}
+
+function notifyRawTaps(buffer: Buffer, source: AudioSource): void {
+  for (const tap of rawAudioTaps) {
+    try { tap(buffer, source) } catch (err) { log.debug('raw audio tap failed:', err) }
+  }
+}
+
+let captureRunning = false
+export function isCaptureRunning(): boolean {
+  return captureRunning
+}
+
+/**
  * Set when stopCapture() is called so the child's 'exit' handler knows
  * the teardown was intentional and doesn't fire the "capture died
  * unexpectedly" callback. Reset each time a new capture process is
@@ -501,9 +525,9 @@ export function startCapture(): boolean {
   residualEchoGate.reset()
   aecBypassed = false
   initAec()
-  if (isMac) return startMacCapture()
-  if (isWindows) return startWindowsCapture()
-  return false
+  const started = isMac ? startMacCapture() : isWindows ? startWindowsCapture() : false
+  captureRunning = started
+  return started
 }
 
 /**
@@ -511,6 +535,7 @@ export function startCapture(): boolean {
  */
 export function stopCapture(): boolean {
   captureStopping = true
+  captureRunning = false
   stopHealthMonitor()
   const stopped = isMac ? stopMacCapture() : isWindows ? stopWindowsCapture() : false
   destroyAec()
@@ -522,6 +547,7 @@ export function stopCapture(): boolean {
 function handleSystemChunk(audioData: Buffer): void {
   if (captureStopping) return
   if (getSetting('captureSystemAudio') === false) return
+  notifyRawTaps(audioData, 'system')
 
   systemChunkCount++
   if (systemChunkCount <= 5 || systemChunkCount % 100 === 0) {
@@ -538,6 +564,7 @@ function handleSystemChunk(audioData: Buffer): void {
 
 function handleMicChunk(audioData: Buffer): void {
   if (captureStopping) return
+  notifyRawTaps(audioData, 'mic')
   micChunkCount++
   if (micChunkCount <= 5 || micChunkCount % 100 === 0) {
     log.debug(`Mic chunk #${micChunkCount}, bytes: ${audioData.length}`)

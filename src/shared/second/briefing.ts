@@ -178,3 +178,29 @@ export function reportToMarkdown(r: PostMeetingReport): string {
   if (r.followUpDraft) out.push(`## Follow-up draft`, r.followUpDraft, '')
   return out.join('\n').trim()
 }
+
+const clip = (v: unknown, max: number): string => (typeof v === 'string' ? v.trim().slice(0, max) : '')
+const clipList = (v: unknown, maxItems: number, maxLen: number): string[] => {
+  const arr = Array.isArray(v) ? v : typeof v === 'string' ? v.split(/[,\n;]/) : []
+  return arr.map((x) => clip(x, maxLen)).filter(Boolean).slice(0, maxItems)
+}
+
+/** Validate untrusted setup input (from the renderer) into a safe shape. */
+export function normalizeSetup(raw: unknown, validModes: readonly string[]): MeetingSetupInput {
+  const o = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {}
+  const mode = typeof o.mode === 'string' && validModes.includes(o.mode) ? (o.mode as MeetingModeId) : 'general'
+  return {
+    mode,
+    title: clip(o.title, 200) || undefined,
+    counterpartyPeople: clipList(o.counterpartyPeople, 12, 120),
+    counterpartyOrg: clip(o.counterpartyOrg, 200),
+    objective: clip(o.objective, 1000),
+    idealOutcome: clip(o.idealOutcome, 1000),
+    avoid: clipList(o.avoid, 10, 300),
+    notes: clip(o.notes, 20_000),
+  }
+}
+
+export function isSetupEmpty(s: MeetingSetupInput): boolean {
+  return !s.title && s.counterpartyPeople.length === 0 && !s.counterpartyOrg && !s.objective && !s.idealOutcome && s.avoid.length === 0 && !s.notes
+}

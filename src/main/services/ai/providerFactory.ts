@@ -106,3 +106,37 @@ export async function getMemoryProvider(): Promise<AIProvider> {
 export async function getFastProvider(): Promise<AIProvider> {
   return getMemoryProvider();
 }
+
+/** Fast defaults for live cards: latency matters more than depth. */
+export const COACH_DEFAULT_MODELS: Record<AIProviderName, string> = {
+  anthropic: 'claude-haiku-4-5',
+  openai: 'gpt-5.6-luna',
+};
+
+/** Deeper defaults for briefs, "think deeper", and post-meeting reports. */
+export const DEEP_DEFAULT_MODELS: Record<AIProviderName, string> = {
+  anthropic: 'claude-sonnet-5',
+  openai: 'gpt-5.5',
+};
+
+async function getSecondProvider(slot: 'coach' | 'deep'): Promise<{ provider: AIProvider; model: string }> {
+  const { getSetting, getApiKey } = await import('../../store');
+  const providerName = (getSetting('aiProvider') || 'anthropic') as AIProviderName;
+  const requested = (slot === 'coach' ? getSetting('secondCoachModel') : getSetting('secondDeepModel')) as string;
+  const fallback = slot === 'coach' ? COACH_DEFAULT_MODELS[providerName] : DEEP_DEFAULT_MODELS[providerName];
+  const model = requested ? resolveCatalogModel(providerName, requested) : fallback;
+  // Live cards: lowest reasoning effort the model accepts. Deep slot: low.
+  const effort = slot === 'coach' ? (providerName === 'openai' ? 'none' : 'low') : 'low';
+  const apiKey = requireApiKey(providerName, getApiKey);
+  return { provider: getProvider({ provider: providerName, model, apiKey, effort }), model };
+}
+
+/** Second live coach: one short structured card per qualifying turn. */
+export function getCoachProvider(): Promise<{ provider: AIProvider; model: string }> {
+  return getSecondProvider('coach');
+}
+
+/** Second deep slot: briefs, explicit "think deeper", post-meeting report. */
+export function getDeepProvider(): Promise<{ provider: AIProvider; model: string }> {
+  return getSecondProvider('deep');
+}

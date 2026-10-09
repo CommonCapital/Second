@@ -502,6 +502,10 @@ export class TranscriptionService {
     this.systemConnection.currentInterim = '';
   }
 
+  isSourceConnected(source: AudioSource): boolean {
+    return (source === 'mic' ? this.micConnection : this.systemConnection).isConnected;
+  }
+
   private broadcastTranscript(data: {
     entry: TranscriptEntry;
     isFinal: boolean;
