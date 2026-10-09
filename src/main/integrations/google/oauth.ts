@@ -153,12 +153,12 @@ export async function runAuthFlow(p: {
   const { verifier, challenge } = createPkce()
   const state = base64url(randomBytes(16))
 
-  let server: Server | null = null
+  const box: { server: Server | null } = { server: null }
   try {
     const code = await new Promise<{ code: string; redirectUri: string }>((resolve, reject) => {
       let redirectUri = ''
       const timer = setTimeout(() => reject(new Error('Google sign-in timed out. Try again.')), p.timeoutMs ?? AUTH_TIMEOUT_MS)
-      server = createServer((req, res) => {
+      const server = createServer((req, res) => {
         const url = new URL(req.url ?? '/', 'http://127.0.0.1')
         if (url.pathname !== '/') {
           res.writeHead(404).end()
@@ -182,8 +182,9 @@ export async function runAuthFlow(p: {
         clearTimeout(timer)
         reject(err)
       })
+      box.server = server
       server.listen(0, '127.0.0.1', () => {
-        const port = (server!.address() as AddressInfo).port
+        const port = (server.address() as AddressInfo).port
         redirectUri = `http://127.0.0.1:${port}`
         const authUrl = buildAuthUrl({ clientId: p.clientId, redirectUri, scopes: p.scopes, challenge, state })
         Promise.resolve(p.openBrowser(authUrl)).catch(reject)
@@ -200,6 +201,6 @@ export async function runAuthFlow(p: {
     const email = await fetchEmail(p.fetchFn, tokens.accessToken)
     return { ...tokens, email }
   } finally {
-    ;(server as Server | null)?.close()
+    box.server?.close()
   }
 }
