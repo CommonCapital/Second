@@ -1,0 +1,13 @@
+{
+  "id": "ic-no-owner",
+  "mode": "ic",
+  "title": "IC discussion: decision without an owner",
+  "setup": { "objective": "Decide on the follow-on investment" },
+  "turns": [
+    { "speaker": "them", "text": "I think we're broadly supportive of the follow-on, but the churn uptick last quarter worries me." },
+    { "speaker": "them", "text": "Agreed. Someone should dig into the cohort data before we commit. Let's revisit." }
+  ],
+  "moments": [
+    { "after_turn": 2, "accept": ["ASK", "CLOSE", "WATCH"], "reject": ["WAIT", "NONE"], "note": "Work has no owner or date; pin owner, what must be true, and when." }
+  ]
+}

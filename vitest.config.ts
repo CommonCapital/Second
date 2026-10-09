@@ -8,6 +8,7 @@ export default defineConfig({
       'src/renderer/src/lib/__tests__/**/*.test.ts',
       'src/shared/**/__tests__/**/*.test.ts',
       'src/main/second/__tests__/**/*.test.ts',
+      'evals/**/*.test.ts',
     ],
     environment: 'node',
     globals: true,

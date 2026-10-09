@@ -9,7 +9,10 @@ import {
   clearApiKeys,
   isFreeMode,
   isProMode,
-  resetAll
+  resetAll,
+  isApiKeyField,
+  maskApiKey,
+  resolveKeyInput,
 } from './store'
 import type { LocalSettings } from './store'
 import {
@@ -75,6 +78,8 @@ export function registerIpcHandlers(): void {
 
   safeHandle('store:get', (key: keyof LocalSettings) => {
     assertString(key, 'key', 100)
+    // Secrets never reach the renderer: return a mask, not the key.
+    if (isApiKeyField(key as string)) return maskApiKey(getSetting(key) as string)
     return getSetting(key)
   })
 
@@ -167,7 +172,7 @@ export function registerIpcHandlers(): void {
     'validate-api-keys', 2000,
     async (deepgramKey: string, anthropicKey: string) => {
       const { validateBothKeys } = await import('./validators')
-      return validateBothKeys(deepgramKey, anthropicKey)
+      return validateBothKeys(resolveKeyInput('deepgramApiKey', deepgramKey), resolveKeyInput('anthropicApiKey', anthropicKey))
     }
   )
 
@@ -176,7 +181,14 @@ export function registerIpcHandlers(): void {
     async (deepgramKey: string, aiProvider: 'anthropic' | 'openai', aiKey: string, extras?: { openaiKey?: string }) => {
       if (extras?.openaiKey !== undefined) assertString(extras.openaiKey, 'openaiKey', 500)
       const { validateKeys } = await import('./validators')
-      return validateKeys(deepgramKey, aiProvider, aiKey, extras?.openaiKey ? { openaiKey: extras.openaiKey } : undefined)
+      const aiField = aiProvider === 'openai' ? 'openaiApiKey' : 'anthropicApiKey'
+      const openaiExtra = extras?.openaiKey ? resolveKeyInput('openaiApiKey', extras.openaiKey) : undefined
+      return validateKeys(
+        typeof deepgramKey === 'string' ? resolveKeyInput('deepgramApiKey', deepgramKey) : deepgramKey,
+        aiProvider,
+        typeof aiKey === 'string' ? resolveKeyInput(aiField, aiKey) : aiKey,
+        openaiExtra ? { openaiKey: openaiExtra } : undefined,
+      )
     }
   )
 
@@ -185,7 +197,7 @@ export function registerIpcHandlers(): void {
     async (apiKey: string) => {
       assertString(apiKey, 'apiKey', 500)
       const { validateAssemblyAIKey } = await import('./validators')
-      return validateAssemblyAIKey(apiKey)
+      return validateAssemblyAIKey(resolveKeyInput('assemblyaiApiKey', apiKey))
     }
   )
 
@@ -195,7 +207,7 @@ export function registerIpcHandlers(): void {
       assertString(apiKey, 'apiKey', 500)
       if (apiUrl !== undefined) assertString(apiUrl, 'apiUrl', 200)
       const { validateRecallKey } = await import('./validators')
-      return validateRecallKey(apiKey, apiUrl)
+      return validateRecallKey(resolveKeyInput('recallApiKey', apiKey), apiUrl)
     }
   )
 

@@ -1,0 +1,18 @@
+{
+  "id": "founder-services-disguised",
+  "mode": "founder",
+  "title": "Founder call: services presented as software",
+  "setup": { "counterpartyOrg": "Northwind Ops", "counterpartyPeople": ["Priya, CEO"], "objective": "Understand whether ARR is real software revenue", "idealOutcome": "Agree the next diligence step" },
+  "turns": [
+    { "speaker": "you", "text": "Thanks for making the time, Priya. I'd love to hear how Northwind started." },
+    { "speaker": "them", "text": "Sure. We started as a consultancy for warehouse teams and productized the workflow we kept building. Today we're at about four point two million in ARR, growing a little over a hundred percent." },
+    { "speaker": "you", "text": "That's a strong number. How does that four point two break down?" },
+    { "speaker": "them", "text": "Most of it is platform. Every customer gets an onboarding package, usually six to nine months of our team configuring workflows on site, and that's bundled into the annual contract so we count it as ARR." },
+    { "speaker": "you", "text": "Got it." },
+    { "speaker": "them", "text": "Gross margin overall is around fifty two percent, which we think goes up as implementations get faster." }
+  ],
+  "moments": [
+    { "after_turn": 4, "accept": ["ASK", "WATCH"], "reject": ["SAY", "CLOSE"], "note": "Implementation services are being counted as ARR. Best card separates paid software from services." },
+    { "after_turn": 6, "accept": ["ASK", "WATCH"], "reject": ["CLOSE"], "note": "52% margin is consistent with services-heavy revenue; probe software-only margin." }
+  ]
+}

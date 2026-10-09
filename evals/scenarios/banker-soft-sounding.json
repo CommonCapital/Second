@@ -1,0 +1,14 @@
+{
+  "id": "banker-soft-sounding",
+  "mode": "banker",
+  "title": "Banker call: soft market sounding",
+  "setup": { "counterpartyPeople": ["Rick, Managing Director"], "objective": "Understand real access and process" },
+  "turns": [
+    { "speaker": "them", "text": "We're working with a great vertical software business, about twenty million of EBITDA, and the owners are thinking about options." },
+    { "speaker": "you", "text": "Interesting. Is this a formal process?" },
+    { "speaker": "them", "text": "It's early. We're just taking soundings with a few people we trust before anything goes out." }
+  ],
+  "moments": [
+    { "after_turn": 3, "accept": ["ASK", "WATCH"], "reject": ["CLOSE", "SAY"], "note": "Clarify mandate, exclusivity, and who controls the asset before engaging." }
+  ]
+}

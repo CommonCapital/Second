@@ -1,0 +1,14 @@
+{
+  "id": "interview-behavioral",
+  "mode": "interview",
+  "title": "Interview: behavioral question",
+  "setup": { "counterpartyOrg": "Ridgeway Partners", "counterpartyPeople": ["Sam, Partner"], "objective": "Win the role truthfully" },
+  "profile": { "name": "Alex", "role": "Senior Associate", "background": "Four years in growth equity; led diligence on three enterprise software deals; before that two years in investment banking covering industrials." },
+  "turns": [
+    { "speaker": "them", "text": "Thanks for coming in. Let's start with one I ask everyone." },
+    { "speaker": "them", "text": "Tell me about a time you disagreed with a senior person on a deal. What happened?" }
+  ],
+  "moments": [
+    { "after_turn": 2, "accept": ["SAY"], "reject": ["WAIT", "NONE"], "note": "Direct question the user must answer now. One grounded arc from real background; no invented specifics." }
+  ]
+}

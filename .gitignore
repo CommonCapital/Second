@@ -72,3 +72,7 @@ resources/tray/trayTemplate.png
 resources/tray/trayTemplate@2x.png
 resources/tray/trayActiveTemplate.png
 resources/tray/trayActiveTemplate@2x.png
+
+# Eval scorecards are regenerated per run; keep the folder, not the outputs
+evals/results/*
+!evals/results/.gitkeep

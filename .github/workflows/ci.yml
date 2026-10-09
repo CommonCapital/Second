@@ -30,8 +30,14 @@ jobs:
       - name: Security audit
         run: npm audit --audit-level=critical
 
-      - name: Type check
+      - name: Type check (renderer + shared)
         run: npx tsc --noEmit
+
+      - name: Type check (main + preload)
+        run: npx tsc --noEmit -p tsconfig.main.json
+
+      - name: Lint
+        run: npm run lint
 
       - name: Run tests
         run: npx vitest run

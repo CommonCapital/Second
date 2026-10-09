@@ -1,0 +1,17 @@
+{
+  "id": "founder-evasive-metrics",
+  "mode": "founder",
+  "title": "Founder call: shifting numbers",
+  "setup": { "counterpartyOrg": "Cobalt Health", "counterpartyPeople": ["Jen, CEO"], "objective": "Validate revenue and churn" },
+  "turns": [
+    { "speaker": "them", "text": "We closed last year at four point two million ARR and we're tracking well ahead of plan." },
+    { "speaker": "you", "text": "What does churn look like?" },
+    { "speaker": "them", "text": "Churn is really low, the product is sticky. Customers love the analytics module, honestly that's where most of the excitement is." },
+    { "speaker": "you", "text": "Can you put a number on it?" },
+    { "speaker": "them", "text": "It depends how you count it. If you look at logos it's basically nothing. Our ending ARR for last year was about three point six, but we've got strong pipeline." }
+  ],
+  "moments": [
+    { "after_turn": 3, "accept": ["ASK", "WATCH", "WAIT", "NONE"], "reject": ["CLOSE"], "note": "Churn question dodged; a precise follow-up or listening is fine." },
+    { "after_turn": 5, "accept": ["WATCH", "ASK"], "reject": ["CLOSE", "SAY"], "note": "ARR changed from 4.2M to 3.6M. Surface the inconsistency." }
+  ]
+}

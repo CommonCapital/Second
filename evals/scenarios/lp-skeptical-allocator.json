@@ -1,0 +1,17 @@
+{
+  "id": "lp-skeptical-allocator",
+  "mode": "lp",
+  "title": "LP call: skeptical institution",
+  "setup": { "counterpartyOrg": "Harbor Endowment", "counterpartyPeople": ["Elena, Director of Private Markets"], "objective": "Understand the real allocation path", "idealOutcome": "Agree the next diligence step and who is involved" },
+  "turns": [
+    { "speaker": "them", "text": "We like the strategy, but I'll be candid, we rarely back first-time funds. Our minimum is usually a hundred and fifty million fund size." },
+    { "speaker": "you", "text": "That's helpful to know." },
+    { "speaker": "them", "text": "There are exceptions through our emerging manager sleeve, but that goes through a separate committee and our consultant has to be comfortable." },
+    { "speaker": "you", "text": "Understood." },
+    { "speaker": "them", "text": "If you sent something over I'm happy to take a look. Let's stay in touch." }
+  ],
+  "moments": [
+    { "after_turn": 3, "accept": ["ASK"], "reject": ["SAY"], "note": "Find the decision path: who runs the sleeve, consultant role, timing." },
+    { "after_turn": 5, "accept": ["CLOSE", "ASK"], "reject": ["WAIT", "NONE"], "note": "Convert 'stay in touch' into a concrete next diligence step." }
+  ]
+}

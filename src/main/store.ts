@@ -320,22 +320,47 @@ export function getApiKey(key: typeof API_KEY_FIELDS[number]): string {
 
 // ---- API Key Helpers ----
 
+/**
+ * The renderer never receives a decrypted key. It gets a mask that keeps the
+ * last four characters so the UI can show "a key is set"; when the renderer
+ * sends a masked value back (save / validate), main substitutes the stored key.
+ */
+export const KEY_MASK_PREFIX = '••••••••'
+
+export function isApiKeyField(key: string): key is typeof API_KEY_FIELDS[number] {
+  return (API_KEY_FIELDS as readonly string[]).includes(key)
+}
+
+export function maskApiKey(value: string): string {
+  if (!value) return ''
+  return `${KEY_MASK_PREFIX}${value.slice(-4)}`
+}
+
+export function isMaskedKey(value: unknown): boolean {
+  return typeof value === 'string' && value.startsWith(KEY_MASK_PREFIX)
+}
+
+/** Renderer-supplied key value -> real key (masked means "unchanged"). */
+export function resolveKeyInput(field: typeof API_KEY_FIELDS[number], value: string): string {
+  return isMaskedKey(value) ? getApiKey(field) : value
+}
+
 export function saveApiKeys(
   deepgramKey: string,
   anthropicKey: string,
   openaiKey?: string,
   extras?: { assemblyaiApiKey?: string; recallApiKey?: string },
 ): void {
-  store.set('deepgramApiKey', encryptValue(deepgramKey));
-  store.set('anthropicApiKey', encryptValue(anthropicKey));
+  store.set('deepgramApiKey', encryptValue(resolveKeyInput('deepgramApiKey', deepgramKey)));
+  store.set('anthropicApiKey', encryptValue(resolveKeyInput('anthropicApiKey', anthropicKey)));
   if (openaiKey !== undefined) {
-    store.set('openaiApiKey', encryptValue(openaiKey));
+    store.set('openaiApiKey', encryptValue(resolveKeyInput('openaiApiKey', openaiKey)));
   }
   if (extras?.assemblyaiApiKey !== undefined) {
-    store.set('assemblyaiApiKey', encryptValue(extras.assemblyaiApiKey));
+    store.set('assemblyaiApiKey', encryptValue(resolveKeyInput('assemblyaiApiKey', extras.assemblyaiApiKey)));
   }
   if (extras?.recallApiKey !== undefined) {
-    store.set('recallApiKey', encryptValue(extras.recallApiKey));
+    store.set('recallApiKey', encryptValue(resolveKeyInput('recallApiKey', extras.recallApiKey)));
   }
   store.set('apiKeysConfigured', true);
 }

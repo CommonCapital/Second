@@ -1,0 +1,13 @@
+{
+  "id": "relationship-listening",
+  "mode": "relationship",
+  "title": "Relationship call: mostly listen",
+  "setup": { "counterpartyPeople": ["Tom"], "objective": "Build a genuine relationship" },
+  "turns": [
+    { "speaker": "you", "text": "How's the new role going?" },
+    { "speaker": "them", "text": "It's been a lot, honestly. We're rebuilding the whole data team and I underestimated how much of my week would go to hiring. But the people we've brought in are great, and" }
+  ],
+  "moments": [
+    { "after_turn": 2, "accept": ["WAIT", "NONE"], "reject": ["SAY", "ASK", "CLOSE"], "note": "They are mid-story. The right move is to listen." }
+  ]
+}

@@ -125,6 +125,9 @@ vi.mock('../store', () => ({
   isProMode: mockIsProMode,
   resetAll: mockResetAll,
   getApiKey: vi.fn(() => ''),
+  isApiKeyField: (k: string) => ['deepgramApiKey', 'anthropicApiKey', 'openaiApiKey', 'assemblyaiApiKey', 'recallApiKey'].includes(k),
+  maskApiKey: (v: string) => (v ? `••••••••${v.slice(-4)}` : ''),
+  resolveKeyInput: (_field: string, v: string) => (v.startsWith('••••••••') ? 'stored-real-key' : v),
 }))
 
 vi.mock('../windowManager', () => ({
@@ -270,6 +273,15 @@ describe('IPC Handlers (registerIpcHandlers)', () => {
 
       expect(mockGetSetting).toHaveBeenCalledWith('theme')
       expect(result).toBe('dark')
+    })
+
+    it('never returns a decrypted API key to the renderer', () => {
+      mockGetSetting.mockReturnValue('sk-ant-secret-value-1234')
+
+      const result = handlers['store:get'](fakeEvent(), 'anthropicApiKey')
+
+      expect(result).toBe('••••••••1234')
+      expect(String(result)).not.toContain('secret')
     })
   })
 
@@ -751,6 +763,14 @@ describe('IPC Handlers (registerIpcHandlers)', () => {
       const result = await handlers['validate-api-keys'](fakeEvent(), 'dg-key', 'ant-key')
 
       expect(result).toEqual({ valid: true })
+    })
+
+    it('substitutes the stored key when the renderer sends back a masked value', async () => {
+      mockValidateBothKeys.mockResolvedValue({ valid: true })
+
+      await handlers['validate-api-keys'](fakeEvent(), '••••••••abcd', 'ant-key')
+
+      expect(mockValidateBothKeys).toHaveBeenCalledWith('stored-real-key', 'ant-key')
     })
 
     it('returns failure from validateBothKeys', async () => {

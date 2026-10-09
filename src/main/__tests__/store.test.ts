@@ -44,6 +44,8 @@ import {
   resetAll,
   getApiKey,
   getStore,
+  maskApiKey,
+  isMaskedKey,
 } from '../store'
 
 describe('store', () => {
@@ -192,6 +194,21 @@ describe('store', () => {
       expect(mockSet).toHaveBeenCalledWith('deepgramApiKey', 'dg-key')
       expect(mockSet).toHaveBeenCalledWith('anthropicApiKey', 'ant-key')
       expect(mockSet).toHaveBeenCalledWith('apiKeysConfigured', true)
+    })
+
+    it('keeps the stored key when the renderer sends back a masked value', () => {
+      mockGet.mockImplementation((k: string) => (k === 'anthropicApiKey' ? 'real-ant-key' : ''))
+      saveApiKeys('dg-key', maskApiKey('real-ant-key'))
+
+      expect(mockSet).toHaveBeenCalledWith('anthropicApiKey', 'real-ant-key')
+      expect(mockSet).not.toHaveBeenCalledWith('anthropicApiKey', expect.stringContaining('••••'))
+    })
+
+    it('masks keys to the last four characters', () => {
+      expect(maskApiKey('sk-abcdefgh1234')).toBe('••••••••1234')
+      expect(maskApiKey('')).toBe('')
+      expect(isMaskedKey(maskApiKey('x1234'))).toBe(true)
+      expect(isMaskedKey('sk-real')).toBe(false)
     })
 
     it('saves optional openai key', () => {

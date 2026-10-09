@@ -1,0 +1,12 @@
+{
+  "id": "interview-technical",
+  "mode": "interview",
+  "title": "Interview: technical finance",
+  "setup": { "counterpartyOrg": "Ridgeway Partners", "objective": "Answer technical questions correctly" },
+  "turns": [
+    { "speaker": "them", "text": "Quick technical one. Depreciation goes up by ten dollars. Walk me through the three statements, assume a twenty five percent tax rate." }
+  ],
+  "moments": [
+    { "after_turn": 1, "accept": ["SAY"], "reject": ["WAIT", "NONE", "ASK"], "note": "Net income down 7.5, cash up 2.5, PP&E down 10, retained earnings down 7.5. Direct and correct." }
+  ]
+}

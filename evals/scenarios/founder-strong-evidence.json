@@ -1,0 +1,18 @@
+{
+  "id": "founder-strong-evidence",
+  "mode": "founder",
+  "title": "Founder call: strong company, move to next step",
+  "setup": { "counterpartyOrg": "Lumen Ledger", "counterpartyPeople": ["Marcus, CEO"], "objective": "Decide whether to start diligence", "idealOutcome": "Get monthly P&L, ARR by customer, and cap table" },
+  "turns": [
+    { "speaker": "them", "text": "We're at six point one million ARR, all subscription, no services. Gross margin is eighty one percent." },
+    { "speaker": "you", "text": "And retention?" },
+    { "speaker": "them", "text": "Gross retention is ninety four percent, net retention is one twenty eight. Top customer is six percent of ARR, and the top ten are under thirty percent combined." },
+    { "speaker": "you", "text": "Who owns the budget on the customer side?" },
+    { "speaker": "them", "text": "The CFO's office. We replace a manual close process, so it's a line item they already pay for in contractors. Sales cycle is about sixty days." },
+    { "speaker": "them", "text": "Honestly we're raising because we want to double the sales team ahead of a new segment, not because we need the money. We have about twenty months of runway." }
+  ],
+  "moments": [
+    { "after_turn": 3, "accept": ["WAIT", "NONE", "ASK"], "reject": ["WATCH"], "note": "Evidence is strong; no need to interrogate." },
+    { "after_turn": 6, "accept": ["CLOSE", "ASK"], "reject": ["WATCH"], "note": "Evidence is strong. Move to the next diligence step instead of asking more questions to look diligent." }
+  ]
+}

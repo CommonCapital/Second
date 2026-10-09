@@ -1,0 +1,15 @@
+{
+  "id": "negotiation-anchor",
+  "mode": "negotiation",
+  "title": "Negotiation: they anchor, then go quiet",
+  "setup": { "counterpartyOrg": "Atlas Data", "objective": "Hold price; trade term length for discount only", "avoid": ["Conceding price and term at once"] },
+  "turns": [
+    { "speaker": "them", "text": "We've looked at the proposal. Honestly, at four hundred and twenty thousand a year it's hard for us. We were thinking closer to three hundred." },
+    { "speaker": "you", "text": "Okay." },
+    { "speaker": "them", "text": "We also need the first ninety days free to cover migration, and a thirty day out clause." }
+  ],
+  "moments": [
+    { "after_turn": 1, "accept": ["WAIT", "NONE", "ASK"], "reject": ["SAY"], "note": "Do not counter immediately; expose constraints or let the silence work." },
+    { "after_turn": 3, "accept": ["ASK", "WATCH"], "reject": ["SAY"], "note": "They stacked three asks (price, free period, out clause). Identify the real variable; don't concede several at once." }
+  ]
+}
