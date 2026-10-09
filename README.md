@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://github.com/CommonCapital/Second/releases/latest"><img src="https://img.shields.io/github/v/release/CommonCapital/Second?label=release&color=B08A4A" alt="Latest release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-B08A4A" alt="License: MIT" /></a>
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-141B2D" alt="Platforms: macOS and Windows" />
+  <img src="https://img.shields.io/badge/platform-macOS%20(Apple%20Silicon)-141B2D" alt="Platform: macOS (Apple Silicon)" />
 </p>
 
 ---
@@ -49,7 +49,7 @@ See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what leaves your machine and 
 | **macOS 12+ (Apple Silicon)** | [Second-Mac-0.1.0-Installer.dmg](https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.dmg) | 235 MB |
 | **macOS 12+ (Apple Silicon)**, zip | [Second-Mac-0.1.0-Installer.zip](https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.zip) | 227 MB |
 
-All builds: [GitHub Releases](https://github.com/CommonCapital/Second/releases). Intel Macs and Windows: build from source ([Getting Started](#getting-started)).
+All builds: [GitHub Releases](https://github.com/CommonCapital/Second/releases). Second runs on macOS 12+ with Apple Silicon. Intel Macs: build from source ([Getting Started](#getting-started)).
 
 ### Install on macOS
 
@@ -62,25 +62,13 @@ All builds: [GitHub Releases](https://github.com/CommonCapital/Second/releases).
 
 Installed copies check GitHub Releases for updates (`latest-mac.yml`) and only offer a build **newer** than the one you have. Maintainers: see [Releasing](CONTRIBUTING.md#releasing).
 
-----------|-----------|
-| **macOS 12+ (Apple Silicon)** | `Second-Mac-<version>-Installer.dmg` |
-| **Windows 10/11 (x64)** | `Second-Windows-<version>-Setup.exe` |
-
-**macOS:** open the DMG, drag **Second** to Applications, then open it. Grant **Microphone** and **Screen Recording** when asked (Screen Recording is how macOS exposes system audio). Intel Macs: build from source below.
-
-**Windows:** run the setup executable. SmartScreen may warn on an unsigned build — choose **More info → Run anyway**.
-
-No release published yet? Build from source with the [Getting Started](#getting-started) guide.
-
-Installed copies check GitHub Releases for updates (`latest-mac.yml` on macOS, `latest.yml` on Windows) and only offer a build **newer** than the one you have. Maintainers: see [Releasing](CONTRIBUTING.md#releasing).
-
 ---
 
 ## Features (shipping today)
 
 ### The live judgment layer
 
-- **One card at a time** — SAY, ASK, WATCH, WAIT, or CLOSE, usually 22 words or fewer, only when it beats silence. Each card shows its mode and expires when it stops being actionable. Keep, dismiss, or ask the deeper model to think again. `Cmd/Ctrl + Shift + Enter` asks for the best move now.
+- **One card at a time** — SAY, ASK, WATCH, WAIT, or CLOSE, usually 22 words or fewer, only when it beats silence. Each card shows its mode and expires when it stops being actionable. Keep, dismiss, or ask the deeper model to think again. `Cmd + Shift + Enter` asks for the best move now.
 - **Meeting state, not a giant prompt** — A deterministic reducer tracks the objective, topic, facts (with the turn they came from), numbers (contradictions flagged automatically), open questions, objections, commitments (missing dates flagged), capture gaps, and the next best action. The coach sees this state plus the last few turns, never the whole transcript. See the **State** tab in the overlay.
 - **Intervention engine** — Coaching runs only after meaningful finalized turns. Cards are held back when confidence is low, they repeat, the current card is still being used, the other side is mid-answer, or a question you just asked is still pending.
 - **Meeting modes** — General executive, Founder / investment, LP / allocator, Interview, Banker / sponsor, Negotiation, IC / portfolio, Relationship. A mode changes the objective, guardrails, close target, and how often Second speaks.
@@ -92,7 +80,7 @@ Installed copies check GitHub Releases for updates (`latest-mac.yml` on macOS, `
 
 ### Capture, transcription, and history
 
-- **Dual-stream capture** — System audio + microphone. macOS uses ScreenCaptureKit + CoreAudio; Windows uses WASAPI loopback + capture (Rust/NAPI).
+- **Dual-stream capture** — System audio + microphone via ScreenCaptureKit + CoreAudio.
 - **Echo cancellation** — GStreamer `webrtcechoprobe` / `webrtcdsp` (WebRTC AEC3), then a **residual echo gate** that drops mic chunks that still look like speaker bleed before they reach STT.
 - **Real-time transcription** — Two streams: **You** (cleaned mic) and **Them** (system audio). Deepgram `nova-3` and/or AssemblyAI `u3-rt-pro`. Auto-routing prefers AssemblyAI for English, Spanish, French, German, Portuguese, and Italian when that key is present; otherwise Deepgram. Settings can force either engine.
 - **AI assistance** — Anthropic or OpenAI from the overlay (Assist, recap, follow-up, and custom prompts). Optional screenshot via `desktopCapturer`.
@@ -106,7 +94,7 @@ Installed copies check GitHub Releases for updates (`latest-mac.yml` on macOS, `
 - **Meeting auto-start** — Optionally detect a Zoom, Google Meet, Microsoft Teams (including 1:1 calls), or Webex meeting and prompt — or auto-start — a recording. No bot joins; detection just reads open window titles locally. Off / prompt / auto in Settings.
 - **In-app updates** — Installed builds check this repo's GitHub Releases: **Update now** downloads, **Restart & update** installs. Your keys and history are untouched.
 - **Local settings** — API keys and preferences in encrypted `electron-store` (`second-config.json`).
-- **Tray** — Packaged builds load icons from `resources/tray`. On Windows 11 a new icon may start in the `^` overflow.
+- **Menu bar** — Second lives in the macOS menu bar (`resources/tray`).
 - **Profile picture editor** — Crop, zoom, and pan before saving your avatar.
 
 Live recording uses the **OS default** mic and playback devices. The Settings mic picker is for the in-app mic **test** only.
@@ -132,7 +120,6 @@ Not planned for v1: a meeting bot that joins the call, autonomous emails or cale
 ```mermaid
 flowchart TB
   subgraph capture [Native capture]
-    Win["Windows: WASAPI loopback + capture"]
     Mac["macOS: ScreenCaptureKit + CoreAudio"]
   end
 
@@ -161,7 +148,6 @@ flowchart TB
     LLM[Anthropic or OpenAI]
   end
 
-  Win --> SAN
   Mac --> SAN
   SAN -->|"system PCM = Them"| AM
   SAN --> AEC
@@ -205,13 +191,12 @@ There is no global “Second remembers you across meetings” store.
 
 ## How It Works
 
-1. You start a session (`Cmd/Ctrl + Shift + Space`, or the overlay). Incognito, if enabled, will not write the session to SQLite.
+1. You start a session (`Cmd + Shift + Space`, or the overlay). Incognito, if enabled, will not write the session to SQLite.
 2. A native helper captures system audio and microphone at the same time.
-   - **macOS:** Swift `audiocapture` — ScreenCaptureKit (system) + CoreAudio (mic). Needs Microphone and Screen Recording.
-   - **Windows:** Rust/NAPI `second-windows-audio` — WASAPI loopback + capture. Uses the default devices.
+   - Swift `audiocapture` — ScreenCaptureKit (system) + CoreAudio (mic). Needs Microphone and Screen Recording.
 3. System PCM is the AEC **reference**. Mic PCM goes through GStreamer `webrtcechoprobe` / `webrtcdsp`. `ResidualEchoGate` then compares raw mic to recent system audio and drops leftover speaker echo so it does not land in **You**.
 4. Two STT connections run in parallel (mic → You, system → Them). Engine pick is Settings `sttProvider` (`auto` / `assemblyai` / `deepgram`) plus language: AssemblyAI Universal-3 Pro for the six languages above when that key exists; Deepgram `nova-3` otherwise (including auto-detect / `multi`). AssemblyAI failures can fall back to Deepgram.
-5. The overlay shows the live transcript. Assist (`Cmd/Ctrl + Enter`) builds a prompt from the mode brief, retrieved RAG chunks (if the mode has docs), session memory, recent chat, transcript tail, and an optional screenshot, then streams from your LLM.
+5. The overlay shows the live transcript. Assist (`Cmd + Enter`) builds a prompt from the mode brief, retrieved RAG chunks (if the mode has docs), session memory, recent chat, transcript tail, and an optional screenshot, then streams from your LLM.
 6. On stop, a non-incognito session is saved. A cheap/fast model writes a title and summary. Insights are generated later from the dashboard, still with your key.
 
 ## Project Structure
@@ -257,7 +242,6 @@ src/
 ├── preload/                      # Context bridge
 └── native/
     ├── swift/AudioCapture/       # macOS capture
-    ├── windows/                  # Windows WASAPI (Rust/NAPI)
     └── aec/                      # GStreamer AEC addon
 
 prompts/second_core.md            # Versioned core coach prompt
@@ -271,17 +255,15 @@ RELEASE_GATE.md                   # Acceptance checklist
 
 | Platform | System Audio | Microphone | Echo Cancellation | Status |
 |----------|-------------|------------|-------------------|--------|
-| **macOS 12+** | ScreenCaptureKit | CoreAudio | GStreamer AEC3 | Primary, fully tested |
-| **Windows 10/11** | WASAPI Loopback | WASAPI Capture | GStreamer AEC3 | Supported |
-| Linux | — | — | — | Not supported (no native capture path) |
+| **macOS 12+** | ScreenCaptureKit | CoreAudio | GStreamer AEC3 | Supported |
 
-Prebuilt Mac DMG is **Apple Silicon**. Intel Macs: build from source (this section). Second has no login, cloud sync, or meeting bot — capture happens on your machine.
+Second is macOS-only. The prebuilt DMG is **Apple Silicon**; Intel Macs can build from source (below). Second has no login, cloud sync, or meeting bot — capture happens on your machine.
 
 ## Getting Started
 
 If you only want to run Second, use a [prebuilt installer](#download) instead of this section.
 
-This walkthrough is for building from source — from a fresh machine to a running app. Pick your platform, follow every numbered step in order, and verify each one before moving on.
+This walkthrough is for building from source — from a fresh Mac to a running app. Follow every numbered step in order, and verify each one before moving on.
 
 > **API keys** (entered in-app on first launch — nothing to configure beforehand):
 >
@@ -442,257 +424,21 @@ The Electron app opens. On first launch you'll be prompted to enter your API key
 
 ---
 
-### Windows Setup
-
-> Tested on Windows 10 (21H2+) and Windows 11. All commands are for **PowerShell**. Open a **new terminal** after each installer to pick up PATH changes.
-
-**Step 1 — Install Visual Studio Build Tools**
-
-Download and run the [Visual Studio Build Tools installer](https://visualstudio.microsoft.com/visual-cpp-build-tools/).
-
-In the installer, check the **"Desktop development with C++"** workload and click Install. Make sure these optional components are selected (they should be by default):
-- MSVC Build Tools for x64/x86 (Latest)
-- Windows 10/11 SDK
-- C++ CMake tools for Windows
-
-Verify:
-```powershell
-& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -products * -requires Microsoft.VisualStudio.Workload.VCTools -property displayName
-# Expected: Visual Studio Build Tools 2022
-```
-
-> **If you have full Visual Studio** (not just Build Tools) with the C++ workload, that works too.
-
----
-
-**Step 2 — Install Node.js (LTS)**
-
-Option A — [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) (recommended):
-
-Download and run the latest `nvm-setup.exe`, then open a **new** terminal:
-
-```
-nvm install 22
-nvm use 22
-```
-
-Option B — Download the LTS 22.x MSI installer directly from [nodejs.org](https://nodejs.org/).
-
-Verify (in a **new** terminal):
-```
-node -v
-# Expected: v22.x.x
-```
-
-> **Why Node 22 specifically?** The project requires `node >= 22.12.0` (see `package.json` engines). Using `nvm install lts` may install a newer major version that hasn't been tested.
-
----
-
-**Step 3 — Install Python**
-
-Python is required by `node-gyp` to compile native Node.js modules (`better-sqlite3`, `bufferutil`, etc.).
-
-Option A — [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/):
-```
-winget install Python.Python.3.12 --source winget
-```
-
-Option B — Download from [python.org](https://www.python.org/downloads/). Make sure "Add to PATH" is checked during installation.
-
-Verify (in a **new** terminal):
-```
-python --version
-# Expected: Python 3.x.x
-```
-
----
-
-**Step 4 — Install the Rust toolchain**
-
-Download and run [rustup-init.exe](https://rustup.rs/). Accept the defaults (installs `stable-msvc`).
-
-Verify (in a **new** terminal):
-```
-rustc --version
-# Expected: rustc 1.xx.x (...)
-rustup default stable-msvc
-```
-
----
-
-**Step 5 — Install GStreamer (MSVC)**
-
-Download the **MSVC x86_64** installer from [gstreamer.freedesktop.org/download](https://gstreamer.freedesktop.org/download/) — click **Windows** → **MSVC x86_64 (VS 2022, Release CRT)**.
-
-> For GStreamer 1.28+, there is a single combined installer (runtime + development). For older versions, download both the Runtime and Development MSI files.
-
-Run with default settings. The installer typically installs to `C:\gstreamer\` or `C:\Program Files\gstreamer\`.
-
-After installation, verify the environment variable is set (open a **new** terminal):
-```powershell
-echo $env:GSTREAMER_1_0_ROOT_MSVC_X86_64
-# Expected: C:\gstreamer\1.0\msvc_x86_64\ (or C:\Program Files\gstreamer\1.0\msvc_x86_64\)
-```
-
-Also make sure GStreamer's `bin` directory is on your PATH:
-```powershell
-$gstRoot = $env:GSTREAMER_1_0_ROOT_MSVC_X86_64
-if ($gstRoot) { echo "GStreamer root: $gstRoot" } else { echo "NOT SET - see below" }
-```
-
-> **If the variable is empty:** The installer didn't set it. Find where GStreamer was installed and set it manually:
-> ```powershell
-> # Adjust the path below to match your installation
-> [Environment]::SetEnvironmentVariable("GSTREAMER_1_0_ROOT_MSVC_X86_64", "C:\Program Files\gstreamer\1.0\msvc_x86_64\", "User")
-> ```
-> Then **restart your terminal**.
->
-> **If GStreamer installed to `C:\Program Files\gstreamer\` instead of `C:\gstreamer\`:** That's fine — just make sure the environment variable points to the correct path (e.g. `C:\Program Files\gstreamer\1.0\msvc_x86_64\`).
-
----
-
-**Step 6 — Install CMake**
-
-CMake is required to compile the GStreamer echo-cancellation addon.
-
-```
-winget install Kitware.CMake --source winget
-```
-
-Or download from [cmake.org/download](https://cmake.org/download/). Make sure "Add to PATH" is checked.
-
-Verify (in a **new** terminal):
-```
-cmake --version
-# Expected: cmake version 3.x.x
-```
-
----
-
-**Step 7 — Clone the repo and install dependencies**
-
-```
-git clone https://github.com/CommonCapital/Second.git
-cd Second
-npm install
-```
-
-`npm install` takes a few minutes. It automatically rebuilds `better-sqlite3` for Electron via the `postinstall` script.
-
-Verify:
-```powershell
-Test-Path node_modules\.package-lock.json
-# Expected: True
-```
-
-> **If `npm install` fails with `Could not find any Python installation`:** Revisit Step 3 — Python must be installed and on PATH.
->
-> **If `npm install` fails with `Could not find any Visual Studio installation`:** `node-gyp` can't auto-detect your Build Tools. Try these fixes in order:
-> ```powershell
-> # Fix 1: Set the version hint for node-gyp
-> npm config set msvs_version 2022
-> Remove-Item -Recurse -Force node_modules
-> npm install
-> ```
-> If `npm config set msvs_version` gives an error on newer npm versions, use the environment variable instead:
-> ```powershell
-> # Fix 2: Environment variable (works on all npm versions)
-> $env:GYP_MSVS_VERSION = "2022"
-> Remove-Item -Recurse -Force node_modules
-> npm install
-> ```
-
----
-
-**Step 8 — Build the GStreamer echo-cancellation addon**
-
-First, check the Electron version used by the project:
-```
-node -e "console.log(require('./node_modules/electron/package.json').version)"
-# Note the version (e.g. 40.4.1)
-```
-
-Then build the addon targeting that version:
-```
-cd src\native\aec
-npm install
-npx cmake-js compile --runtime electron --runtime-version <ELECTRON_VERSION>
-cd ..\..\..
-```
-
-Replace `<ELECTRON_VERSION>` with the version from the previous command (e.g. `40.4.1`).
-
-> **Important:** The `--runtime electron --runtime-version` flags are required. Without them, the addon is built for Node.js instead of Electron, and it **will crash** when loaded. If you upgrade Electron later, you must rebuild this addon with the new version.
->
-> **Note:** The `build-deps.sh` script is macOS-only. On Windows, the GStreamer MSVC installer already includes all required plugins (including WebRTC DSP).
-
-Verify:
-```powershell
-Test-Path src\native\aec\build\Release\second-aec.node
-# Expected: True
-```
-
-> **If cmake-js fails with "CMake is not installed":** Revisit Step 6.
->
-> **If cmake-js fails with "GStreamer not found":** The `GSTREAMER_1_0_ROOT_MSVC_X86_64` environment variable is not set. Revisit Step 5.
->
-> **If the build succeeds but linking fails with "unresolved external symbol `g_object_set` / `g_type_check_instance_cast`":** GLib/GObject libraries are missing from the link step. This should be handled automatically by the CMakeLists.txt — if you see this error, file a bug.
-
----
-
-**Step 9 — Build the Windows audio capture module**
-
-```
-cd src\native\windows
-npm install
-npx napi build --platform --release
-cd ..\..\..
-```
-
-Verify:
-```powershell
-Test-Path src\native\windows\second-windows-audio.win32-x64-msvc.node
-# Expected: True
-```
-
-> **If the build fails with linker errors:** Make sure Rust is using the MSVC target: `rustup default stable-msvc`.
->
-> **If it fails with "Windows SDK not found":** Open **Visual Studio Installer → Modify → Individual components** and install the latest "Windows 10 SDK" or "Windows 11 SDK".
-
----
-
-**Step 10 — Run the app**
-
-```
-npm run dev
-```
-
-The Electron app opens. On first launch you'll see a 6-step onboarding flow — enter a transcription key (Deepgram and/or AssemblyAI) and an AI key (Anthropic or OpenAI).
-
-> **If the app starts but audio capture doesn't work:** Check **Settings → Sound** and make sure the correct playback and recording devices are set as default. WASAPI captures from the **default** devices. The Settings mic picker only drives the in-app mic test.
-
----
-
 ### Setup Troubleshooting Quick Reference
 
 | Symptom | Likely Cause | Fix |
 |---------|-------------|-----|
-| `Could not find any Python installation` | Python not installed | Install Python 3.x and add to PATH (Windows Step 3) |
-| `Could not find any Visual Studio installation to use` | `node-gyp` can't auto-detect Build Tools | Set `$env:GYP_MSVS_VERSION = "2022"`, delete `node_modules`, re-run `npm install` |
-| `npm install` fails with `node-gyp` errors | Missing C/C++ build tools | **macOS:** `xcode-select --install` **Windows:** VS Build Tools "Desktop development with C++" workload |
+| `npm install` fails with `node-gyp` errors | Missing C/C++ build tools | `xcode-select --install` |
 | `NODE_MODULE_VERSION mismatch` at runtime | Native module built for wrong Electron version | `npx @electron/rebuild -f -w better-sqlite3` from the project root |
 | `build-deps.sh`: "gstreamer-1.0 not found" | GStreamer not installed or `pkg-config` can't find it | **macOS:** Install via Homebrew and check `PKG_CONFIG_PATH` (see macOS Step 3) |
-| cmake-js: "CMake is not installed" | CMake not on PATH | Install CMake (Windows Step 6) |
-| cmake-js: "GStreamer not found" on Windows | `GSTREAMER_1_0_ROOT_MSVC_X86_64` not set | Set the env var manually and restart terminal (see Windows Step 5) |
-| AEC addon crashes Electron on startup | Built for Node.js instead of Electron | Rebuild with `--runtime electron --runtime-version <your-electron-version>` (Windows Step 8) |
+| cmake-js: "CMake is not installed" | CMake not on PATH | `brew install cmake` |
+| AEC addon crashes Electron on startup | Built for Node.js instead of Electron | Rebuild with `--runtime electron --runtime-version <your-electron-version>` (macOS Step 5) |
 | `swift build` fails | Swift toolchain too old (need 5.9+) | `sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install` |
-| `napi build` linker errors on Windows | Wrong Rust target or missing Windows SDK | `rustup default stable-msvc` and ensure VS Build Tools C++ workload is installed |
-| App starts, no audio on macOS | Missing system permissions | **System Settings → Privacy & Security**: grant **Microphone** and **Screen Recording** |
-| App starts, no audio on Windows | Wrong default audio device | **Settings → Sound**: set correct default playback/recording devices |
+| App starts, no audio | Missing system permissions | **System Settings → Privacy & Security**: grant **Microphone** and **Screen Recording** |
 
 ## Keyboard Shortcuts
 
-These match `registerGlobalHotkeys` in `src/main/index.ts`. On Windows use `Ctrl` instead of `Cmd`. Recording used to be `Cmd/Ctrl+R` and clear used to be `Cmd/Ctrl+Shift+R`; those were changed because they stole browser refresh globally. If an onboarding screenshot still shows the old keys, this table wins.
+These match `registerGlobalHotkeys` in `src/main/index.ts`. Recording used to be `Cmd+R` and clear used to be `Cmd+Shift+R`; those were changed because they stole browser refresh globally. If an onboarding screenshot still shows the old keys, this table wins.
 
 | Action | Shortcut |
 |--------|----------|
@@ -736,13 +482,6 @@ rm -rf ~/Library/Application\ Support/Second/
 rm -rf ~/Library/Application\ Support/second-desktop/
 ```
 
-```bat
-:: Windows (packaged)
-rmdir /s /q "%APPDATA%\Second"
-
-:: Windows (dev)
-rmdir /s /q "%APPDATA%\second-desktop"
-```
 
 ## Contributing
 
