@@ -6,13 +6,15 @@ export default defineConfig({
       'src/main/__tests__/**/*.test.ts',
       'src/main/services/__tests__/**/*.test.ts',
       'src/renderer/src/lib/__tests__/**/*.test.ts',
+      'src/shared/**/__tests__/**/*.test.ts',
+      'src/main/second/__tests__/**/*.test.ts',
     ],
     environment: 'node',
     globals: true,
     mockReset: true,
     coverage: {
       provider: 'v8',
-      include: ['src/main/**/*.ts'],
+      include: ['src/main/**/*.ts', 'src/shared/second/**/*.ts'],
       exclude: [
         'src/main/__tests__/**',
         'src/main/**/__tests__/**',
