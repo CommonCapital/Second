@@ -1,37 +1,33 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-
-const DOCS = 'https://docs.useraven.ai'
-const FEEDBACK = 'https://laxcorphq.wixforms.com/f/7497329197333873820'
+import { DOCS_URL, FEEDBACK_URL, ISSUES_URL, REPO_URL } from '../../shared/project'
 
 function src(rel: string): string {
   return readFileSync(join(process.cwd(), rel), 'utf8')
 }
 
 describe('About and menu help links', () => {
-  it('Send Feedback in the user menu opens the Wix form, not GitHub or docs', () => {
+  it('project links all point at the project repo', () => {
+    for (const url of [DOCS_URL, FEEDBACK_URL, ISSUES_URL]) {
+      expect(url.startsWith(REPO_URL)).toBe(true)
+    }
+  })
+
+  it('Send Feedback in the user menu uses the shared feedback link', () => {
     const header = src('src/renderer/src/components/dashboard/Header.tsx')
     const label = '<span>Send Feedback</span>'
     const helpBlock = header.slice(header.indexOf(label) - 400, header.indexOf(label))
     expect(header).toContain(label)
-    expect(header).not.toContain('Get Help')
-    expect(helpBlock).toContain(FEEDBACK)
-    expect(helpBlock).not.toContain(DOCS)
-    expect(helpBlock).not.toContain('github.com/Laxcorp-Research/project-raven')
+    expect(helpBlock).toContain('openExternal(FEEDBACK_URL)')
   })
 
-  it('About Docs stays on docs.useraven.ai; Send Feedback replaces Report a Bug and GitHub issues/new', () => {
+  it('About links come from the shared project constants, not hardcoded hosts', () => {
     const about = src('src/renderer/src/components/dashboard/settings/AboutTab.tsx')
-    expect(about).toContain(`handleOpenLink('${DOCS}')`)
-    expect(about).toContain('>Docs</div>')
-    expect(about).toContain(`label: 'Send Feedback'`)
-    expect(about).toContain(FEEDBACK)
-    expect(about).not.toContain('Discussions')
-    expect(about).not.toContain('project-raven/discussions')
-    expect(about).not.toContain('useraven.ai/changelog')
-    expect(about).not.toMatch(/label: 'Changelog'/)
-    expect(about).not.toMatch(/label: 'Report a Bug'/)
-    expect(about).not.toContain('project-raven/issues/new')
+    expect(about).toContain('handleOpenLink(REPO_URL)')
+    expect(about).toContain('handleOpenLink(ISSUES_URL)')
+    expect(about).toContain('handleOpenLink(DOCS_URL)')
+    expect(about).toContain('url: FEEDBACK_URL')
+    expect(about).not.toMatch(/https?:\/\//)
   })
 })

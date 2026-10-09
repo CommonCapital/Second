@@ -1,137 +1,98 @@
 <p align="center">
-  <img src="logo/raven_full.svg" alt="Project Raven" height="80" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/second_full-white.svg" />
+    <img src="logo/second_full.svg" alt="Second" height="72" />
+  </picture>
 </p>
 
 <p align="center">
-  <strong>Open-source meeting copilot: dual-stream capture, local echo cancellation, BYOK transcription and AI.</strong>
+  <strong>A private live meeting intelligence layer.</strong><br />
+  For interviews, founder and investor calls, negotiations, and the meetings where one sentence matters.
 </p>
 
 <p align="center">
-  <a href="https://github.com/Laxcorp-Research/project-raven/releases/latest"><img src="https://img.shields.io/github/v/release/Laxcorp-Research/project-raven?label=release&color=6366f1" alt="Latest release" /></a>
-  <a href="https://github.com/Laxcorp-Research/project-raven/releases"><img src="https://img.shields.io/github/downloads/Laxcorp-Research/project-raven/total?label=downloads&color=6366f1" alt="Total downloads" /></a>
-  <a href="https://github.com/Laxcorp-Research/project-raven/stargazers"><img src="https://img.shields.io/github/stars/Laxcorp-Research/project-raven?color=6366f1" alt="GitHub stars" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/Laxcorp-Research/project-raven?color=6366f1" alt="License" /></a>
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-6366f1" alt="Platforms: macOS and Windows" />
+  <a href="https://github.com/CommonCapital/second/releases/latest"><img src="https://img.shields.io/github/v/release/CommonCapital/second?label=release&color=B08A4A" alt="Latest release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-B08A4A" alt="License: MIT" /></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-141B2D" alt="Platforms: macOS and Windows" />
 </p>
-
-- **During the call** — dual-stream capture and an overlay that suggests what to say, invisible to screen share.
-- **After the call** — auto notes, structured action items, a follow-up email draft, talk ratio, export, and Ask across your meetings.
-- **Yours** — recordings and notes stay in local SQLite; transcription and AI use *your* API keys. Nothing goes to a Raven server.
-
-Raven is an Electron desktop app. It captures microphone and system audio, cancels echo on your machine, transcribes **You** and **Them** on two parallel streams, and answers from the live transcript. You bring your own API keys. This build has **no Raven account, no hosted backend, and no cloud session sync**.
-
-Capture, echo cancellation, SQLite history, and document RAG run locally. Microphone/system audio goes to **Deepgram** or **AssemblyAI**. Assist prompts (transcript excerpts, chat, optional screenshot, retrieved docs) go to **Anthropic** or **OpenAI**.
-
-<p align="center">
-  <a href="#download"><strong>Download</strong></a> &nbsp;|&nbsp;
-  <a href="https://github.com/Laxcorp-Research/project-raven/releases"><strong>Releases</strong></a> &nbsp;|&nbsp;
-  <a href="https://docs.useraven.ai"><strong>Docs</strong></a> &nbsp;|&nbsp;
-  <a href="https://github.com/Laxcorp-Research/project-raven/issues"><strong>Issues</strong></a>
-</p>
-
-<p align="center"><em>If Raven helps you, star the repo — it's how open source travels.</em></p>
 
 ---
+
+Second sits quietly beside your call. It hears **You** and **Them** on separate streams, understands where the conversation is going, and surfaces one useful line — the question to ask, the fact to remember, the close to land — only when it is worth interrupting you. After the call it hands you the outcome, commitments, open questions, and a follow-up draft.
+
+**The goal: you forget the software is there and simply have a better meeting.**
+
+- **Yours.** No Second account, no hosted backend, no cloud sync. Sessions live in local SQLite on your machine.
+- **Bring your own keys.** Transcription uses your **Deepgram** or **AssemblyAI** key; intelligence uses your **Anthropic** or **OpenAI** key. Nothing goes to a Second server, because there isn't one.
+- **Quiet by design.** A small overlay, keyboard-first, invisible to typical screen shares.
+
+See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what leaves your machine and when.
+
+## Principles
+
+1. **Judgment over transcription.** The transcript exists to make the next decision better.
+2. **One glance.** A suggestion should be understood in about a second and sound natural spoken aloud.
+3. **Silence is intelligence.** Often the right move is to keep listening.
+4. **Timing outranks eloquence.** A great line after the moment passes is a failed line.
+5. **Facts before inference.** Keep what was said, what is known, and what is guessed clearly apart.
+6. **Never spend credibility casually.** No bluffing, invented authority, or unearned certainty.
+7. **Close the loop.** Track open questions, commitments, owners, and the next step.
 
 ## Download
 
-Prebuilt installers are on the [latest GitHub Release](https://github.com/Laxcorp-Research/project-raven/releases/latest). Enter your own API keys in Settings on first launch.
+Prebuilt installers are published on [GitHub Releases](https://github.com/CommonCapital/second/releases/latest). Enter your own API keys on first launch.
 
 | Platform | Installer |
 |----------|-----------|
-| **Windows 10/11 (x64)** | [Raven-Windows-2.5.0-Setup.exe](https://github.com/Laxcorp-Research/project-raven/releases/download/v2.5.0/Raven-Windows-2.5.0-Setup.exe) |
-| **macOS 12+ (Apple Silicon)** | [Raven-Mac-2.5.0-Installer.dmg](https://github.com/Laxcorp-Research/project-raven/releases/download/v2.5.0/Raven-Mac-2.5.0-Installer.dmg) |
+| **macOS 12+ (Apple Silicon)** | `Second-Mac-<version>-Installer.dmg` |
+| **Windows 10/11 (x64)** | `Second-Windows-<version>-Setup.exe` |
 
-**Windows:** run the setup executable. SmartScreen may warn on an unsigned OSS build — choose **More info → Run anyway**.
+**macOS:** open the DMG, drag **Second** to Applications, then open it. Grant **Microphone** and **Screen Recording** when asked (Screen Recording is how macOS exposes system audio). Intel Macs: build from source below.
 
-**macOS:** open the DMG, drag Raven to Applications, then open it. Intel Macs are not in this DMG — build from source below.
+**Windows:** run the setup executable. SmartScreen may warn on an unsigned build — choose **More info → Run anyway**.
 
-Installed copies check GitHub Releases for updates (`latest.yml` on Windows, `latest-mac.yml` on macOS). From **2.4.1**, macOS self-updates in-app like Windows — **Update now** downloads and **Restart & update** installs (Macs on 2.4.0 update via the DMG one last time). The updater only offers a build when the published version is **newer** than the one you have. Maintainers: publishing a GitHub Release notarizes and attaches the Mac DMG — see [Releasing](CONTRIBUTING.md#releasing).
+No release published yet? Build from source with the [Getting Started](#getting-started) guide.
 
----
-
-## Screenshots
-
-<table>
-<tr>
-<td width="50%">
-
-**Dashboard — Session History**
-![Dashboard](docs/sessions.png)
-
-</td>
-<td width="50%">
-
-**Settings — API Keys**
-![API Keys](docs/API-Keys.png)
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Stealth Mode OFF — Overlay visible to screen share**
-![Detectable](docs/Detectable.png)
-
-</td>
-<td>
-
-**Stealth Mode ON — Overlay invisible to screen share**
-![Undetectable](docs/Undetectable.png)
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Settings — Model Selection**
-![Model Selection](docs/Model-Selection.png)
-
-</td>
-<td>
-
-**Onboarding — Overlay Tour**
-![Overlay Tour](docs/onboarding-4.png)
-
-</td>
-</tr>
-</table>
-
-<details>
-<summary>Full onboarding flow (6 steps)</summary>
-
-| Step 1: Welcome | Step 2: API Keys | Step 3: Permissions |
-|---|---|---|
-| ![Welcome](docs/onboarding-1.png) | ![API Keys](docs/onboarding-2.png) | ![Permissions](docs/onboarding-3.png) |
-
-| Step 4: Overlay Tour | Step 5: Shortcuts | Step 6: Ready to Go |
-|---|---|---|
-| ![Overlay Tour](docs/onboarding-4.png) | ![Shortcuts](docs/onboarding-5.png) | ![Ready](docs/onboarding-6.png) |
-
-</details>
+Installed copies check GitHub Releases for updates (`latest-mac.yml` on macOS, `latest.yml` on Windows) and only offer a build **newer** than the one you have. Maintainers: see [Releasing](CONTRIBUTING.md#releasing).
 
 ---
 
-## Features
+## Features (shipping today)
 
 - **Dual-stream capture** — System audio + microphone. macOS uses ScreenCaptureKit + CoreAudio; Windows uses WASAPI loopback + capture (Rust/NAPI).
 - **Echo cancellation** — GStreamer `webrtcechoprobe` / `webrtcdsp` (WebRTC AEC3), then a **residual echo gate** that drops mic chunks that still look like speaker bleed before they reach STT.
 - **Real-time transcription** — Two streams: **You** (cleaned mic) and **Them** (system audio). Deepgram `nova-3` and/or AssemblyAI `u3-rt-pro`. Auto-routing prefers AssemblyAI for English, Spanish, French, German, Portuguese, and Italian when that key is present; otherwise Deepgram. Settings can force either engine.
 - **AI assistance** — Anthropic or OpenAI from the overlay (Assist, recap, follow-up, and custom prompts). Optional screenshot via `desktopCapturer`.
-- **Stealth overlay** — Electron `setContentProtection` so the overlay and dashboard are omitted from typical screen-share APIs (Zoom, Meet, Teams, Discord). Not a guarantee against every capture tool.
+- **Private overlay** — The overlay and dashboard use Electron `setContentProtection`, so they are left out of typical screen shares (Zoom, Meet, Teams). Not a guarantee against every capture tool.
 - **Modes** — Local behavior profiles (system prompt, notes templates). Attach documents for RAG on that mode.
 - **RAG (per mode, local)** — Upload `.txt`, `.md`, `.pdf`, or `.docx`. Chunked and embedded on-device with `Xenova/all-MiniLM-L6-v2` (`@xenova/transformers`). Chunks live in SQLite; the top matches are injected into the Assist system prompt. First embed may download the ~30MB model.
 - **Session context (not long-term memory)** — During a recording, Assist keeps recent turns, pins the opening transcript and your typed questions, and may compress older context with a cheap model. That compacted memory is stored **on the session row** (local SQLite, deleted with the session) so a resumed session can pick it back up. There is **no** cross-meeting user-memory profile.
 - **Sessions** — Saved locally in SQLite (transcript, overlay chat, auto title/summary). Dashboard can generate insights with your LLM key. **Resume** a saved session to keep recording into it later (a multi-day interview stays one session, and Assist remembers the earlier sitting). **Incognito** skips SQLite persistence for that session.
 - **Ask your meetings** — A per-session **Ask** tab answers from that call's transcript; **Ask across all meetings** searches your whole history with on-device retrieval (`Xenova/all-MiniLM-L6-v2`) and cites the source sessions. Answers stream token-by-token; conversations are saved (one per session, plus multi-chat for the global view).
-- **Post-call recap** — Structured **action items** (task, owner, deadline), a one-click **follow-up email** draft, **talk ratio** (You vs. Them, word-based), and **export** to Markdown or PDF. All generated with your own key; nothing goes to a Raven server.
+- **Post-call recap** — Structured **action items** (task, owner, deadline), a one-click **follow-up email** draft, **talk ratio** (You vs. Them, word-based), and **export** to Markdown or PDF. All generated with your own key; nothing goes to a Second server.
 - **Meeting auto-start** — Optionally detect a Zoom, Google Meet, Microsoft Teams (including 1:1 calls), or Webex meeting and prompt — or auto-start — a recording. No bot joins; detection just reads open window titles locally. Off / prompt / auto in Settings.
-- **In-app updates** — Windows and (from 2.4.1) macOS update in place: **Update now** downloads, **Restart & update** installs. Your keys and history are untouched.
-- **Local settings** — API keys and preferences in encrypted `electron-store` (`raven-config.json`).
+- **In-app updates** — Installed builds check this repo's GitHub Releases: **Update now** downloads, **Restart & update** installs. Your keys and history are untouched.
+- **Local settings** — API keys and preferences in encrypted `electron-store` (`second-config.json`).
 - **Tray** — Packaged builds load icons from `resources/tray`. On Windows 11 a new icon may start in the `^` overflow.
 - **Profile picture editor** — Crop, zoom, and pan before saving your avatar.
 
 Live recording uses the **OS default** mic and playback devices. The Settings mic picker is for the in-app mic **test** only.
+
+## Roadmap
+
+Second is built in phases. Each phase has an exit condition; the next starts only when it is met.
+
+| Phase | Work | Exit condition |
+|-------|------|----------------|
+| 1. Consolidate | One production code path for capture, transcription, and coaching | Replayable realtime loop with no regressions |
+| 2. Stabilize capture | Permissions, mic/system meters, dual-audio self test, device-change recovery | A fresh Mac passes preflight and survives a 30-minute call |
+| 3. Meeting state | Event log + deterministic state reducer (topic, open questions, facts, numbers, commitments, objections) | Replaying a meeting reproduces the same state |
+| 4. Context | Editable profile, meeting-mode playbooks, pre-meeting brief, scoped retrieval | Mode-appropriate behavior with no external memory attached |
+| 5. Coaching | Intervention gate, one-card output (**SAY / ASK / WATCH / WAIT / CLOSE**), stale-card expiry | Curated evals reach quality and latency thresholds |
+| 6. Hardening | Credential handling, retention defaults, diagnostics, crash recovery, signing | Release candidate passes privacy and failure tests |
+| 7. Ship and learn | Real meetings, feedback capture, growing eval suite | Trusted in real high-stakes calls without supervision |
+
+Not planned for v1: a meeting bot that joins the call, autonomous emails or calendar actions, a team dashboard, or a CRM.
 
 ## Architecture
 
@@ -150,7 +111,7 @@ flowchart TB
     RAG["ragService — MiniLM embeddings"]
     MEM["sessionMemory — current recording only"]
     CS[claudeService]
-    DB[("SQLite data/raven.db")]
+    DB[("SQLite data/second.db")]
     CFG["electron-store — keys and settings"]
     OV[Overlay]
     Dash[Dashboard]
@@ -162,7 +123,7 @@ flowchart TB
     RECAP["Recap — action items, follow-up email, export, insights"]
   end
 
-  subgraph byok [Your API keys — not a Raven server]
+  subgraph byok [Your API keys — not a Second server]
     STT["Deepgram nova-3 and/or AssemblyAI u3-rt-pro"]
     LLM[Anthropic or OpenAI]
   end
@@ -207,14 +168,14 @@ flowchart TB
 | Ask conversations | Until you delete the chat / session | Saved Ask history — one per session, plus standalone global threads |
 | electron-store | Until you reset settings | Keys, STT preference, window bounds — not semantic memory |
 
-There is no global “Raven remembers you across meetings” store.
+There is no global “Second remembers you across meetings” store.
 
 ## How It Works
 
 1. You start a session (`Cmd/Ctrl + Shift + Space`, or the overlay). Incognito, if enabled, will not write the session to SQLite.
 2. A native helper captures system audio and microphone at the same time.
    - **macOS:** Swift `audiocapture` — ScreenCaptureKit (system) + CoreAudio (mic). Needs Microphone and Screen Recording.
-   - **Windows:** Rust/NAPI `raven-windows-audio` — WASAPI loopback + capture. Uses the default devices.
+   - **Windows:** Rust/NAPI `second-windows-audio` — WASAPI loopback + capture. Uses the default devices.
 3. System PCM is the AEC **reference**. Mic PCM goes through GStreamer `webrtcechoprobe` / `webrtcdsp`. `ResidualEchoGate` then compares raw mic to recent system audio and drops leftover speaker echo so it does not land in **You**.
 4. Two STT connections run in parallel (mic → You, system → Them). Engine pick is Settings `sttProvider` (`auto` / `assemblyai` / `deepgram`) plus language: AssemblyAI Universal-3 Pro for the six languages above when that key exists; Deepgram `nova-3` otherwise (including auto-detect / `multi`). AssemblyAI failures can fall back to Deepgram.
 5. The overlay shows the live transcript. Assist (`Cmd/Ctrl + Enter`) builds a prompt from the mode brief, retrieved RAG chunks (if the mode has docs), session memory, recent chat, transcript tail, and an optional screenshot, then streams from your LLM.
@@ -264,11 +225,11 @@ src/
 | **Windows 10/11** | WASAPI Loopback | WASAPI Capture | GStreamer AEC3 | Supported |
 | Linux | — | — | — | Not supported (no native capture path) |
 
-Prebuilt Mac DMG is **Apple Silicon**. Intel Macs: build from source (this section). This OSS tree does not ship login, hosted Pro, cloud sync, or Recall meeting-bot capture.
+Prebuilt Mac DMG is **Apple Silicon**. Intel Macs: build from source (this section). Second has no login, cloud sync, or meeting bot — capture happens on your machine.
 
 ## Getting Started
 
-If you only want to run Raven, use a [prebuilt installer](#download) instead of this section.
+If you only want to run Second, use a [prebuilt installer](#download) instead of this section.
 
 This walkthrough is for building from source — from a fresh machine to a running app. Pick your platform, follow every numbered step in order, and verify each one before moving on.
 
@@ -354,8 +315,8 @@ pkg-config --modversion gstreamer-1.0
 **Step 4 — Clone the repo and install dependencies**
 
 ```bash
-git clone https://github.com/Laxcorp-Research/project-raven.git
-cd project-raven
+git clone https://github.com/CommonCapital/second.git
+cd second
 npm install
 ```
 
@@ -388,7 +349,7 @@ What this does:
 
 Verify:
 ```bash
-ls src/native/aec/build/Release/raven-aec.node && echo "OK"
+ls src/native/aec/build/Release/second-aec.node && echo "OK"
 # Expected: OK
 ```
 
@@ -561,8 +522,8 @@ cmake --version
 **Step 7 — Clone the repo and install dependencies**
 
 ```
-git clone https://github.com/Laxcorp-Research/project-raven.git
-cd project-raven
+git clone https://github.com/CommonCapital/second.git
+cd second
 npm install
 ```
 
@@ -617,7 +578,7 @@ Replace `<ELECTRON_VERSION>` with the version from the previous command (e.g. `4
 
 Verify:
 ```powershell
-Test-Path src\native\aec\build\Release\raven-aec.node
+Test-Path src\native\aec\build\Release\second-aec.node
 # Expected: True
 ```
 
@@ -640,7 +601,7 @@ cd ..\..\..
 
 Verify:
 ```powershell
-Test-Path src\native\windows\raven-windows-audio.win32-x64-msvc.node
+Test-Path src\native\windows\second-windows-audio.win32-x64-msvc.node
 # Expected: True
 ```
 
@@ -713,22 +674,22 @@ npx @electron/rebuild -f -w better-sqlite3
 
 **Reset all data (fresh start):**
 
-SQLite is `data/raven.db` under the app user-data folder. Packaged builds use the product name **Raven**; `npm run dev` uses the package name **project-raven**.
+SQLite is `data/second.db` under the app user-data folder. Packaged builds use the product name **Second**; `npm run dev` uses the package name **second-desktop**, so dev and installed data stay separate.
 
 ```bash
 # macOS (packaged)
-rm -rf ~/Library/Application\ Support/Raven/
+rm -rf ~/Library/Application\ Support/Second/
 
 # macOS (dev)
-rm -rf ~/Library/Application\ Support/project-raven/
+rm -rf ~/Library/Application\ Support/second-desktop/
 ```
 
 ```bat
 :: Windows (packaged)
-rmdir /s /q "%APPDATA%\Raven"
+rmdir /s /q "%APPDATA%\Second"
 
 :: Windows (dev)
-rmdir /s /q "%APPDATA%\project-raven"
+rmdir /s /q "%APPDATA%\second-desktop"
 ```
 
 ## Contributing
@@ -743,4 +704,6 @@ Issues and pull requests are welcome. This project is in active development. See
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © Nursan Omarov.
+
+Second began as a fork of [Project Raven](https://github.com/Laxcorp-Research/project-raven) (MIT); its original copyright notice is kept in [LICENSE](LICENSE).

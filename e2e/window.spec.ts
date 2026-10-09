@@ -51,12 +51,12 @@ test.describe('Window Management', () => {
     // Evaluate the main window title
     const title = await electronApp.evaluate(({ BrowserWindow }) => {
       const windows = BrowserWindow.getAllWindows()
-      const dashboard = windows.find((w) => w.getTitle() === '' || w.getTitle() === 'Raven')
+      const dashboard = windows.find((w) => w.getTitle() === '' || w.getTitle() === 'Second')
       return dashboard?.getTitle() ?? null
     })
 
     // Title should be empty string (set in windowManager.ts)
-    expect(title === '' || title === 'Raven' || title === null).toBeTruthy()
+    expect(title === '' || title === 'Second' || title === null).toBeTruthy()
   })
 
   test('stealth mode can be toggled via IPC', async ({ electronApp }) => {

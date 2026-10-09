@@ -1,18 +1,18 @@
 name: Bug report
-description: Something in Raven isn't working as expected
+description: Something in Second isn't working as expected
 title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve Raven. Prefer not to use GitHub? Send it via the [feedback form](https://laxcorphq.wixforms.com/f/7497329197333873820) — no account needed.
+        Thanks for helping improve Second.
   - type: input
     id: version
     attributes:
-      label: Raven version
+      label: Second version
       description: See Settings → About, or the window title.
-      placeholder: "2.5.0"
+      placeholder: "0.1.0"
     validations:
       required: true
   - type: dropdown

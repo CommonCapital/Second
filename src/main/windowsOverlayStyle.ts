@@ -41,9 +41,9 @@ function loadWindowsNativeModule(): WindowsNativeModule | null {
     'src',
     'native',
     'windows',
-    'raven-windows-audio.win32-x64-msvc.node'
+    'second-windows-audio.win32-x64-msvc.node'
   )
-  const packagedPath = join(process.resourcesPath, 'raven-windows-audio.win32-x64-msvc.node')
+  const packagedPath = join(process.resourcesPath, 'second-windows-audio.win32-x64-msvc.node')
 
   try {
     cachedModule = require(devPath) as WindowsNativeModule

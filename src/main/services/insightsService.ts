@@ -1,6 +1,6 @@
 /**
  * Post-meeting insights. Runs on the user's own LLM key — same prompts
- * the hosted proxy used, without a Raven backend.
+ * the hosted proxy used, without a Second backend.
  */
 
 import { createLogger } from '../logger'

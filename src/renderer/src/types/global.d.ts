@@ -61,7 +61,7 @@ interface SessionMessage {
 
 declare global {
   interface Window {
-    raven: {
+    second: {
       storeGetAll: () => Promise<Record<string, unknown>>;
       storeGet: (key: string) => Promise<unknown>;
       storeSet: (key: string, value: unknown) => Promise<boolean>;

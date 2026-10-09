@@ -88,8 +88,8 @@ export function SearchResultsView({ query, onBack, onSessionSelect }: SearchResu
       setIsLoading(true)
       try {
         const [sessions, all] = await Promise.all([
-          window.raven.sessions.search(query),
-          window.raven.sessions.getAll()
+          window.second.sessions.search(query),
+          window.second.sessions.getAll()
         ])
         if (!cancelled) {
           setResults(sessions)

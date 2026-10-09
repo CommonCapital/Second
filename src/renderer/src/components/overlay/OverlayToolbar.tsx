@@ -19,11 +19,11 @@ export function OverlayToolbar({
   const [isRecording, setIsRecording] = useState(false)
 
   useEffect(() => {
-    const unsubRecording = window.raven.onRecordingStateChanged((state) => {
+    const unsubRecording = window.second.onRecordingStateChanged((state) => {
       setIsRecording(state.isRecording)
     })
 
-    window.raven.audioGetState().then((state) => {
+    window.second.audioGetState().then((state) => {
       setIsRecording(state.isRecording)
     }).catch((err) => log.error('Failed to get audio state:', err))
 
@@ -34,22 +34,22 @@ export function OverlayToolbar({
 
   const handleMicToggle = useCallback(async () => {
     if (isRecording) {
-      await window.raven.audioStopRecording()
+      await window.second.audioStopRecording()
     } else {
       try {
-        const micId = await window.raven.storeGet('selectedMicrophone')
-        await window.raven.audioStartRecording(
+        const micId = await window.second.storeGet('selectedMicrophone')
+        await window.second.audioStartRecording(
           typeof micId === 'string' && micId ? micId : undefined,
         )
       } catch (err) {
         log.error('Failed to start recording:', err)
-        await window.raven.audioStopRecording()
+        await window.second.audioStopRecording()
       }
     }
   }, [isRecording])
 
   useEffect(() => {
-    const unsubHotkey = window.raven.onHotkeyToggleRecording(() => {
+    const unsubHotkey = window.second.onHotkeyToggleRecording(() => {
       void handleMicToggle()
     })
 
@@ -66,7 +66,7 @@ export function OverlayToolbar({
       {/* Left: Logo + Stealth Badge */}
       <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
         <span className="text-lg">🐦‍⬛</span>
-        <span className="font-semibold text-white text-sm">Raven</span>
+        <span className="font-semibold text-white text-sm">Second</span>
         <span
           className={`text-xs px-2 py-0.5 rounded-full font-medium ${
             stealthEnabled

@@ -91,7 +91,7 @@ const {
 
 vi.mock('electron', () => ({
   app: {
-    getPath: vi.fn(() => '/tmp/raven-test'),
+    getPath: vi.fn(() => '/tmp/second-test'),
     setLoginItemSettings: mockSetLoginItemSettings,
     quit: mockQuit,
     getVersion: mockGetVersion,

@@ -1,0 +1,6 @@
+<svg width="760" height="200" viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="m"><rect width="760" height="200" fill="white"/><circle cx="125" cy="62" r="34" fill="black"/></mask>
+  <circle cx="88" cy="100" r="56" stroke="#F4EFE6" stroke-width="19" mask="url(#m)"/>
+  <circle cx="125" cy="62" r="24.5" fill="#B08A4A"/>
+  <text x="196" y="132" fill="#F4EFE6" font-family="Georgia, 'Times New Roman', Times, serif" font-size="96" font-weight="700" letter-spacing="10">SECOND</text>
+</svg>

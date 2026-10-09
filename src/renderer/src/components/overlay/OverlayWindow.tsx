@@ -187,45 +187,45 @@ export function OverlayWindow() {
 
   // Initialize
   useEffect(() => {
-    window.raven.storeGet('stealthEnabled').then((enabled) => {
+    window.second.storeGet('stealthEnabled').then((enabled) => {
       if (typeof enabled === 'boolean') setStealthEnabled(enabled)
     }).catch(() => {})
 
-    window.raven.storeGet('incognitoMode').then((enabled) => {
+    window.second.storeGet('incognitoMode').then((enabled) => {
       if (typeof enabled === 'boolean') setIncognitoMode(enabled)
     }).catch(() => {})
 
-    window.raven.audioGetState().then((state) => {
+    window.second.audioGetState().then((state) => {
       setIsRecording(state.isRecording)
     }).catch((err) => log.error('Failed to get audio state:', err))
 
     const loadInsets = () => {
-      void window.raven.windowGetOverlaySafeInsets?.().then((insets) => {
+      void window.second.windowGetOverlaySafeInsets?.().then((insets) => {
         if (insets && typeof insets.top === 'number') setSafeInsets(insets)
       }).catch(() => {})
     }
     loadInsets()
     window.addEventListener('resize', loadInsets)
 
-    const unsubStealth = window.raven.onStealthChanged((enabled: boolean) => {
+    const unsubStealth = window.second.onStealthChanged((enabled: boolean) => {
       setStealthEnabled(enabled)
     })
 
-    const unsubRecording = window.raven.onRecordingStateChanged((state) => {
+    const unsubRecording = window.second.onRecordingStateChanged((state) => {
       setIsRecording(state.isRecording)
       if (!state.isRecording) {
         setIsStarting(false)
       }
     })
 
-    const unsubNotification = window.raven.on('overlay:notification', (data: unknown) => {
+    const unsubNotification = window.second.on('overlay:notification', (data: unknown) => {
       const n = data as NotificationData
       if (n?.id) {
         pushNotification(n)
       }
     })
 
-    const unsubClaude = window.raven.onClaudeResponse((data) => {
+    const unsubClaude = window.second.onClaudeResponse((data) => {
       const clearWatchdog = () => {
         if (aiStartWatchdogRef.current) {
           clearTimeout(aiStartWatchdogRef.current)
@@ -341,11 +341,11 @@ export function OverlayWindow() {
       }
     })
 
-    const unsubAi = window.raven.onHotkeyAiSuggestion(async () => {
+    const unsubAi = window.second.onHotkeyAiSuggestion(async () => {
       await handleAssist()
     })
 
-    const unsubSessionLimit = window.raven.onSessionLimit(() => {
+    const unsubSessionLimit = window.second.onSessionLimit(() => {
       setLimitInfo({
         type: 'session',
         used: 1,
@@ -394,7 +394,7 @@ export function OverlayWindow() {
 
   useEffect(() => {
     const MOVE_STEP = 50
-    const unsub = window.raven.onHotkeyMove((direction: 'up' | 'down' | 'left' | 'right') => {
+    const unsub = window.second.onHotkeyMove((direction: 'up' | 'down' | 'left' | 'right') => {
       const vw = window.innerWidth
       const vh = window.innerHeight
       const { panelWidth: w, panelHeight: h, panelRight: r, panelBottom: b, safeInsets: insets } = layoutRef.current
@@ -459,17 +459,17 @@ export function OverlayWindow() {
 
   const handleToggleRecording = useCallback(async () => {
     if (isRecording) {
-      await window.raven.audioStopRecording()
+      await window.second.audioStopRecording()
     } else {
       setIsStarting(true)
       setResponses([])
       setActiveResponseId(null)
       activeResponseIdRef.current = null
-      await window.raven.claudeClearHistory?.()
+      await window.second.claudeClearHistory?.()
 
       try {
-        const micId = await window.raven.storeGet('selectedMicrophone')
-        const result = await window.raven.audioStartRecording(
+        const micId = await window.second.storeGet('selectedMicrophone')
+        const result = await window.second.audioStartRecording(
           typeof micId === 'string' && micId ? micId : undefined,
         ) as { success: boolean; code?: string; error?: string }
         if (result && !result.success) {
@@ -505,7 +505,7 @@ export function OverlayWindow() {
           type: 'error',
           autoDismissMs: 8000,
         })
-        await window.raven.audioStopRecording()
+        await window.second.audioStopRecording()
         setIsStarting(false)
       }
     }
@@ -516,7 +516,7 @@ export function OverlayWindow() {
   }, [isRecording])
 
   useEffect(() => {
-    const unsub = window.raven.onHotkeyToggleRecording(() => {
+    const unsub = window.second.onHotkeyToggleRecording(() => {
       handleToggleRecording()
     })
     return () => unsub()
@@ -529,14 +529,14 @@ export function OverlayWindow() {
   // ClaudeService to drop its conversation history so the NEXT AI
   // request starts fresh.
   useEffect(() => {
-    const unsub = window.raven.onHotkeyClearConversation(() => {
+    const unsub = window.second.onHotkeyClearConversation(() => {
       setResponses([])
       setActiveResponseId(null)
       activeResponseIdRef.current = null
       setIsLoadingResponse(false)
       requestInFlightRef.current = false
       setLimitInfo(null)
-      window.raven.claudeClearHistory?.().catch(() => { /* best-effort */ })
+      window.second.claudeClearHistory?.().catch(() => { /* best-effort */ })
     })
     return () => unsub()
   }, [])
@@ -555,8 +555,8 @@ export function OverlayWindow() {
         behavior: 'smooth',
       })
     }
-    const unsubUp = window.raven.onHotkeyScrollUp(() => scrollByFraction('up'))
-    const unsubDown = window.raven.onHotkeyScrollDown(() => scrollByFraction('down'))
+    const unsubUp = window.second.onHotkeyScrollUp(() => scrollByFraction('up'))
+    const unsubDown = window.second.onHotkeyScrollDown(() => scrollByFraction('down'))
     return () => {
       unsubUp()
       unsubDown()
@@ -565,14 +565,14 @@ export function OverlayWindow() {
 
   const handleHide = () => {
     setOverlayMouseIgnore(true)
-    window.raven.windowHide()
+    window.second.windowHide()
   }
 
   const handleToggleStealth = useCallback(async () => {
     const next = !stealthEnabled
     setStealthEnabled(next)
     try {
-      await window.raven.windowSetStealth(next)
+      await window.second.windowSetStealth(next)
     } catch {
       setStealthEnabled(!next)
     }
@@ -609,7 +609,7 @@ export function OverlayWindow() {
   // built here (functions can't cross IPC), which is why this is a dedicated
   // channel rather than the generic overlay:notification path.
   useEffect(() => {
-    const unsub = window.raven.on('meeting:detected', (data: unknown) => {
+    const unsub = window.second.on('meeting:detected', (data: unknown) => {
       const d = (data ?? {}) as { platform?: string; title?: string; autoStart?: boolean }
       if (isRecording) return
 
@@ -640,11 +640,11 @@ export function OverlayWindow() {
       pushNotification({
         id,
         title: 'Meeting detected',
-        body: `Start Raven for your ${platformLabel} meeting?`,
+        body: `Start Second for your ${platformLabel} meeting?`,
         type: 'meeting',
         autoDismissMs: 15000,
         action: {
-          label: 'Start Raven',
+          label: 'Start Second',
           onClick: () => {
             dismissNotification(id)
             void handleToggleRecording()
@@ -658,7 +658,7 @@ export function OverlayWindow() {
   const handleToggleIncognito = useCallback(async () => {
     const next = !incognitoMode
     setIncognitoMode(next)
-    await window.raven.storeSet('incognitoMode', next)
+    await window.second.storeSet('incognitoMode', next)
   }, [incognitoMode])
 
   const clearAiStartWatchdog = useCallback(() => {
@@ -679,7 +679,7 @@ export function OverlayWindow() {
         ...prev,
         {
           id: `ai-timeout-${Date.now()}`,
-          content: 'Raven did not start a reply. Check the AI API key in Settings, then try again.',
+          content: 'Second did not start a reply. Check the AI API key in Settings, then try again.',
           action: 'Error',
           badgeVariant: 'system',
           hasScreenshot: false,
@@ -701,10 +701,10 @@ export function OverlayWindow() {
     armAiStartWatchdog()
 
     try {
-      const transcript = await window.raven.getTranscript()
-      const activeMode = await window.raven.modes.getActive()
+      const transcript = await window.second.getTranscript()
+      const activeMode = await window.second.modes.getActive()
       if (!requestInFlightRef.current) return
-      await window.raven.claudeGetResponse({
+      await window.second.claudeGetResponse({
         transcript,
         action: opts.action,
         customPrompt: opts.customPrompt,
@@ -721,7 +721,7 @@ export function OverlayWindow() {
         ...prev,
         {
           id: `ai-fail-${Date.now()}`,
-          content: error instanceof Error ? error.message : 'Could not reach Raven. Try again.',
+          content: error instanceof Error ? error.message : 'Could not reach Second. Try again.',
           action: 'Error',
           badgeVariant: 'system',
           hasScreenshot: false,
@@ -753,7 +753,7 @@ export function OverlayWindow() {
 
   const handleClear = () => {
     setOverlayMouseIgnore(true)
-    window.raven.windowHide()
+    window.second.windowHide()
   }
 
   const handlePanelMouseEnter = () => {
@@ -1367,7 +1367,7 @@ export function OverlayWindow() {
                     // We deliberately do NOT revert on blur: flipping the
                     // window back to focusable:false kills setIgnoreMouseEvents
                     // mouse-move forwarding after Ctrl+\ (issue D).
-                    void window.raven.windowSetOverlayFocusable(true).then(() => {
+                    void window.second.windowSetOverlayFocusable(true).then(() => {
                       inputRef.current?.focus()
                     })
                   }}

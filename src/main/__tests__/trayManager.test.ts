@@ -82,7 +82,7 @@ describe('trayManager', () => {
       createTray()
 
       expect(Tray).toHaveBeenCalledOnce()
-      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Raven')
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Second')
       expect(mockTrayInstance.setContextMenu).toHaveBeenCalled()
     })
 
@@ -177,7 +177,7 @@ describe('trayManager', () => {
       updateTrayRecordingState(true)
 
       expect(mockTrayInstance.setImage).toHaveBeenCalled()
-      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Raven (Recording)')
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Second (Recording)')
       expect(mockTrayInstance.setContextMenu).toHaveBeenCalled()
     })
 
@@ -188,7 +188,7 @@ describe('trayManager', () => {
 
       updateTrayRecordingState(false)
 
-      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Raven')
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Second')
     })
 
     it('handles error when icon not found during update', () => {

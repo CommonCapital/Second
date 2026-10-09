@@ -31,7 +31,7 @@ describe('README matches the OSS runtime', () => {
     expect(text).toMatch(/sessionMemory/)
     expect(text).toMatch(/cross-meeting user-memory/)
     expect(text).toMatch(/There is no global/)
-    expect(text).not.toMatch(/Raven Backend/)
+    expect(text).not.toMatch(/Second Backend/)
     expect(text).not.toMatch(/Pro Loader/)
   })
 
@@ -43,11 +43,11 @@ describe('README matches the OSS runtime', () => {
     expect(text).not.toMatch(/Clear Conversation \| `Cmd \+ Shift \+ R`/)
   })
 
-  it('does not advertise hosted Pro, login, or Recall as available', () => {
+  it('does not advertise accounts, cloud sync, or a meeting bot as available', () => {
     const text = readme()
-    expect(text).toMatch(/no Raven account/)
-    expect(text).toMatch(/does not ship login, hosted Pro/)
-    expect(text).toMatch(/Recall meeting-bot capture/)
+    expect(text).toMatch(/No Second account/)
+    expect(text).toMatch(/no login, cloud sync, or meeting bot/)
+    expect(text).toMatch(/docs\/PRIVACY\.md/)
   })
 
   it('points maintainers at CONTRIBUTING.md for cutting a notarized Mac release', () => {
@@ -60,12 +60,11 @@ describe('CONTRIBUTING.md documents the Mac release loop', () => {
   it('states that publishing a GitHub Release is the notarize trigger', () => {
     const text = readFileSync(join(process.cwd(), 'CONTRIBUTING.md'), 'utf8')
     expect(text).toMatch(/## Releasing/)
-    expect(text).toMatch(/Dispatch notarized Mac release/)
-    expect(text).toMatch(/Release OSS macOS/)
-    expect(text).toMatch(/PRIVATE_DISPATCH_TOKEN/)
-    expect(text).toMatch(/OSS_RELEASE_GITHUB_TOKEN/)
-    expect(text).toMatch(/project-raven-private/)
-    expect(text).toMatch(/Free Apps/)
-    expect(text).not.toMatch(/release-electron\.yml/)
+    expect(text).toMatch(/release-macos\.yml/)
+    expect(text).toMatch(/release: published/)
+    for (const secret of ['MAC_CERTIFICATE', 'MAC_CERTIFICATE_PASSWORD', 'APPLE_ID', 'APPLE_PASSWORD', 'APPLE_TEAM_ID']) {
+      expect(text).toContain(`\`${secret}\``)
+    }
+    expect(text).not.toMatch(/-private/)
   })
 })

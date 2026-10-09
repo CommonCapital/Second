@@ -64,15 +64,15 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
 
   useEffect(() => {
     async function loadState() {
-      const val = await window.raven.storeGet('stealthEnabled')
+      const val = await window.second.storeGet('stealthEnabled')
       setStealth(val as boolean)
     }
     loadState()
 
     async function syncActiveSession() {
       try {
-        const active = await window.raven.sessions.getActive()
-        const session = active || (await window.raven.sessions.getInProgress())
+        const active = await window.second.sessions.getActive()
+        const session = active || (await window.second.sessions.getInProgress())
         if (session) {
           const startedAt = session.startedAt ?? session.createdAt ?? Date.now()
           setActiveSession({
@@ -88,11 +88,11 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
       }
     }
 
-    const unsub = window.raven.onStealthChanged((enabled) => {
+    const unsub = window.second.onStealthChanged((enabled) => {
       setStealth(enabled)
     })
 
-    const unsubRecording = window.raven.onRecordingStateChanged((state) => {
+    const unsubRecording = window.second.onRecordingStateChanged((state) => {
       setIsRecording(state.isRecording)
       if (state.isRecording) {
         syncActiveSession()
@@ -100,14 +100,14 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
         const sessionId = state.endedSessionId
         setActiveSession(null)
         if (sessionId) {
-          window.raven.sessions.get(sessionId).then((fullSession) => {
+          window.second.sessions.get(sessionId).then((fullSession) => {
             if (fullSession) setSelectedSession(fullSession)
           }).catch(() => {})
         }
       }
     })
 
-    const unsubSessionUpdated = window.raven.sessions.onSessionUpdated((session) => {
+    const unsubSessionUpdated = window.second.sessions.onSessionUpdated((session) => {
       if (!session) return
       setActiveSession((prev) => {
         if (prev && prev.id !== session.id) return prev
@@ -122,11 +122,11 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
       })
     })
 
-    const unsubListUpdated = window.raven.sessions.onListUpdated(() => {
+    const unsubListUpdated = window.second.sessions.onListUpdated(() => {
       setSelectedSession((prev) => {
         if (!prev) return prev
         const prevId = prev.id
-        window.raven.sessions.get(prevId).then((updated) => {
+        window.second.sessions.get(prevId).then((updated) => {
           if (updated) {
             setSelectedSession((current) => current?.id === prevId ? updated : current)
           }
@@ -135,7 +135,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
       })
     })
 
-    window.raven.audioGetState().then((state) => {
+    window.second.audioGetState().then((state) => {
       setIsRecording(state.isRecording)
       if (state.isRecording) {
         syncActiveSession()
@@ -144,7 +144,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
       }
     }).catch((err) => log.error('Failed to get audio state:', err))
 
-    const unsubTraySettings = window.raven.on('tray:open-settings', () => {
+    const unsubTraySettings = window.second.on('tray:open-settings', () => {
       setSettingsOpen(true)
     })
 
@@ -175,20 +175,20 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
 
   const handleToggleStealth = async () => {
     const newValue = !stealth
-    await window.raven.windowSetStealth(newValue)
+    await window.second.windowSetStealth(newValue)
     setStealth(newValue)
   }
 
-  const handleStartRaven = async () => {
+  const handleStartSecond = async () => {
     if (!isRecording) {
-      await window.raven.windowShowOverlay()
+      await window.second.windowShowOverlay()
     }
-    window.raven.sendHotkeyToggleRecording()
+    window.second.sendHotkeyToggleRecording()
   }
 
   const handleStopRecording = () => {
     try {
-      window.raven.sendHotkeyToggleRecording()
+      window.second.sendHotkeyToggleRecording()
     } catch (error) {
       log.error('Failed to stop recording:', error)
     }
@@ -201,7 +201,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
 
   const handleSessionSelect = async (session: { id: string }) => {
     try {
-      const fullSession = await window.raven.sessions.get(session.id)
+      const fullSession = await window.second.sessions.get(session.id)
       if (fullSession) {
         setSelectedSession(fullSession)
       }
@@ -227,7 +227,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
 
   const handleUpdateTitle = async (sessionId: string, newTitle: string) => {
     try {
-      await window.raven.sessions.updateTitle(sessionId, newTitle)
+      await window.second.sessions.updateTitle(sessionId, newTitle)
       setSelectedSession((prev) => (prev ? { ...prev, title: newTitle } : null))
     } catch (error) {
       log.error('Failed to update title:', error)
@@ -244,12 +244,12 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
         className="flex items-center justify-center shrink-0 h-9 bg-white border-b border-gray-100 text-xs font-medium text-gray-400 select-none"
         style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
       >
-        {isMac ? null : 'Raven'}
+        {isMac ? null : 'Second'}
       </div>
       <Header
         stealth={stealth}
         onToggleStealth={handleToggleStealth}
-        onStartRaven={handleStartRaven}
+        onStartSecond={handleStartSecond}
         isRecording={isRecording}
         onOpenSettings={handleOpenSettings}
         onReplayTour={() => setShowOverlayTour(true)}

@@ -38,12 +38,12 @@ export function LanguageTab() {
   useEffect(() => {
     async function loadSettings() {
       try {
-        const tLang = (await window.raven.storeGet('transcriptionLanguage')) as string
-        const oLang = (await window.raven.storeGet('outputLanguage')) as string
-        const vocab = (await window.raven.storeGet('vocabulary')) as string
-        const stt = parseSttProviderPreference(await window.raven.storeGet('sttProvider'))
-        const dgKey = (await window.raven.storeGet('deepgramApiKey')) as string
-        const aaiKey = (await window.raven.storeGet('assemblyaiApiKey')) as string
+        const tLang = (await window.second.storeGet('transcriptionLanguage')) as string
+        const oLang = (await window.second.storeGet('outputLanguage')) as string
+        const vocab = (await window.second.storeGet('vocabulary')) as string
+        const stt = parseSttProviderPreference(await window.second.storeGet('sttProvider'))
+        const dgKey = (await window.second.storeGet('deepgramApiKey')) as string
+        const aaiKey = (await window.second.storeGet('assemblyaiApiKey')) as string
         if (tLang) setTranscriptionLang(tLang)
         if (oLang) setOutputLang(oLang)
         if (vocab) setVocabulary(vocab)
@@ -79,18 +79,18 @@ export function LanguageTab() {
   const handleTranscriptionLangChange = async (value: string) => {
     setTranscriptionLang(value)
     setTranscriptionDropdownOpen(false)
-    await window.raven.storeSet('transcriptionLanguage', value)
+    await window.second.storeSet('transcriptionLanguage', value)
   }
 
   const handleOutputLangChange = async (value: string) => {
     setOutputLang(value)
     setOutputDropdownOpen(false)
-    await window.raven.storeSet('outputLanguage', value)
+    await window.second.storeSet('outputLanguage', value)
   }
 
   const handleSttProviderChange = async (value: SttProviderPreference) => {
     setSttProvider(value)
-    await window.raven.storeSet('sttProvider', value)
+    await window.second.storeSet('sttProvider', value)
   }
 
   // Debounced save - don't round-trip to the server on every keystroke.
@@ -104,7 +104,7 @@ export function LanguageTab() {
     if (vocabSaveTimerRef.current) clearTimeout(vocabSaveTimerRef.current)
     vocabSaveTimerRef.current = setTimeout(async () => {
       try {
-        await window.raven.storeSet('vocabulary', raw)
+        await window.second.storeSet('vocabulary', raw)
         setVocabularySaveState('saved')
         setTimeout(() => setVocabularySaveState('idle'), 1500)
       } catch (err) {
@@ -385,7 +385,7 @@ export function LanguageTab() {
         )}
 
         <p className="text-xs text-gray-500">
-          &quot;Raven&quot; is always included automatically - you don&apos;t need to add it.
+          &quot;Second&quot; is always included automatically - you don&apos;t need to add it.
         </p>
       </div>
     </div>

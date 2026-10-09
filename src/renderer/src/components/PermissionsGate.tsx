@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import ravenFullLogo from '../../../../logo/raven_full.svg'
+import secondFullLogo from '../../../../logo/second_full.svg'
 import { createLogger } from '../lib/logger'
 import { detectMacPlatform } from '../lib/shortcutLabels'
 import { shouldOpenAccessibilitySettingsAfterPrompt } from '../../../shared/macAccessibilityGrant'
@@ -39,7 +39,7 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const status = await window.raven.permissionsGetStatus()
+        const status = await window.second.permissionsGetStatus()
         const m: PermissionState = status.microphone === 'granted' ? 'granted' : 'denied'
         const s: PermissionState = status.screen === 'granted' ? 'granted' : 'denied'
         const a: PermissionState = status.accessibility === 'granted' ? 'granted' : 'denied'
@@ -63,11 +63,11 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
 
   const handleGrantMic = async () => {
     try {
-      const granted = await window.raven.permissionsRequestMicrophone()
+      const granted = await window.second.permissionsRequestMicrophone()
       if (granted) {
         setMic('granted')
       } else {
-        await window.raven.permissionsOpenMicrophone()
+        await window.second.permissionsOpenMicrophone()
       }
     } catch (err) {
       log.warn('Microphone grant failed:', err)
@@ -76,12 +76,12 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
 
   const handleGrantScreen = async () => {
     try {
-      const hasPerm = await window.raven.systemAudioHasPermission()
+      const hasPerm = await window.second.systemAudioHasPermission()
       if (hasPerm) {
         setScreen('granted')
         return
       }
-      await window.raven.permissionsOpenScreenRecording()
+      await window.second.permissionsOpenScreenRecording()
     } catch (err) {
       log.warn('Screen grant failed:', err)
     }
@@ -89,11 +89,11 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
 
   const handleGrantAccessibility = async () => {
     try {
-      const granted = await window.raven.permissionsRequestAccessibility()
+      const granted = await window.second.permissionsRequestAccessibility()
       if (granted) {
         setAccessibility('granted')
       } else if (shouldOpenAccessibilitySettingsAfterPrompt(granted)) {
-        await window.raven.permissionsOpenAccessibility()
+        await window.second.permissionsOpenAccessibility()
       }
     } catch (err) {
       log.warn('Accessibility grant failed:', err)
@@ -109,7 +109,7 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
         />
       )}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <img src={ravenFullLogo} alt="Raven" className="h-6" />
+        <img src={secondFullLogo} alt="Second" className="h-6" />
         <span className="text-xs text-gray-400">Permissions needed</span>
       </div>
 
@@ -119,8 +119,8 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
             <h1 className="text-xl font-semibold text-gray-900 mb-1">Grant permissions to continue</h1>
             <p className="text-sm text-gray-500">
               {isWindows
-                ? 'Raven needs microphone access to capture your voice. Windows Settings may have turned it off for desktop apps.'
-                : 'Raven needs these macOS permissions to capture audio and detect meetings. It looks like one or more have been revoked since you set Raven up.'}
+                ? 'Second needs microphone access to capture your voice. Windows Settings may have turned it off for desktop apps.'
+                : 'Second needs these macOS permissions to capture audio and detect meetings. It looks like one or more have been revoked since you set Second up.'}
             </p>
           </div>
 
@@ -170,10 +170,10 @@ export function PermissionsGate({ onAllGranted }: PermissionsGateProps): JSX.Ele
                     After enabling Screen Recording, macOS requires a restart for it to take effect.
                   </p>
                   <button
-                    onClick={() => window.raven.relaunchApp()}
+                    onClick={() => window.second.relaunchApp()}
                     className="text-xs font-medium text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-md transition-colors"
                   >
-                    Quit &amp; Reopen Raven
+                    Quit &amp; Reopen Second
                   </button>
                 </div>
               </div>

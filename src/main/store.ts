@@ -13,7 +13,7 @@ function getEncryptionKey(): string {
   //   - safeStorage.encryptString() is non-deterministic (random IV each call)
   //   - It changes across Electron major versions, breaking existing configs
   //   - It triggers macOS Keychain permission prompts on upgrade
-  const machineId = `${hostname()}-${userInfo().username}-raven-v1`;
+  const machineId = `${hostname()}-${userInfo().username}-second-v1`;
   return createHash('sha256').update(machineId).digest('hex').slice(0, 32);
 }
 
@@ -51,7 +51,7 @@ export interface LocalSettings {
   // User's custom vocabulary for transcription (comma-separated string
   // stored locally, parsed into string[] when passed to the backend as
   // keyterms). See F1 in docs/LAUNCH_V2_1_PLAN.md. The backend always
-  // prepends "Raven" + dedupes + caps at 100, so this value is the
+  // prepends "Second" + dedupes + caps at 100, so this value is the
   // user's additions only (not the brand term itself).
   vocabulary: string;
 
@@ -70,7 +70,7 @@ export interface LocalSettings {
 
   /**
    * Auto-start on meeting detection. 'off' disables detection entirely,
-   * 'prompt' shows a non-intrusive "start Raven?" toast, 'auto' starts a
+   * 'prompt' shows a non-intrusive "start Second?" toast, 'auto' starts a
    * session automatically. No meeting bot; capture stays local either way.
    */
   meetingAutoStart: 'off' | 'prompt' | 'auto';
@@ -129,7 +129,7 @@ function createStore(): Store<LocalSettings> {
   const encryptionKey = getEncryptionKey();
   try {
     const s = new Store<LocalSettings>({
-      name: 'raven-config',
+      name: 'second-config',
       defaults: STORE_DEFAULTS,
       encryptionKey,
     });
@@ -140,13 +140,13 @@ function createStore(): Store<LocalSettings> {
     // Decryption failed (e.g. encryption key changed).
     // Delete the corrupted config file and start fresh.
     try {
-      const configPath = join(app.getPath('userData'), 'raven-config.json');
+      const configPath = join(app.getPath('userData'), 'second-config.json');
       if (existsSync(configPath)) unlinkSync(configPath);
     } catch {
       // ignore - file may not exist or be locked
     }
     return new Store<LocalSettings>({
-      name: 'raven-config',
+      name: 'second-config',
       defaults: STORE_DEFAULTS,
       encryptionKey,
     });

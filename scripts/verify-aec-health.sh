@@ -45,7 +45,7 @@ fi
 # 2. Verify AEC addon exists
 echo ""
 echo "Step 2: Verify AEC addon binary"
-AEC_NODE="src/native/aec/build/Release/raven-aec.node"
+AEC_NODE="src/native/aec/build/Release/second-aec.node"
 if [ -f "$AEC_NODE" ]; then
   echo "  [PASS] $AEC_NODE exists"
   PASS=$((PASS + 1))

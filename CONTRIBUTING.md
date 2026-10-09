@@ -1,6 +1,6 @@
-# Contributing to Raven
+# Contributing to Second
 
-Thanks for your interest in contributing to Raven! This guide will help you get started.
+Thanks for your interest in contributing to Second! This guide will help you get started.
 
 ## Development Setup
 
@@ -16,8 +16,8 @@ Thanks for your interest in contributing to Raven! This guide will help you get 
 
 ```bash
 # Clone the repo
-git clone https://github.com/Laxcorp-Research/project-raven.git
-cd project-raven
+git clone https://github.com/CommonCapital/second.git
+cd second
 
 # Install dependencies
 npm install
@@ -35,8 +35,8 @@ npm run dev
 
 ```bash
 # Clone the repo
-git clone https://github.com/Laxcorp-Research/project-raven.git
-cd project-raven
+git clone https://github.com/CommonCapital/second.git
+cd second
 
 # Install dependencies
 npm install
@@ -177,51 +177,49 @@ E2E specs live in `e2e/` and cover onboarding, dashboard, recording, window mana
 
 ## Releasing
 
-Mac installers are **Developer ID–signed and notarized**. Apple certificates stay on `Laxcorp-Research/project-raven-private`; this public repo only starts that job and receives the artifacts.
+Mac installers are **Developer ID–signed and notarized** by `.github/workflows/release-macos.yml`, using signing secrets stored on this repo.
 
 ### Cut a release
 
-1. Bump `version` in `package.json` (and lockfile if needed). Merge to `main`.
+1. Bump `version` in `package.json` (and the lockfile). Merge to `main`.
 2. Tag that commit `vX.Y.Z` (must match `package.json`).
-3. **Publish a GitHub Release** on `Laxcorp-Research/project-raven` for that tag (GitHub UI or `gh release create vX.Y.Z`). Do **not** mark it as a prerelease if you want a Mac DMG.
+3. **Publish a GitHub Release** for that tag (GitHub UI or `gh release create vX.Y.Z`). Do **not** mark it as a prerelease if you want a Mac DMG.
 
 Publishing the release is the trigger. You do not pack the Mac DMG on your laptop.
 
 ### What CI does (Mac)
 
-1. Public workflow **Dispatch notarized Mac release** (`.github/workflows/dispatch-mac-release.yml`) runs on `release: published`.
-2. It starts **Release OSS macOS** on `project-raven-private` (`release-oss-macos.yml`), packing this repo at the tag.
-3. `electron-builder` signs with the Laxcorp Developer ID and notarizes (`-c.mac.notarize=true`).
-4. The job uploads to the **same public release**:
-   - `Raven-Mac-{version}-Installer.dmg` (+ `.blockmap`)
-   - `Raven-Mac-{version}-Installer.zip` (+ `.blockmap`)
-   - `latest-mac.yml`
+1. **Release macOS** runs on `release: published` on a `macos-15` runner.
+2. It builds the GStreamer echo-cancellation addon and the Swift capture helper, then runs `electron-builder` with `-c.mac.notarize=true`.
+3. It uploads to the same release:
+   - `Second-Mac-{version}-Installer.dmg` (+ `.blockmap`)
+   - `Second-Mac-{version}-Installer.zip` (+ `.blockmap`)
+   - `latest-mac.yml` (feeds the in-app updater)
 
-Watch **Release OSS macOS** on the private repo until it is green. Confirm `spctl -a -vv -t install` on `Raven.app` inside the DMG shows `source=Notarized Developer ID`.
+Confirm `spctl -a -vv -t install` on `Second.app` inside the DMG shows `source=Notarized Developer ID`.
 
-To retry without a new tag: **Actions → Dispatch notarized Mac release → Run workflow** with the existing tag (ref defaults to the tag).
+To retry without a new tag: **Actions → Release macOS → Run workflow** with the existing tag.
 
 ### Secrets (one-time)
 
-| Secret | Repo | Purpose |
-|--------|------|---------|
-| `PRIVATE_DISPATCH_TOKEN` | **public** `project-raven` | PAT: Actions read/write on `project-raven-private` (so this repo can start the pack). |
-| `MAC_CERTIFICATE`, `MAC_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID` | **private** `project-raven-private` | Developer ID + notarytool (same as Pro). |
-| `OSS_RELEASE_GITHUB_TOKEN` | **private** `project-raven-private` | PAT: Contents write on public `project-raven` (attach files to the GitHub Release). |
+| Secret | Purpose |
+|--------|---------|
+| `MAC_CERTIFICATE` | Base64 of your Developer ID Application `.p12` |
+| `MAC_CERTIFICATE_PASSWORD` | Password for that `.p12` |
+| `APPLE_ID` | Apple ID used for notarization |
+| `APPLE_PASSWORD` | App-specific password for that Apple ID |
+| `APPLE_TEAM_ID` | 10-character Apple Developer Team ID |
 
-Do not put the Apple `.p12` on the public repo. Prefer fine-grained PATs over a `gh auth` OAuth token (OAuth tokens die if you log out of `gh`).
-
-If notarytool returns **HTTP 403 agreement missing or expired**, the Account Holder must re-accept **Free Apps** in [App Store Connect → Agreements](https://appstoreconnect.apple.com/agreements). Skip Paid Apps bank/tax/DSA unless you actually sell on the App Store.
+If notarytool returns **HTTP 403 agreement missing or expired**, the Account Holder must re-accept the agreements in [App Store Connect → Agreements](https://appstoreconnect.apple.com/agreements).
 
 ### Windows
 
-NSIS is still packed on a **local Windows machine** (GStreamer + WASAPI). Upload `Raven-Windows-{version}-Setup.exe`, its `.blockmap`, and `latest.yml` to the same GitHub Release. Do not replace the Mac assets.
+NSIS is packed on a **local Windows machine** (GStreamer + WASAPI). Optional EV signing runs through `build/win-sign.cjs` when `WIN_SIGN_THUMBPRINT` is set. Upload `Second-Windows-{version}-Setup.exe`, its `.blockmap`, and `latest.yml` to the same GitHub Release.
 
 ### What this does not do
 
 - Merging to `main` does not build a DMG.
-- Same-version clobber does not prompt installs already on that version (updater only offers a **newer** semver).
-- Packaged Mac still uses the GitHub DMG flow, not ShipIt, until that is turned on separately.
+- The updater only offers a **newer** semver than the installed one.
 
 ## Pull Request Process
 
@@ -240,7 +238,7 @@ Open an issue on GitHub with:
 
 - Steps to reproduce
 - Expected vs actual behavior
-- OS version (macOS/Windows) and Raven version
+- OS version (macOS/Windows) and Second version
 - Console logs if relevant (View > Toggle Developer Tools)
 
 ## Feature Requests
@@ -253,4 +251,4 @@ Open a GitHub Discussion or Issue with:
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/Laxcorp-Research/project-raven/discussions) — we're happy to help.
+Open a [GitHub Discussion](https://github.com/CommonCapital/second/discussions) — we're happy to help.

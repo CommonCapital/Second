@@ -31,14 +31,14 @@ export function AudioTab() {
         const mics = devices.filter((d) => d.kind === 'audioinput')
         setMicrophones(mics)
 
-        const savedMic = (await window.raven.storeGet('selectedMicrophone')) as string
+        const savedMic = (await window.second.storeGet('selectedMicrophone')) as string
         if (savedMic && mics.find((m) => m.deviceId === savedMic)) {
           setSelectedMic(savedMic)
         } else if (mics.length > 0) {
           setSelectedMic(mics[0].deviceId)
         }
 
-        const systemAudio = (await window.raven.storeGet('captureSystemAudio')) as boolean
+        const systemAudio = (await window.second.storeGet('captureSystemAudio')) as boolean
         if (systemAudio !== undefined) setCaptureSystemAudio(systemAudio)
       } catch (error) {
         log.error('Failed to load microphones:', error)
@@ -64,7 +64,7 @@ export function AudioTab() {
   const handleMicChange = async (deviceId: string) => {
     setSelectedMic(deviceId)
     setDropdownOpen(false)
-    await window.raven.storeSet('selectedMicrophone', deviceId)
+    await window.second.storeSet('selectedMicrophone', deviceId)
 
     if (isTestingMic) {
       stopMicTest()
@@ -77,7 +77,7 @@ export function AudioTab() {
   const handleSystemAudioToggle = async () => {
     const newValue = !captureSystemAudio
     setCaptureSystemAudio(newValue)
-    await window.raven.storeSet('captureSystemAudio', newValue)
+    await window.second.storeSet('captureSystemAudio', newValue)
   }
 
   const startMicTest = async (deviceId?: string) => {
@@ -151,7 +151,7 @@ registerProcessor('pcm-capture-processor', PcmCaptureProcessor)
           const sample = Math.max(-1, Math.min(1, resampled[i]))
           int16Data[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff
         }
-        void window.raven.sendTestAudio(int16Data.buffer)
+        void window.second.sendTestAudio(int16Data.buffer)
       }
       source.connect(workletNode)
       workletNodeRef.current = workletNode
@@ -180,14 +180,14 @@ registerProcessor('pcm-capture-processor', PcmCaptureProcessor)
       updateBars()
 
       try {
-        const result = await window.raven.startTestTranscription(micId)
+        const result = await window.second.startTestTranscription(micId)
         if (!result?.success) {
           setTestError(result?.error || 'Could not reach AssemblyAI or Deepgram.')
           stopMicTest()
           return
         }
         transcriptUnsubscribeRef.current?.()
-        transcriptUnsubscribeRef.current = window.raven.onTestTranscriptionUpdate((data) => {
+        transcriptUnsubscribeRef.current = window.second.onTestTranscriptionUpdate((data) => {
           if (!data.text) return
           if (data.isFinal) {
             setTestTranscript((prev) => {
@@ -253,7 +253,7 @@ registerProcessor('pcm-capture-processor', PcmCaptureProcessor)
     }
 
     try {
-      void window.raven.stopTestTranscription()
+      void window.second.stopTestTranscription()
       transcriptUnsubscribeRef.current?.()
       transcriptUnsubscribeRef.current = null
     } catch (err) {

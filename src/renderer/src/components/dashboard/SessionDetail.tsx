@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react'
 import Markdown from 'react-markdown'
 import { useAskConversation, type AskFn, type AskConversationState } from '../../lib/useAskConversation'
-import ravenLogo from '../../../../../logo/raven.svg'
+import secondLogo from '../../../../../logo/second.svg'
 import { createLogger } from '../../lib/logger'
 import { isPlaceholderSessionTitle } from '../../../../shared/sessionDisplay'
 import { parseActionItems, type ActionItem } from '../../../../shared/actionItems'
@@ -94,7 +94,7 @@ export function SessionDetail({ session, onBack, onUpdateTitle, isRecording = fa
 
   useEffect(() => {
     async function loadName() {
-      const name = (await window.raven.storeGet('displayName')) as string
+      const name = (await window.second.storeGet('displayName')) as string
       setDisplayName(name || '')
     }
     loadName().catch(() => {})
@@ -267,7 +267,7 @@ export function SessionDetail({ session, onBack, onUpdateTitle, isRecording = fa
     setNotesStatus('generating')
     setNotesError(null)
     try {
-      const ok = await window.raven.sessions.regenerateSummary(requestId)
+      const ok = await window.second.sessions.regenerateSummary(requestId)
       if (currentSessionIdRef.current !== requestId) return
       if (ok !== true && !session.summary?.trim()) {
         setNotesStatus('failed')
@@ -299,7 +299,7 @@ export function SessionDetail({ session, onBack, onUpdateTitle, isRecording = fa
   const loadMessages = async () => {
     setLoadingMessages(true)
     try {
-      const msgs = await window.raven.sessions.getMessages(session.id)
+      const msgs = await window.second.sessions.getMessages(session.id)
       setMessages(msgs)
     } catch (error) {
       log.error('Failed to load messages:', error)
@@ -312,7 +312,7 @@ export function SessionDetail({ session, onBack, onUpdateTitle, isRecording = fa
     if (activeTab === 'transcript') return transcriptText
     if (activeTab === 'usage') {
       return messages
-        .map((message) => `${message.role === 'user' ? userName : 'Raven'}: ${message.content}`)
+        .map((message) => `${message.role === 'user' ? userName : 'Second'}: ${message.content}`)
         .join('\n\n')
     }
     if (activeTab === 'insights' && currentInsightsJson) {
@@ -682,7 +682,7 @@ function SummaryTab({
     if (text === savedSummary) return
     setSavedSummary(text)
     try {
-      await window.raven.sessions.update(sessionId, { summary: text })
+      await window.second.sessions.update(sessionId, { summary: text })
     } catch (err) {
       console.error('Failed to save summary:', err)
     }
@@ -820,7 +820,7 @@ function FollowupDraft({ sessionId, initialDraft }: { sessionId: string; initial
     setLoading(true)
     setError(null)
     try {
-      const result = await window.raven.sessions.draftFollowup(sessionId)
+      const result = await window.second.sessions.draftFollowup(sessionId)
       if (result && typeof result === 'object' && 'email' in result && result.email) {
         setDraft(result.email)
       } else {
@@ -916,9 +916,9 @@ function ResumeSessionButton({ sessionId, disabled }: { sessionId: string; disab
     try {
       // Same as the dashboard's Start: the overlay is where the "Session
       // resumed" notice, the replayed answers and Assist live.
-      await window.raven.windowShowOverlay()
-      const micId = await window.raven.storeGet('selectedMicrophone')
-      const result = await window.raven.audioStartRecording(
+      await window.second.windowShowOverlay()
+      const micId = await window.second.storeGet('selectedMicrophone')
+      const result = await window.second.audioStartRecording(
         typeof micId === 'string' && micId ? micId : undefined,
         { resumeSessionId: sessionId },
       )
@@ -991,7 +991,7 @@ function ExportMenu({ sessionId, disabled }: { sessionId: string; disabled: bool
     setBusy(true)
     setStatus(null)
     try {
-      const result = await window.raven.sessions.export(sessionId, format, includeTranscript)
+      const result = await window.second.sessions.export(sessionId, format, includeTranscript)
       if (result?.ok) {
         setStatus('Saved')
         setOpen(false)
@@ -1089,7 +1089,7 @@ function ActionItemsCard({ actionItemsJson, sessionId }: { actionItemsJson: stri
     })
     setItems(next)
     // Persist the checked state so it survives navigation (best-effort).
-    window.raven.sessions
+    window.second.sessions
       .update(sessionId, { actionItemsJson: JSON.stringify(next) } as Record<string, unknown>)
       .catch((err) => console.error('Failed to save action item state:', err))
   }
@@ -1139,7 +1139,7 @@ function SessionAskTab({ sessionId, hasTranscript }: { sessionId: string; hasTra
   useEffect(() => {
     let cancelled = false
     setInitial(undefined)
-    window.raven.sessions
+    window.second.sessions
       .getAsk(sessionId)
       .then((state) => { if (!cancelled) setInitial(state ?? null) })
       .catch(() => { if (!cancelled) setInitial(null) })
@@ -1172,11 +1172,11 @@ function SessionAskChat({ sessionId, initial }: { sessionId: string; initial: As
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const ask = useCallback<AskFn>(
-    (question, ctx, onToken) => window.raven.sessions.askStream('one', sessionId, question, ctx, onToken),
+    (question, ctx, onToken) => window.second.sessions.askStream('one', sessionId, question, ctx, onToken),
     [sessionId],
   )
   const persist = useCallback(
-    (state: AskConversationState) => { void window.raven.sessions.saveAsk(sessionId, state) },
+    (state: AskConversationState) => { void window.second.sessions.saveAsk(sessionId, state) },
     [sessionId],
   )
   const { exchanges, busy, submit } = useAskConversation(ask, { initial, onPersist: persist })
@@ -1624,7 +1624,7 @@ function InsightsTab({ sessionId, transcript, hasTranscript, savedInsights, onIn
     setError(null)
 
     try {
-      const result = await window.raven.proxyAnalyzeSession({
+      const result = await window.second.proxyAnalyzeSession({
         transcript,
         features: ['sentiment', 'topics', 'key_phrases'],
         sessionId,
@@ -1650,7 +1650,7 @@ function InsightsTab({ sessionId, transcript, hasTranscript, savedInsights, onIn
         if (hasAny) {
           const insightsStr = JSON.stringify(rawInsights)
           try {
-            await window.raven.sessions.update(sessionId, { insightsJson: insightsStr } as Record<string, unknown>)
+            await window.second.sessions.update(sessionId, { insightsJson: insightsStr } as Record<string, unknown>)
             onInsightsSaved?.(insightsStr)
           } catch (saveErr) {
             console.warn('[Insights] Failed to save:', saveErr)
@@ -1783,7 +1783,7 @@ function UsageTab({ messages, loading }: { messages: SessionMessage[]; loading: 
           </svg>
         </div>
         <p className="text-gray-500">No AI interactions yet</p>
-        <p className="text-sm text-gray-400 mt-1">Ask Raven for help during your session</p>
+        <p className="text-sm text-gray-400 mt-1">Ask Second for help during your session</p>
       </div>
     )
   }
@@ -1829,7 +1829,7 @@ function UsageTab({ messages, loading }: { messages: SessionMessage[]; loading: 
           ) : (
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center">
-                <img src={ravenLogo} alt="Raven" className="w-4 h-4" draggable={false} />
+                <img src={secondLogo} alt="Second" className="w-4 h-4" draggable={false} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">

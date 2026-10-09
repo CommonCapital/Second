@@ -26,8 +26,8 @@ class ErrorBoundary extends React.Component<
     // error reporter to throw its own errors.
     try {
       const api = (window as unknown as {
-        raven?: { reportRendererError?: (p: { message: string; stack?: string; componentStack?: string }) => void }
-      }).raven
+        second?: { reportRendererError?: (p: { message: string; stack?: string; componentStack?: string }) => void }
+      }).second
       api?.reportRendererError?.({
         message: error.message,
         stack: error.stack,

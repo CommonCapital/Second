@@ -48,15 +48,15 @@ export function TranscriptTab() {
     // ("overlay speaker label" or similar) rather than reusing
     // displayName, which has conflicting consumers.
 
-    window.raven.getTranscriptEntries?.().then((e: TranscriptEntry[]) => {
+    window.second.getTranscriptEntries?.().then((e: TranscriptEntry[]) => {
       if (e) setEntries(e);
     }).catch(() => {});
 
-    window.raven.audioGetState().then((state: { isRecording: boolean }) => {
+    window.second.audioGetState().then((state: { isRecording: boolean }) => {
       setIsRecording(state.isRecording);
     }).catch(() => {});
 
-    const unsubTranscript = window.raven.onTranscriptUpdate((data) => {
+    const unsubTranscript = window.second.onTranscriptUpdate((data) => {
       const incoming = (data as unknown as { entry?: TranscriptEntry }).entry
       if (incoming && data.isFinal) {
         setEntries(prev => {
@@ -78,7 +78,7 @@ export function TranscriptTab() {
       }
     });
 
-    const unsubRecording = window.raven.onRecordingStateChanged((state) => {
+    const unsubRecording = window.second.onRecordingStateChanged((state) => {
       setIsRecording(state.isRecording);
       if (!state.isRecording) {
         setRecordingStartedAt(null)
@@ -93,13 +93,13 @@ export function TranscriptTab() {
       }
     });
 
-    const unsubConn = window.raven.onTranscriptionConnectionState?.((data) => {
+    const unsubConn = window.second.onTranscriptionConnectionState?.((data) => {
       setConnection(data)
     }) ?? (() => {})
 
     // A resumed session preloads the provider with the earlier sitting;
     // show it here too so this tab agrees with the model and the dashboard.
-    const unsubSeeded = window.raven.on('transcription:seeded', (data: unknown) => {
+    const unsubSeeded = window.second.on('transcription:seeded', (data: unknown) => {
       if (Array.isArray(data)) setEntries(data as TranscriptEntry[])
     })
 

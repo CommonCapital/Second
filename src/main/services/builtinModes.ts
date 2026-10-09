@@ -98,7 +98,7 @@ export async function createDefaultMode(): Promise<void> {
  * but only if the user hasn't edited it (exact-string match on the
  * pre-v2.1 default). Leaves user-edited prompts strictly alone.
  *
- * Intentionally NOT guarded by a "has-run" flag. Raven Pro switches SQLite
+ * Intentionally NOT guarded by a "has-run" flag. Second Pro switches SQLite
  * DBs per account (databaseService.switchToAccountDatabase) so a boot-time
  * flag would skip the migration for a DB that loads later in the session.
  * The function is idempotent instead: after a successful rewrite the row

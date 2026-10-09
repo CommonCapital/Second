@@ -4,7 +4,7 @@
  * eSigner CKA virtual USB token.
  *
  * The hook is invoked by electron-builder during a Windows release-CI
- * build for every PE binary in the package (Raven.exe, the NSIS
+ * build for every PE binary in the package (Second.exe, the NSIS
  * Uninstall.exe, elevate.exe, agent-windows.exe, and the Setup
  * wrapper). A regression that silently no-ops the signing call - or,
  * worse, swallows a signtool non-zero exit - would re-ship the v2.2.0
@@ -84,7 +84,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     // --win` work on a developer's laptop without the cloud-signing
     // infra.
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,
@@ -101,7 +101,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     spawnSync.mockReturnValue({ status: 0, error: null, stdout: '', stderr: '' })
 
     // Thumbprint as copied from certmgr.msc Details: spaces every 2 chars.
-    await hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+    await hook._signWithDeps({ path: '/tmp/Second.exe' }, {
       existsSync,
       readdirSync,
       spawnSync,
@@ -118,7 +118,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
 
   it('rejects a non-hex thumbprint (e.g., the user pasted a credential UUID instead of the cert thumbprint)', async () => {
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,
@@ -133,7 +133,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
 
   it('rejects an obviously-too-short thumbprint (catch truncated paste / wrong cert reference)', async () => {
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,
@@ -146,7 +146,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     existsSync.mockImplementation((p: string) => p === FAKE_SIGNTOOL)
 
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,
@@ -159,10 +159,10 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
 
   it('throws when WIN_SIGN_SIGNTOOL_PATH is unset and autodetect cannot find any SDK (gives an actionable error rather than silently skipping or crashing)', async () => {
     // existsSync(input file) = true; existsSync(SDK root) = false.
-    existsSync.mockImplementation((p: string) => p === '/tmp/Raven.exe')
+    existsSync.mockImplementation((p: string) => p === '/tmp/Second.exe')
 
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,
@@ -177,7 +177,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     existsSync.mockReturnValue(true)
     spawnSync.mockReturnValue({ status: 0, error: null, stdout: '', stderr: '' })
 
-    await hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+    await hook._signWithDeps({ path: '/tmp/Second.exe' }, {
       existsSync,
       readdirSync,
       spawnSync,
@@ -193,7 +193,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     existsSync.mockReturnValue(true)
     spawnSync.mockReturnValue({ status: 0, error: null, stdout: '', stderr: '' })
 
-    await hook._signWithDeps({ path: '/tmp/release/Raven.exe' }, {
+    await hook._signWithDeps({ path: '/tmp/release/Second.exe' }, {
       existsSync,
       readdirSync,
       spawnSync,
@@ -209,7 +209,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
       '/tr', 'http://ts.ssl.com',
       '/td', 'sha256',
       '/sha1', VALID_THUMB,
-      '/tmp/release/Raven.exe',
+      '/tmp/release/Second.exe',
     ])
     // shell:false because the file path can contain `&`, `(`, `)`,
     // `^`, etc. - cmd.exe would mangle them.
@@ -220,7 +220,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     existsSync.mockReturnValue(true)
     spawnSync.mockReturnValue({ status: 0, error: null, stdout: '', stderr: '' })
 
-    await hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+    await hook._signWithDeps({ path: '/tmp/Second.exe' }, {
       existsSync,
       readdirSync,
       spawnSync,
@@ -238,7 +238,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     existsSync.mockReturnValue(true)
     spawnSync.mockReturnValue({ status: 0, error: null, stdout: '', stderr: '' })
 
-    await hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+    await hook._signWithDeps({ path: '/tmp/Second.exe' }, {
       existsSync,
       readdirSync,
       spawnSync,
@@ -255,7 +255,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     spawnSync.mockReturnValue({ status: 1, error: null, stdout: '', stderr: 'SignTool Error: ...' })
 
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,
@@ -274,7 +274,7 @@ describe('build/win-sign.cjs (W1: signtool.exe + eSigner CKA integration)', () =
     })
 
     await expect(
-      hook._signWithDeps({ path: '/tmp/Raven.exe' }, {
+      hook._signWithDeps({ path: '/tmp/Second.exe' }, {
         existsSync,
         readdirSync,
         spawnSync,

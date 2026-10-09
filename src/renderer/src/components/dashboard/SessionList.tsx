@@ -1,5 +1,5 @@
 /**
- * Session List - Cluely-style design
+ * Session List
  * - Grouped by date: "Today", "Yesterday", "Mon, Feb 2"
  * - Clean rows: Title | Duration | Time
  * - Minimal design, no cards
@@ -128,13 +128,13 @@ export function SessionList({ onSessionSelect, activeSessionId, activeSession, s
 
   useEffect(() => {
     loadSessions()
-    const unsubscribe = window.raven.sessions.onListUpdated(() => {
+    const unsubscribe = window.second.sessions.onListUpdated(() => {
       loadSessions()
     })
-    const unsubPending = window.raven.sessions.onSummaryPending((sessionId) => {
+    const unsubPending = window.second.sessions.onSummaryPending((sessionId) => {
       setPendingNotesIds((prev) => new Set(prev).add(sessionId))
     })
-    const unsubDone = window.raven.sessions.onSummaryDone((sessionId) => {
+    const unsubDone = window.second.sessions.onSummaryDone((sessionId) => {
       setPendingNotesIds((prev) => {
         const next = new Set(prev)
         next.delete(sessionId)
@@ -161,7 +161,7 @@ export function SessionList({ onSessionSelect, activeSessionId, activeSession, s
   async function loadSessions() {
     try {
       setIsLoading(true)
-      const allSessions = await window.raven.sessions.getAll()
+      const allSessions = await window.second.sessions.getAll()
       const mapped = allSessions.map((session) => ({
         id: session.id,
         title: session.title,
@@ -202,7 +202,7 @@ export function SessionList({ onSessionSelect, activeSessionId, activeSession, s
     setToast({ message: 'Deleting session...', type: 'loading' })
     try {
       await Promise.all([
-        window.raven.sessions.delete(sessionId),
+        window.second.sessions.delete(sessionId),
         new Promise((resolve) => setTimeout(resolve, 2000)),
       ])
       setToast({ message: 'Deleted session', type: 'success' })
@@ -220,7 +220,7 @@ export function SessionList({ onSessionSelect, activeSessionId, activeSession, s
 
     setRegeneratingId(sessionId)
     try {
-      const result = await window.raven.sessions.regenerateSummary(sessionId)
+      const result = await window.second.sessions.regenerateSummary(sessionId)
       if (result !== true) {
         setToast({ message: 'Could not generate title or summary', type: 'error' })
         return

@@ -66,18 +66,6 @@ Thumbs.db
 # Build artifacts
 release/
 
-# Premium features (only tracked on the premium branch)
-src/pro/
-backend/
-infra/
-docs/*.md
-.github/SECRETS.md
-.github/workflows/deploy-backend.yml
-.github/workflows/release-electron.yml
-
-# Project-specific
-RavenPlan.txt
-cluely/
 
 # Old placeholder tray icons (quarantine-locked, replaced by icon*.png)
 resources/tray/trayTemplate.png

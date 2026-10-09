@@ -1,4 +1,0 @@
-module CAecBridge {
-    header "aec_bridge.h"
-    export *
-}

@@ -89,14 +89,14 @@ export function ModelsTab() {
           anthropicKey,
           openaiKey,
         ] = await Promise.all([
-          window.raven.storeGet('aiProvider'),
-          window.raven.storeGet('aiModel'),
-          window.raven.storeGet('aiEffort'),
-          window.raven.storeGet('notesProvider'),
-          window.raven.storeGet('notesModel'),
-          window.raven.storeGet('notesEffort'),
-          window.raven.storeGet('anthropicApiKey'),
-          window.raven.storeGet('openaiApiKey'),
+          window.second.storeGet('aiProvider'),
+          window.second.storeGet('aiModel'),
+          window.second.storeGet('aiEffort'),
+          window.second.storeGet('notesProvider'),
+          window.second.storeGet('notesModel'),
+          window.second.storeGet('notesEffort'),
+          window.second.storeGet('anthropicApiKey'),
+          window.second.storeGet('openaiApiKey'),
         ])
 
         const liveProvider = parseAIProviderName(aiProviderRaw) ?? 'anthropic'
@@ -129,17 +129,17 @@ export function ModelsTab() {
   }
 
   const persistLive = async (next: SlotState) => {
-    await window.raven.storeSet('aiProvider', next.provider)
-    await window.raven.storeSet('aiModel', next.model)
-    await window.raven.storeSet('aiEffort', next.effort)
+    await window.second.storeSet('aiProvider', next.provider)
+    await window.second.storeSet('aiModel', next.model)
+    await window.second.storeSet('aiEffort', next.effort)
     flashSaved()
   }
 
   const persistNotes = async (next: SlotState) => {
     setNotesExplicit(true)
-    await window.raven.storeSet('notesProvider', next.provider)
-    await window.raven.storeSet('notesModel', next.model)
-    await window.raven.storeSet('notesEffort', next.effort)
+    await window.second.storeSet('notesProvider', next.provider)
+    await window.second.storeSet('notesModel', next.model)
+    await window.second.storeSet('notesEffort', next.effort)
     flashSaved()
   }
 

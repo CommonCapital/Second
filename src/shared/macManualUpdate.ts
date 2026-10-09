@@ -4,8 +4,9 @@
  * Pure helpers live here so the dashboard modal can share the same rules.
  */
 
-export const MAC_UPDATE_FEED_URL =
-  'https://github.com/Laxcorp-Research/project-raven/releases/latest/download/latest-mac.yml'
+import { RELEASES_URL } from './project'
+
+export const MAC_UPDATE_FEED_URL = `${RELEASES_URL}/latest/download/latest-mac.yml`
 
 export function parseLatestMacYmlVersion(yml: string): string | null {
   const match = yml.match(/^version:\s*['"]?(\d+\.\d+\.\d+)['"]?\s*$/m)
@@ -31,7 +32,7 @@ export function compareSemver(a: string, b: string): number {
 }
 
 export function macDmgDownloadUrl(version: string): string {
-  return `https://github.com/Laxcorp-Research/project-raven/releases/download/v${version}/Raven-Mac-${version}-Installer.dmg`
+  return `${RELEASES_URL}/download/v${version}/Second-Mac-${version}-Installer.dmg`
 }
 
 export function evaluateMacManualUpdate(opts: {

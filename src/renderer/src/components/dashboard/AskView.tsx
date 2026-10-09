@@ -43,7 +43,7 @@ export function AskView({ onBack, onSessionSelect }: AskViewProps) {
 
   const refreshList = useCallback(async (): Promise<ConversationMeta[]> => {
     try {
-      const list = await window.raven.askConversations.list()
+      const list = await window.second.askConversations.list()
       setConversations(list)
       list.forEach((c) => createdRef.current.add(c.id))
       return list
@@ -56,7 +56,7 @@ export function AskView({ onBack, onSessionSelect }: AskViewProps) {
     setActiveInitial(undefined)
     setActiveId(id)
     try {
-      const conv = await window.raven.askConversations.get(id)
+      const conv = await window.second.askConversations.get(id)
       setActiveInitial(conv?.state ?? null)
     } catch {
       setActiveInitial(null)
@@ -72,7 +72,7 @@ export function AskView({ onBack, onSessionSelect }: AskViewProps) {
   useEffect(() => {
     // Lazily index sessions recorded before this feature existed. The embedding
     // model only loads here, when the user actually opens Ask.
-    window.raven.sessions.ensureIndex().catch(() => {})
+    window.second.sessions.ensureIndex().catch(() => {})
     void (async () => {
       const list = await refreshList()
       if (list.length > 0) {
@@ -90,10 +90,10 @@ export function AskView({ onBack, onSessionSelect }: AskViewProps) {
       try {
         if (!createdRef.current.has(id)) {
           // First turn of a new chat: materialize it, auto-titled.
-          await window.raven.askConversations.create(id, deriveTitle(state))
+          await window.second.askConversations.create(id, deriveTitle(state))
           createdRef.current.add(id)
         }
-        await window.raven.askConversations.save(id, { state })
+        await window.second.askConversations.save(id, { state })
         await refreshList()
       } catch {
         // Persistence is best-effort; the in-memory chat still works.
@@ -105,7 +105,7 @@ export function AskView({ onBack, onSessionSelect }: AskViewProps) {
   const handleDelete = useCallback(
     async (id: string) => {
       try {
-        await window.raven.askConversations.delete(id)
+        await window.second.askConversations.delete(id)
       } catch {
         // ignore
       }
@@ -125,7 +125,7 @@ export function AskView({ onBack, onSessionSelect }: AskViewProps) {
       setRenamingId(null)
       if (!title) return
       try {
-        await window.raven.askConversations.rename(id, title)
+        await window.second.askConversations.rename(id, title)
         await refreshList()
       } catch {
         // ignore
@@ -253,7 +253,7 @@ function AskChat({
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const ask = useCallback<AskFn>(
-    (question, ctx, onToken) => window.raven.sessions.askStream('all', null, question, ctx, onToken),
+    (question, ctx, onToken) => window.second.sessions.askStream('all', null, question, ctx, onToken),
     [],
   )
   const { exchanges, busy, submit } = useAskConversation(ask, { initial, onPersist })

@@ -2,7 +2,7 @@
  * GStreamer-based AEC (Acoustic Echo Cancellation) NAPI addon.
  *
  * Uses the webrtcechoprobe/webrtcdsp pipeline (same AEC3 engine as
- * Recall.ai / Cluely). Adds production resilience:
+ * other desktop meeting tools). Adds production resilience:
  *   - Timestamp drift detection between mic and system streams
  *   - Push failure tracking (buffer overflow)
  *   - RMS level monitoring on all streams
@@ -477,4 +477,4 @@ Napi::Object InitModule(Napi::Env env, Napi::Object exports) {
     return exports;
 }
 
-NODE_API_MODULE(raven_aec, InitModule)
+NODE_API_MODULE(second_aec, InitModule)

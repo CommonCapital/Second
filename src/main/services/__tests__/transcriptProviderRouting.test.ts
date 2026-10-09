@@ -133,25 +133,25 @@ describe('parseSttProviderPreference', () => {
 })
 
 describe('sanitizeKeyterms', () => {
-  it('always prepends Raven and dedupes case-insensitively', () => {
-    expect(sanitizeKeyterms(['raven', 'Zoom', 'Raven'])).toEqual(['Raven', 'Zoom'])
+  it('always prepends Second and dedupes case-insensitively', () => {
+    expect(sanitizeKeyterms(['second', 'Zoom', 'Second'])).toEqual(['Second', 'Zoom'])
   })
 
   it('caps at 100 terms', () => {
     const many = Array.from({ length: 120 }, (_, i) => `term-${i}`)
     expect(sanitizeKeyterms(many)).toHaveLength(100)
-    expect(sanitizeKeyterms(many)[0]).toBe('Raven')
+    expect(sanitizeKeyterms(many)[0]).toBe('Second')
   })
 })
 
 describe('buildProviderBody', () => {
   it('emits assembly_ai_v3_streaming with keyterms_prompt', () => {
     expect(
-      buildProviderBody({ kind: 'assemblyai', speechModel: 'u3-rt-pro' }, ['Raven', 'Zoom']),
+      buildProviderBody({ kind: 'assemblyai', speechModel: 'u3-rt-pro' }, ['Second', 'Zoom']),
     ).toEqual({
       assembly_ai_v3_streaming: {
         speech_model: 'u3-rt-pro',
-        keyterms_prompt: 'Raven, Zoom',
+        keyterms_prompt: 'Second, Zoom',
       },
     })
   })
@@ -159,13 +159,13 @@ describe('buildProviderBody', () => {
   it('emits deepgram_streaming with string smart_format', () => {
     const body = buildProviderBody(
       { kind: 'deepgram', model: 'nova-3', language: 'hi' },
-      ['Raven'],
+      ['Second'],
     )
     expect(body.deepgram_streaming).toMatchObject({
       model: 'nova-3',
       language: 'hi',
       smart_format: 'true',
-      keyterms: ['Raven'],
+      keyterms: ['Second'],
     })
   })
 })

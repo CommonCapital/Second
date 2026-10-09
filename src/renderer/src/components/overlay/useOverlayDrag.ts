@@ -22,7 +22,7 @@ export function useOverlayDrag(options: UseOverlayDragOptions) {
       logoDragMovedRef.current = false
       return
     }
-    window.raven.windowShowDashboard?.()
+    window.second.windowShowDashboard?.()
   }, [])
 
   const handleLogoMouseDown = useCallback((event: ReactMouseEvent<HTMLButtonElement>) => {

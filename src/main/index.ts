@@ -5,20 +5,20 @@ import { fileURLToPath } from 'url'
 
 // CRITICAL: single-instance lock is the FIRST runtime action this main
 // process takes. If a second instance launches (e.g. Windows Shell
-// invoked Raven again to handle a `raven://` OAuth deep-link callback
+// invoked Second again to handle a `second://` OAuth deep-link callback
 // while the app was already running) we quit IMMEDIATELY - before any
 // later import has a chance to open the database, register IPC
 // handlers, or create a window. Without this top-of-file guard, the
 // previous setupDeepLinkHandlers() lock check fired far too late
 // (after app.whenReady, after boot() had already created the dashboard
-// window) and the user ended up with two visible Raven windows on
+// window) and the user ended up with two visible Second windows on
 // screen: the original instance + the OAuth-callback instance whose
 // dashboard was already onscreen by the time it realised it should
 // have quit. Reproduced live on 2026-05-08 by the user finishing
 // Google OAuth and seeing both an "all sessions" dashboard AND a
 // fresh permissions-step onboarding window in parallel.
 //
-// Once we hold the lock, the OS routes every subsequent raven://...
+// Once we hold the lock, the OS routes every subsequent second://...
 // invocation to us via the `second-instance` event registered later
 // in setupDeepLinkHandlers(). The deep-link URL arrives in the
 // argv array there and is forwarded to handleDeepLink() which
@@ -80,7 +80,7 @@ import { registerPermissionHandlers, getPermissionStatus, permissionsAllowOverla
 import { createLogger } from './logger'
 import { trustSystemCAs } from './trustSystemCAs'
 
-const log = createLogger('Raven')
+const log = createLogger('Second')
 const ipcLog = createLogger('IPC')
 
 // Node `ws` / undici (mic test + live STT) must use the OS CA store.
@@ -188,7 +188,7 @@ function registerGlobalHotkeys(
     }
   })
 
-  // Ask Raven (AI Suggestion): Cmd/Ctrl + Enter
+  // Ask Second (AI Suggestion): Cmd/Ctrl + Enter
   const aiRegistered = globalShortcut.register(`${modifier}+Return`, () => {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
       overlayWindow.webContents.send('hotkey:ai-suggestion')
@@ -201,7 +201,7 @@ function registerGlobalHotkeys(
 
   // Toggle Recording: Cmd/Ctrl + Shift + Space.
   // NOTE: this is a SYSTEM-WIDE shortcut. It was previously Cmd/Ctrl+R,
-  // which hijacked the browser's refresh in every app while Raven ran.
+  // which hijacked the browser's refresh in every app while Second ran.
   // Shift+Space is effectively never bound globally by other apps.
   // Only the overlay subscribes to 'hotkey:toggle-recording'
   // (OverlayWindow / OverlayToolbar). The dashboard uses its own
@@ -274,7 +274,7 @@ function registerGlobalHotkeys(
   // If the PRIMARY hotkeys failed to register, the likely cause is:
   //   - macOS Accessibility permission not granted (common on first run)
   //   - Another app already owns the accelerator (e.g. Cmd+R in a
-  //     running browser foregrounded over Raven)
+  //     running browser foregrounded over Second)
   // Either way, silent failure is the worst outcome - the user hits
   // Cmd+R, nothing happens, they assume the app is broken. Surface a
   // one-time notification that tells them what to check.
@@ -284,12 +284,12 @@ function registerGlobalHotkeys(
     const failed: string[] = []
     if (!recordingRegistered) failed.push(`${modifier}+Shift+Space (toggle recording)`)
     if (!visibilityRegistered) failed.push(`${modifier}+\\ (toggle visibility)`)
-    if (!aiRegistered) failed.push(`${modifier}+Return (ask Raven)`)
+    if (!aiRegistered) failed.push(`${modifier}+Return (ask Second)`)
     const payload = {
       id: `hotkey-fail-${Date.now()}`,
       title: 'Some shortcuts are disabled',
       body: process.platform === 'darwin'
-        ? `Couldn't register ${failed.join(', ')}. Grant Raven Accessibility permission in System Settings → Privacy & Security → Accessibility, or quit the other app that owns these shortcuts.`
+        ? `Couldn't register ${failed.join(', ')}. Grant Second Accessibility permission in System Settings → Privacy & Security → Accessibility, or quit the other app that owns these shortcuts.`
         : `Couldn't register ${failed.join(', ')}. Another app may already own the shortcut.`,
       type: 'warning' as const,
       autoDismissMs: 12_000,

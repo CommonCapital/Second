@@ -43,7 +43,7 @@ describe('buildSessionMarkdown', () => {
     expect(md).toContain('- [ ] Book kickoff')
     expect(md).toContain('## Summary')
     expect(md).toContain('Discussed **pricing**')
-    expect(md).toContain('_Exported from Raven_')
+    expect(md).toContain('_Exported from Second_')
   })
 
   it('omits the transcript unless includeTranscript is set', () => {

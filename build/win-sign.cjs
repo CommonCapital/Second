@@ -18,11 +18,10 @@
  *   even with confirmed-correct credentials (CodeSignTool's bundled
  *   client_id is the suspect). CKA uses a different client_id and
  *   works against the same account. signtool.exe via CKA's KSP is
- *   the only path verified end-to-end on 2026-05-07; see
- *   docs/_evidence/W01_sslcom_support_ticket.md.
+ *   the only path verified end-to-end.
  *
  * Triggered by electron-builder for every PE binary it produces in
- * the Windows build (Raven.exe, the NSIS Uninstall.exe, elevate.exe,
+ * the Windows build (Second.exe, the NSIS Uninstall.exe, elevate.exe,
  * agent-windows.exe from @recallai/desktop-sdk, and the Setup
  * wrapper). For each, we shell out to signtool.exe which finds the
  * cert by SHA-1 thumbprint, hands the file's hash to CKA's KSP,

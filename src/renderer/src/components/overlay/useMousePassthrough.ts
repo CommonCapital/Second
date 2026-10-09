@@ -19,7 +19,7 @@ export function useMousePassthrough(refs: HitTestRefs) {
   const setOverlayMouseIgnore = useCallback((ignore: boolean) => {
     if (mouseIgnoreRef.current === ignore) return
     mouseIgnoreRef.current = ignore
-    void window.raven.windowSetIgnoreMouseEvents(ignore)
+    void window.second.windowSetIgnoreMouseEvents(ignore)
   }, [])
 
   const isInside = useCallback((rect: DOMRect, x: number, y: number): boolean => {
@@ -66,7 +66,7 @@ export function useMousePassthrough(refs: HitTestRefs) {
 
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('blur', handleWindowBlur)
-    const unsubOverlayShown = window.raven.on('overlay:shown', handleOverlayShown)
+    const unsubOverlayShown = window.second.on('overlay:shown', handleOverlayShown)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)

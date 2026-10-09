@@ -2,7 +2,7 @@
  * Meeting auto-start detector.
  *
  * Polls the list of open window titles and, when a Zoom/Meet/Teams/Webex
- * meeting window appears, either prompts the user to start a Raven session
+ * meeting window appears, either prompts the user to start a Second session
  * ('prompt') or starts one automatically ('auto'). No meeting bot is involved;
  * capture stays local. Fully gated behind the `meetingAutoStart` setting
  * (default 'prompt') and disabled while a session is already active.

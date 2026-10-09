@@ -27,8 +27,8 @@ export function ApiKeysTab() {
   useEffect(() => {
     async function loadKeys() {
       try {
-        const dgKey = (await window.raven.storeGet('deepgramApiKey')) as string
-        const anKey = (await window.raven.storeGet('anthropicApiKey')) as string
+        const dgKey = (await window.second.storeGet('deepgramApiKey')) as string
+        const anKey = (await window.second.storeGet('anthropicApiKey')) as string
         if (dgKey) {
           setDeepgramKey(dgKey)
           setOriginalDeepgramKey(dgKey)
@@ -39,13 +39,13 @@ export function ApiKeysTab() {
           setOriginalAnthropicKey(anKey)
           setAnthropicStatus('valid')
         }
-        const oaiKey = (await window.raven.storeGet('openaiApiKey')) as string
+        const oaiKey = (await window.second.storeGet('openaiApiKey')) as string
         if (oaiKey) {
           setOpenaiKey(oaiKey)
           setOriginalOpenaiKey(oaiKey)
           setOpenaiStatus('valid')
         }
-        const aaiKey = (await window.raven.storeGet('assemblyaiApiKey')) as string
+        const aaiKey = (await window.second.storeGet('assemblyaiApiKey')) as string
         if (aaiKey) { setAssemblyKey(aaiKey); setOriginalAssemblyKey(aaiKey); setAssemblyStatus('valid') }
       } catch (error) {
         log.error('Failed to load API keys:', error)
@@ -82,7 +82,7 @@ export function ApiKeysTab() {
       const firstKey = anthropicKey.trim() || openaiKey.trim()
       // Both LLM keys go in a single call; the channel has a 2s cooldown.
       const hasSecondaryOpenai = firstProvider === 'anthropic' && openaiKey.trim().length > 0
-      const result = await window.raven.validateKeys(
+      const result = await window.second.validateKeys(
         deepgramKey.trim(),
         firstProvider,
         firstKey,
@@ -110,7 +110,7 @@ export function ApiKeysTab() {
 
       if (assemblyKey.trim()) {
         setAssemblyStatus('validating')
-        const aai = await window.raven.validateAssemblyAIKey(assemblyKey.trim())
+        const aai = await window.second.validateAssemblyAIKey(assemblyKey.trim())
         if (!aai.valid) {
           setAssemblyStatus('invalid')
           setSaveMessage({ type: 'error', text: aai.error || 'Invalid AssemblyAI key' })
@@ -137,7 +137,7 @@ export function ApiKeysTab() {
     const isValid = await validateKeys(false)
     if (isValid) {
       try {
-        await window.raven.apiKeysSave(deepgramKey.trim(), anthropicKey.trim(), openaiKey.trim(), {
+        await window.second.apiKeysSave(deepgramKey.trim(), anthropicKey.trim(), openaiKey.trim(), {
           assemblyaiApiKey: assemblyKey.trim(),
         })
         setSaveMessage({ type: 'success', text: 'API keys saved' })
@@ -194,7 +194,7 @@ export function ApiKeysTab() {
             href="#"
             onClick={(e) => {
               e.preventDefault()
-              window.raven.openExternal('https://console.deepgram.com/')
+              window.second.openExternal('https://console.deepgram.com/')
             }}
             className="text-xs text-blue-600 hover:text-blue-700"
           >
@@ -251,7 +251,7 @@ export function ApiKeysTab() {
             href="#"
             onClick={(e) => {
               e.preventDefault()
-              window.raven.openExternal('https://www.assemblyai.com/dashboard/signup')
+              window.second.openExternal('https://www.assemblyai.com/dashboard/signup')
             }}
             className="text-xs text-blue-600 hover:text-blue-700"
           >
@@ -308,7 +308,7 @@ export function ApiKeysTab() {
             href="#"
             onClick={(e) => {
               e.preventDefault()
-              window.raven.openExternal('https://console.anthropic.com/')
+              window.second.openExternal('https://console.anthropic.com/')
             }}
             className="text-xs text-blue-600 hover:text-blue-700"
           >
@@ -365,7 +365,7 @@ export function ApiKeysTab() {
             href="#"
             onClick={(e) => {
               e.preventDefault()
-              window.raven.openExternal('https://platform.openai.com/api-keys')
+              window.second.openExternal('https://platform.openai.com/api-keys')
             }}
             className="text-xs text-blue-600 hover:text-blue-700"
           >

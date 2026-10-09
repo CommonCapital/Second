@@ -65,7 +65,7 @@ vi.mock('better-sqlite3', () => ({
 
 vi.mock('electron', () => ({
   app: {
-    getPath: vi.fn(() => '/tmp/raven-test'),
+    getPath: vi.fn(() => '/tmp/second-test'),
   },
 }))
 

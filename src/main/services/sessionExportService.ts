@@ -54,7 +54,7 @@ export async function exportSession(params: {
     if (res.canceled || !res.filePath) return { ok: false, canceled: true }
 
     const html = buildSessionHtml(data)
-    const tmpHtml = path.join(app.getPath('temp'), `raven-export-${Date.now()}.html`)
+    const tmpHtml = path.join(app.getPath('temp'), `second-export-${Date.now()}.html`)
     fs.writeFileSync(tmpHtml, html, 'utf-8')
 
     const win = new BrowserWindow({

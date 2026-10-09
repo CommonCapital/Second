@@ -3,7 +3,7 @@
  * Spawns a child process and streams PCM audio via stdout.
  *
  * Integrates GStreamer-based AEC pipeline (webrtcechoprobe/webrtcdsp)
- * for echo cancellation - the same pipeline Cluely uses via Recall.ai.
+ * for echo cancellation.
  * GStreamer handles synchronization, resampling, and buffering.
  * ResidualEchoGate drops mic chunks that still match recent system PCM
  * after AEC (YouTube on speakers otherwise lands in "You").
@@ -147,12 +147,12 @@ function loadAecModule(): AecModule | null {
     'aec',
     'build',
     'Release',
-    'raven-aec.node'
+    'second-aec.node'
   )
 
   const packagedPath = join(
     process.resourcesPath,
-    'raven-aec.node'
+    'second-aec.node'
   )
 
   try {
@@ -207,7 +207,7 @@ function getGstPluginPath(): string {
 }
 
 /**
- * On Windows, GStreamer DLLs must be on PATH before loading raven-aec.node.
+ * On Windows, GStreamer DLLs must be on PATH before loading second-aec.node.
  * In packaged mode we bundled them into resources/gstreamer-lib/;
  * in dev mode the GStreamer installer's bin/ should already be on PATH.
  */
@@ -464,12 +464,12 @@ function loadWindowsModule(): WindowsAudioModule | null {
     'src',
     'native',
     'windows',
-    'raven-windows-audio.win32-x64-msvc.node'
+    'second-windows-audio.win32-x64-msvc.node'
   )
 
   const packagedPath = join(
     process.resourcesPath,
-    'raven-windows-audio.win32-x64-msvc.node'
+    'second-windows-audio.win32-x64-msvc.node'
   )
 
   try {

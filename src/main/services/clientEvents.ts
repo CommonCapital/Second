@@ -50,16 +50,13 @@
  * write time (defense in depth).
  */
 
-import { app, ipcMain } from 'electron'
+import { ipcMain } from 'electron'
 import { createLogger } from '../logger'
 
 const log = createLogger('ClientEvents')
 
-const FLUSH_INTERVAL_MS = 10_000
 const FLUSH_AT = 20
 const MAX_BUFFER = 200
-const PLATFORM = process.platform
-const VERSION = app.getVersion()
 
 /**
  * Allowlist mirrors the backend's ALLOWED_EVENT_NAMES set.
@@ -112,7 +109,6 @@ interface QueuedEvent {
 let buffer: QueuedEvent[] = []
 let flushTimer: ReturnType<typeof setInterval> | null = null
 let initialized = false
-let flushInFlight = false
 
 /**
  * Initialize the periodic flush timer. Safe to call multiple
@@ -127,7 +123,7 @@ export function initClientEvents(): void {
   // including OSS, is fine - the handler itself respects
   // isProMode() and no-ops there. We accept the call from the
   // renderer regardless so renderer code stays simple
-  // ("window.raven.trackClientEvent('X')" - it doesn't have
+  // ("window.second.trackClientEvent('X')" - it doesn't have
   // to know whether the main process will send anything).
   // Allowlist validation lives BOTH here (defense in depth)
   // and on the backend (the canonical authority). The local
@@ -223,7 +219,6 @@ export function _resetForTests(): void {
     clearInterval(flushTimer)
     flushTimer = null
   }
-  flushInFlight = false
 }
 export function _flushForTests(): Promise<void> {
   return flush()

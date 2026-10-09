@@ -68,7 +68,7 @@ fi
 
 # 4. Build the native addon
 echo ""
-echo "Step 4: Build raven-aec.node"
+echo "Step 4: Build second-aec.node"
 if npx cmake-js compile --CDCMAKE_BUILD_TYPE=Release 2>&1 | tail -3; then
   echo "  [PASS] cmake-js compile"
   PASS=$((PASS + 1))
@@ -80,11 +80,11 @@ fi
 # 5. Verify output binary
 echo ""
 echo "Step 5: Verify output"
-if [ -f build/Release/raven-aec.node ]; then
-  echo "  [PASS] build/Release/raven-aec.node exists ($(du -h build/Release/raven-aec.node | cut -f1))"
+if [ -f build/Release/second-aec.node ]; then
+  echo "  [PASS] build/Release/second-aec.node exists ($(du -h build/Release/second-aec.node | cut -f1))"
   PASS=$((PASS + 1))
 else
-  echo "  [FAIL] build/Release/raven-aec.node not found"
+  echo "  [FAIL] build/Release/second-aec.node not found"
   FAIL=$((FAIL + 1))
 fi
 

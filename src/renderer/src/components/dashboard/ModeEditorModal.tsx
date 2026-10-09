@@ -1,5 +1,5 @@
 /**
- * Mode Editor Modal - Cluely-style design
+ * Mode Editor Modal
  * - Templates create new modes (not editable directly)
  * - Mode list shows only user-created modes
  * - Active mode indicator with checkmark
@@ -287,7 +287,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
   // mid-edit form state doesn't get wiped if a sync arrives.
   useEffect(() => {
     if (!isOpen) return
-    const unsub = window.raven.modes.onListUpdated(() => {
+    const unsub = window.second.modes.onListUpdated(() => {
       loadModes(false)
     })
     return unsub
@@ -307,7 +307,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
 
   async function loadContextFiles(modeId: string) {
     try {
-      const files = await window.raven.context.getFiles(modeId)
+      const files = await window.second.context.getFiles(modeId)
       setContextFiles(files)
     } catch {
       setContextFiles([])
@@ -317,7 +317,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
   async function handleUploadContextFile() {
     if (!selectedMode || isUploading) return
     try {
-      const selected = await window.raven.context.selectFile()
+      const selected = await window.second.context.selectFile()
       if (!selected) return
 
       if (selected.fileSize > 10 * 1024 * 1024) {
@@ -328,11 +328,11 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
       setIsUploading(true)
       setUploadProgress({ stage: 'parsing', current: 0, total: 1 })
 
-      const unsub = window.raven.context.onUploadProgress((data) => {
+      const unsub = window.second.context.onUploadProgress((data) => {
         setUploadProgress(data)
       })
 
-      const result = await window.raven.context.uploadFile(
+      const result = await window.second.context.uploadFile(
         selectedMode.id,
         selected.filePath,
         selected.fileName,
@@ -358,7 +358,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
 
   async function handleDeleteContextFile(fileId: string) {
     if (!selectedMode) return
-    await window.raven.context.deleteFile(selectedMode.id, fileId)
+    await window.second.context.deleteFile(selectedMode.id, fileId)
     await loadContextFiles(selectedMode.id)
   }
 
@@ -376,8 +376,8 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
     try {
       setIsLoading(true)
       const [allModes, active] = await Promise.all([
-        window.raven.modes.getAll(),
-        window.raven.modes.getActive(),
+        window.second.modes.getAll(),
+        window.second.modes.getActive(),
       ])
       const userModes = allModes.filter((mode) => !mode.isBuiltin)
       setModes(userModes)
@@ -402,14 +402,14 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
 
     try {
       setIsSaving(true)
-      await window.raven.modes.update(selectedMode.id, {
+      await window.second.modes.update(selectedMode.id, {
         name: formName.trim() || 'Untitled Mode',
         systemPrompt: formPrompt,
         notesTemplate: formNotesTemplate,
       })
       await loadModes()
 
-      const updated = await window.raven.modes.get(selectedMode.id)
+      const updated = await window.second.modes.get(selectedMode.id)
       if (updated) setSelectedMode(updated)
 
       setToast({ message: 'Mode saved', type: 'success' })
@@ -422,7 +422,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
 
   async function handleCreateBlank() {
     try {
-      const newMode = await window.raven.modes.create({
+      const newMode = await window.second.modes.create({
         name: 'Untitled Mode',
         systemPrompt: '',
         icon: '📝',
@@ -449,13 +449,13 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
       const serverKey = template.id.replace(/^tpl-/, '')
       let systemPrompt = template.systemPrompt
       try {
-        const serverPrompt = await window.raven.prompts?.fetchModeTemplate?.(serverKey)
+        const serverPrompt = await window.second.prompts?.fetchModeTemplate?.(serverKey)
         if (serverPrompt) systemPrompt = serverPrompt
       } catch (fetchErr) {
         log.debug('Server template prompt fetch failed, using bundled:', fetchErr)
       }
 
-      const newMode = await window.raven.modes.create({
+      const newMode = await window.second.modes.create({
         name: template.name,
         systemPrompt,
         icon: template.icon,
@@ -475,7 +475,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
   async function handleSetActive() {
     if (!selectedMode) return
     try {
-      await window.raven.modes.setActive(selectedMode.id)
+      await window.second.modes.setActive(selectedMode.id)
       setActiveMode(selectedMode)
       await loadModes()
     } catch (err) {
@@ -498,7 +498,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
 
     try {
       const [result] = await Promise.all([
-        window.raven.modes.delete(modeToDelete.id),
+        window.second.modes.delete(modeToDelete.id),
         new Promise((resolve) => setTimeout(resolve, 2000)),
       ])
 
@@ -542,7 +542,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
     if (!formNotesTemplate) return
     setFormNotesTemplate([
       ...formNotesTemplate,
-      { id: globalThis.crypto.randomUUID(), title: 'Section title', instructions: 'Instructions for Raven' },
+      { id: globalThis.crypto.randomUUID(), title: 'Section title', instructions: 'Instructions for Second' },
     ])
   }
 
@@ -662,7 +662,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           {showTemplates ? (
             <div className="flex-1 overflow-y-auto p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Raven Modes</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Second Modes</h2>
               <p className="text-gray-500 mb-6">Get started by selecting a template or start from an empty mode.</p>
 
               <div className="border-t border-gray-200 pt-5 space-y-2">
@@ -897,7 +897,7 @@ export function ModeEditorModal({ isOpen, onClose }: ModeEditorModalProps) {
                               value={section.instructions}
                               onChange={(e) => handleUpdateSection(section.id, 'instructions', e.target.value)}
                               className="w-full text-sm text-gray-500 bg-transparent border-0 outline-none p-0 mt-0.5 focus:ring-0"
-                              placeholder="Instructions for Raven"
+                              placeholder="Instructions for Second"
                             />
                           </div>
 

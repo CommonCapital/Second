@@ -1,10 +1,10 @@
 {
-  "name": "raven-windows-audio",
+  "name": "second-windows-audio",
   "version": "0.1.0",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
-    "name": "raven-windows-audio",
+    "name": "second-windows-audio",
     "triples": {
       "defaults": false,
       "additional": ["x86_64-pc-windows-msvc"]

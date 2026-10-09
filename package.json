@@ -1,28 +1,30 @@
 {
-  "name": "project-raven",
+  "name": "second-desktop",
   "private": true,
-  "version": "2.5.0",
-  "description": "Open-source AI meeting assistant with real-time transcription and intelligent suggestions, invisible to screen sharing.",
-  "author": "Laxcorp Research <hello@laxcorpresearch.com>",
+  "version": "0.1.0",
+  "description": "Second: an open-source, private live meeting intelligence layer for interviews, founder and investor calls, negotiations, and high-stakes meetings. Bring your own keys; everything stays on your machine.",
+  "author": "Nursan Omarov",
   "license": "MIT",
-  "homepage": "https://github.com/Laxcorp-Research/project-raven",
+  "homepage": "https://github.com/CommonCapital/second",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Laxcorp-Research/project-raven.git"
+    "url": "https://github.com/CommonCapital/second.git"
   },
   "bugs": {
-    "url": "https://github.com/Laxcorp-Research/project-raven/issues"
+    "url": "https://github.com/CommonCapital/second/issues"
   },
   "keywords": [
     "meeting-assistant",
+    "meeting-intelligence",
     "ai",
     "transcription",
     "electron",
+    "macos",
     "deepgram",
     "anthropic",
     "openai",
-    "screen-sharing",
-    "real-time"
+    "real-time",
+    "byok"
   ],
   "type": "module",
   "engines": {

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
+import { AUTHOR_NAME, DOCS_URL, FEEDBACK_URL, ISSUES_URL, PRIVACY_URL, PRODUCT_TAGLINE, RELEASES_URL, REPO_URL } from '../../../../../shared/project'
 
 export function AboutTab() {
   const [appVersion, setAppVersion] = useState('...')
 
   useEffect(() => {
-    window.raven.getAppVersion().then((v) => setAppVersion(v)).catch(() => {})
+    window.second.getAppVersion().then((v) => setAppVersion(v)).catch(() => {})
   }, [])
 
   const handleOpenLink = (url: string) => {
-    window.raven.openExternal?.(url)
+    window.second.openExternal?.(url)
   }
 
   return (
@@ -17,18 +18,18 @@ export function AboutTab() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent_60%)]" />
         <div className="relative flex items-center gap-4">
           <img
-            src={new URL('../../../../../../logo/raven.svg', import.meta.url).href}
-            alt="Raven"
+            src={new URL('../../../../../../logo/second.svg', import.meta.url).href}
+            alt="Second"
             className="w-14 h-14 drop-shadow-lg"
             draggable={false}
           />
           <div>
-            <h2 className="text-lg font-bold text-white">Raven</h2>
+            <h2 className="text-lg font-bold text-white">Second</h2>
             <p className="text-sm text-white/50 mt-0.5">v{appVersion}</p>
           </div>
         </div>
         <p className="relative mt-4 text-sm text-white/60 leading-relaxed">
-          Real-time transcription and AI suggestions for your meetings while being invisible to screen sharing.
+          {PRODUCT_TAGLINE}
         </p>
         <div className="relative mt-4 flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20">
@@ -40,7 +41,7 @@ export function AboutTab() {
 
       <div className="grid grid-cols-3 gap-2">
         <button
-          onClick={() => handleOpenLink('https://github.com/Laxcorp-Research/project-raven')}
+          onClick={() => handleOpenLink(REPO_URL)}
           className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-center"
         >
           <div className="w-9 h-9 bg-gray-900 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -52,7 +53,7 @@ export function AboutTab() {
         </button>
 
         <button
-          onClick={() => handleOpenLink('https://github.com/Laxcorp-Research/project-raven/issues')}
+          onClick={() => handleOpenLink(ISSUES_URL)}
           className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-center"
         >
           <div className="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -64,7 +65,7 @@ export function AboutTab() {
         </button>
 
         <button
-          onClick={() => handleOpenLink('https://docs.useraven.ai')}
+          onClick={() => handleOpenLink(DOCS_URL)}
           className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-center"
         >
           <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -80,10 +81,9 @@ export function AboutTab() {
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Resources</h3>
         <div className="space-y-0.5">
           {[
-            { label: 'Blog', url: 'https://useraven.ai/blog', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" /> },
-            { label: 'Privacy Policy', url: 'https://useraven.ai/legal/privacy-policy', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /> },
-            { label: 'Terms of Service', url: 'https://useraven.ai/legal/terms-of-service', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /> },
-            { label: 'Send Feedback', url: 'https://laxcorphq.wixforms.com/f/7497329197333873820', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 12.75c1.148 0 2.278.08 3.383.237 1.037.146 1.867.966 1.867 2.013 0 .89-.616 1.688-1.489 1.866a15.18 15.18 0 01-7.522 0C7.366 16.688 6.75 15.89 6.75 15c0-1.047.83-1.867 1.867-2.013A15.247 15.247 0 0112 12.75zm0 0c-2.209 0-4.267.427-6.108 1.177M12 12.75c2.209 0 4.267.427 6.108 1.177M12 12.75V9m0 0a3 3 0 10-6 0v1.5M12 9a3 3 0 016 0v1.5" /> },
+            { label: 'Releases', url: RELEASES_URL, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" /> },
+            { label: 'Privacy', url: PRIVACY_URL, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /> },
+            { label: 'Send Feedback', url: FEEDBACK_URL, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 12.75c1.148 0 2.278.08 3.383.237 1.037.146 1.867.966 1.867 2.013 0 .89-.616 1.688-1.489 1.866a15.18 15.18 0 01-7.522 0C7.366 16.688 6.75 15.89 6.75 15c0-1.047.83-1.867 1.867-2.013A15.247 15.247 0 0112 12.75zm0 0c-2.209 0-4.267.427-6.108 1.177M12 12.75c2.209 0 4.267.427 6.108 1.177M12 12.75V9m0 0a3 3 0 10-6 0v1.5M12 9a3 3 0 016 0v1.5" /> },
           ].map((link) => (
             <button
               key={link.label}
@@ -104,14 +104,7 @@ export function AboutTab() {
 
       <div className="pt-4 border-t border-gray-100">
         <p className="text-xs text-gray-400 text-center">
-          {'Made by '}
-          <button
-            onClick={() => handleOpenLink('https://laxcorpresearch.com')}
-            className="text-blue-500 hover:text-blue-700 font-medium transition-colors"
-          >
-            Laxcorp Research
-          </button>
-          {' · Open source under MIT license'}
+          {`Built by ${AUTHOR_NAME} · Open source under MIT license`}
         </p>
       </div>
     </div>

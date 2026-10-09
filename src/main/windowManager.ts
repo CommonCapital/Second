@@ -8,7 +8,7 @@ import { DASHBOARD_DEFAULT_WIDTH, DASHBOARD_DEFAULT_HEIGHT, DASHBOARD_MIN_WIDTH,
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const log = createLogger('WindowManager')
-const CSP_APPLIED = Symbol.for('raven.cspApplied')
+const CSP_APPLIED = Symbol.for('second.cspApplied')
 
 let dashboardWindow: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
@@ -46,7 +46,7 @@ function applyCSP(win: BrowserWindow): void {
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' data: blob: https://lh3.googleusercontent.com",
             "font-src 'self' data:",
-            "connect-src 'self' https://api.useraven.ai https://api-staging.useraven.ai https://api.deepgram.com wss://api.deepgram.com https://api.anthropic.com https://api.openai.com",
+            "connect-src 'self' https://api.deepgram.com wss://api.deepgram.com https://api.anthropic.com https://api.openai.com",
             "media-src 'self' blob:",
             "worker-src 'self' blob:",
             "object-src 'none'",
@@ -183,7 +183,7 @@ export function createDashboardWindow(preloadPath: string, rendererURL: string |
     minWidth: DASHBOARD_MIN_WIDTH,
     minHeight: DASHBOARD_MIN_HEIGHT,
     show: false,
-    title: 'Raven',
+    title: 'Second',
     backgroundColor: '#ffffff',
     ...(process.platform === 'darwin'
       ? {
@@ -231,9 +231,9 @@ export function createDashboardWindow(preloadPath: string, rendererURL: string |
           document.head.appendChild(s);
           var c = document.createElement('div');
           c.className = 'win-controls';
-          c.innerHTML = '<button onclick="window.raven?.windowMinimize?.()" title="Minimize"><svg viewBox="0 0 10 1"><rect fill="currentColor" width="10" height="1"/></svg></button>'
-            + '<button onclick="window.raven?.windowMaximize?.()" title="Maximize"><svg viewBox="0 0 10 10"><rect fill="none" stroke="currentColor" stroke-width="1" x="0.5" y="0.5" width="9" height="9"/></svg></button>'
-            + '<button class="close" onclick="window.raven?.windowClose?.()" title="Close"><svg viewBox="0 0 10 10"><line stroke="currentColor" stroke-width="1.2" x1="0" y1="0" x2="10" y2="10"/><line stroke="currentColor" stroke-width="1.2" x1="10" y1="0" x2="0" y2="10"/></svg></button>';
+          c.innerHTML = '<button onclick="window.second?.windowMinimize?.()" title="Minimize"><svg viewBox="0 0 10 1"><rect fill="currentColor" width="10" height="1"/></svg></button>'
+            + '<button onclick="window.second?.windowMaximize?.()" title="Maximize"><svg viewBox="0 0 10 10"><rect fill="none" stroke="currentColor" stroke-width="1" x="0.5" y="0.5" width="9" height="9"/></svg></button>'
+            + '<button class="close" onclick="window.second?.windowClose?.()" title="Close"><svg viewBox="0 0 10 10"><line stroke="currentColor" stroke-width="1.2" x1="0" y1="0" x2="10" y2="10"/><line stroke="currentColor" stroke-width="1.2" x1="10" y1="0" x2="0" y2="10"/></svg></button>';
           document.body.appendChild(c);
         })()
       `)
@@ -278,9 +278,9 @@ export function createDashboardWindow(preloadPath: string, rendererURL: string |
   })
 
   // Hide-on-close instead of destroy, so the window can be re-shown from
-  // the tray. Raven keeps running in the tray + overlay after the
+  // the tray. Second keeps running in the tray + overlay after the
   // dashboard is closed; a real quit goes through app.quit() ("Quit
-  // Raven" in the tray), and before-quit in index.ts removes this
+  // Second" in the tray), and before-quit in index.ts removes this
   // listener before closing so quit is never blocked.
   //
   // This applies to macOS AND Windows - both ship a persistent tray.
@@ -339,7 +339,7 @@ export function createOverlayWindow(preloadPath: string, rendererURL: string | n
     hasShadow: false,
     roundedCorners: false,
     show: false,
-    title: 'Raven Overlay',
+    title: 'Second Overlay',
     // Windows: keep the overlay focusable (the BrowserWindow default).
     // A focusable:false (WS_EX_NOACTIVATE) window loses setIgnoreMouseEvents
     // (forward:true) mouse-move forwarding after a hide -> re-show cycle,

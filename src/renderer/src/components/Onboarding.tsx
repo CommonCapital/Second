@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Key, Shield, Keyboard, ExternalLink, ArrowRight, ArrowLeft, Check, Loader2, Eye, EyeOff, Sparkles } from 'lucide-react'
-import ravenFullLogo from '../../../../logo/raven_full.svg'
+import secondFullLogo from '../../../../logo/second_full.svg'
 import { OverlayTour } from './OverlayTour'
 import { detectMacPlatform, shortcutKeycaps } from '../lib/shortcutLabels'
 import { shouldOpenAccessibilitySettingsAfterPrompt } from '../../../shared/macAccessibilityGrant'
@@ -25,21 +25,20 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   // wizard remounts on signout/signin which is the correct
   // signal here.
   useEffect(() => {
-    void window.raven.trackClientEvent('onboarding_started')
+    void window.second.trackClientEvent('onboarding_started')
     // intentionally empty deps - fire once per mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     void (async () => {
       try {
         const [storedStep, dg, aai, ant, oai, provider] = await Promise.all([
-          window.raven.storeGet('onboardingStep'),
-          window.raven.storeGet('deepgramApiKey'),
-          window.raven.storeGet('assemblyaiApiKey'),
-          window.raven.storeGet('anthropicApiKey'),
-          window.raven.storeGet('openaiApiKey'),
-          window.raven.storeGet('aiProvider'),
+          window.second.storeGet('onboardingStep'),
+          window.second.storeGet('deepgramApiKey'),
+          window.second.storeGet('assemblyaiApiKey'),
+          window.second.storeGet('anthropicApiKey'),
+          window.second.storeGet('openaiApiKey'),
+          window.second.storeGet('aiProvider'),
         ])
         setStep(parseOnboardingStep(storedStep) as 1 | 2 | 3 | 4 | 5 | 6)
         if (typeof dg === 'string' && dg) setDeepgramKey(dg)
@@ -55,7 +54,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   useEffect(() => {
     if (!stepHydrated) return
-    void window.raven.storeSet('onboardingStep', step)
+    void window.second.storeSet('onboardingStep', step)
   }, [step, stepHydrated])
   const [micPermission, setMicPermission] = useState<'unknown' | 'granted' | 'denied'>('unknown')
   const [screenPermission, setScreenPermission] = useState<'unknown' | 'granted' | 'denied'>('unknown')
@@ -96,7 +95,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       setAssemblyInvalid(false)
       setAiKeyInvalid(false)
       try {
-        const result = await window.raven.validateKeys(
+        const result = await window.second.validateKeys(
           deepgramKey.trim(),
           aiProvider,
           aiKey.trim()
@@ -114,7 +113,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           return
         }
         if (assemblyKey.trim()) {
-          const aai = await window.raven.validateAssemblyAIKey(assemblyKey.trim())
+          const aai = await window.second.validateAssemblyAIKey(assemblyKey.trim())
           if (!aai.valid) {
             setError(aai.error || 'Invalid AssemblyAI key.')
             setAssemblyInvalid(true)
@@ -166,7 +165,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     if (step === ONBOARDING_STEP.permissions) {
       const fetchStatus = async () => {
         try {
-          const status = await window.raven.permissionsGetStatus()
+          const status = await window.second.permissionsGetStatus()
           if (status.microphone === 'granted') setMicPermission('granted')
           if (status.screen === 'granted') setScreenPermission('granted')
           if (status.accessibility === 'granted') setAccessibilityPermission('granted')
@@ -180,11 +179,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   const requestMicPermission = async () => {
     try {
-      const granted = await window.raven.permissionsRequestMicrophone()
+      const granted = await window.second.permissionsRequestMicrophone()
       if (granted) {
         setMicPermission('granted')
       } else {
-        await window.raven.permissionsOpenMicrophone()
+        await window.second.permissionsOpenMicrophone()
       }
     } catch {
       setMicPermission('denied')
@@ -193,21 +192,21 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   const requestScreenPermission = async () => {
     try {
-      const hasPermission = await window.raven.systemAudioHasPermission()
+      const hasPermission = await window.second.systemAudioHasPermission()
       if (hasPermission) {
         setScreenPermission('granted')
         setScreenNeedsRestart(false)
         return
       }
 
-      await window.raven.permissionsOpenScreenRecording()
+      await window.second.permissionsOpenScreenRecording()
 
       if (screenPollRef.current) clearInterval(screenPollRef.current)
       let pollCount = 0
       screenPollRef.current = setInterval(async () => {
         pollCount++
         try {
-          const status = await window.raven.permissionsGetStatus()
+          const status = await window.second.permissionsGetStatus()
           if (status.screen === 'granted') {
             setScreenPermission('granted')
             setScreenNeedsRestart(false)
@@ -226,14 +225,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   }
 
   const persistValidatedKeys = async () => {
-    await window.raven.apiKeysSave(
+    await window.second.apiKeysSave(
       deepgramKey.trim(),
       aiProvider === 'anthropic' ? anthropicKey.trim() : '',
       aiProvider === 'openai' ? openaiKey.trim() : undefined,
       assemblyKey.trim() ? { assemblyaiApiKey: assemblyKey.trim() } : undefined
     )
-    await window.raven.storeSet('aiProvider', aiProvider)
-    await window.raven.storeSet(
+    await window.second.storeSet('aiProvider', aiProvider)
+    await window.second.storeSet(
       'aiModel',
       aiProvider === 'anthropic' ? 'claude-haiku-4-5' : 'gpt-5.6-luna'
     )
@@ -245,8 +244,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
     try {
       await persistValidatedKeys()
-      await window.raven.storeSet('onboardingComplete', true)
-      await window.raven.storeSet('onboardingStep', ONBOARDING_STEP.welcome)
+      await window.second.storeSet('onboardingComplete', true)
+      await window.second.storeSet('onboardingStep', ONBOARDING_STEP.welcome)
       onComplete()
     } catch {
       setError('Failed to save keys. Please try again.')
@@ -301,8 +300,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             {step === 1 && (
               <div className="text-center">
                 <img
-                  src={ravenFullLogo}
-                  alt="Raven"
+                  src={secondFullLogo}
+                  alt="Second"
                   className="h-10 mx-auto mb-5 object-contain"
                   draggable={false}
                 />
@@ -344,7 +343,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault()
-                          window.raven.openExternal('https://console.deepgram.com')
+                          window.second.openExternal('https://console.deepgram.com')
                         }}
                         className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
                       >
@@ -385,7 +384,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault()
-                          window.raven.openExternal('https://www.assemblyai.com/dashboard/signup')
+                          window.second.openExternal('https://www.assemblyai.com/dashboard/signup')
                         }}
                         className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
                       >
@@ -460,7 +459,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                           href="#"
                           onClick={(e) => {
                             e.preventDefault()
-                            window.raven.openExternal('https://console.anthropic.com')
+                            window.second.openExternal('https://console.anthropic.com')
                           }}
                           className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
                         >
@@ -502,7 +501,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                           href="#"
                           onClick={(e) => {
                             e.preventDefault()
-                            window.raven.openExternal('https://platform.openai.com/api-keys')
+                            window.second.openExternal('https://platform.openai.com/api-keys')
                           }}
                           className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
                         >
@@ -593,7 +592,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 <div className="text-center mb-1">
                   <h2 className="text-lg font-semibold text-gray-900 mb-0.5">Permissions</h2>
                   <p className="text-xs text-gray-500">
-                    Raven needs these permissions to work properly.
+                    Second needs these permissions to work properly.
                   </p>
                 </div>
 
@@ -659,10 +658,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                           If you enabled Screen Recording in System Settings, macOS requires a restart for it to take effect.
                         </p>
                         <button
-                          onClick={() => window.raven.relaunchApp()}
+                          onClick={() => window.second.relaunchApp()}
                           className="text-xs font-medium text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-md transition-colors"
                         >
-                          Quit & Reopen Raven
+                          Quit & Reopen Second
                         </button>
                       </div>
                     </div>
@@ -687,11 +686,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                     ) : (
                       <button
                         onClick={async () => {
-                          const granted = await window.raven.permissionsRequestAccessibility()
+                          const granted = await window.second.permissionsRequestAccessibility()
                           if (granted) {
                             setAccessibilityPermission('granted')
                           } else if (shouldOpenAccessibilitySettingsAfterPrompt(granted)) {
-                            await window.raven.permissionsOpenAccessibility()
+                            await window.second.permissionsOpenAccessibility()
                           }
                         }}
                         className="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-colors"
@@ -758,7 +757,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
                 <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
                   {[
-                    { keys: shortcutKeycaps('visibility', isMac), label: 'Show / Hide Overlay', description: 'Toggle Raven visibility anytime' },
+                    { keys: shortcutKeycaps('visibility', isMac), label: 'Show / Hide Overlay', description: 'Toggle Second visibility anytime' },
                     { keys: shortcutKeycaps('assist', isMac), label: 'AI Assist', description: 'Screenshot + transcript analysis' },
                     { keys: shortcutKeycaps('recording', isMac), label: 'Start / Stop Session', description: 'Begin or end a recording' },
                     { keys: shortcutKeycaps('clear', isMac), label: 'Clear Conversation', description: 'Reset the AI conversation' },
@@ -925,7 +924,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                       </>
                     ) : (
                       <>
-                        Launch Raven
+                        Launch Second
                         <ArrowRight size={15} />
                       </>
                     )}

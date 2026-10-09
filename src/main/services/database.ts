@@ -138,7 +138,7 @@ class DatabaseService {
       fs.mkdirSync(this.dbDir, { recursive: true });
     }
 
-    this.dbPath = path.join(this.dbDir, 'raven.db');
+    this.dbPath = path.join(this.dbDir, 'second.db');
   }
 
   /**
@@ -170,7 +170,7 @@ class DatabaseService {
    */
   switchToAccountDatabase(backendUrl: string, userId: string): boolean {
     const hash = this.hashAccount(backendUrl, userId);
-    const newPath = path.join(this.dbDir, `raven-${hash}.db`);
+    const newPath = path.join(this.dbDir, `second-${hash}.db`);
 
     if (newPath === this.dbPath && this.db) return false;
 
@@ -205,7 +205,7 @@ class DatabaseService {
    * Switch back to the default shared database (for logout / unauthenticated state).
    */
   switchToDefaultDatabase(): boolean {
-    const defaultPath = path.join(this.dbDir, 'raven.db');
+    const defaultPath = path.join(this.dbDir, 'second.db');
 
     if (defaultPath === this.dbPath && this.db) return false;
 

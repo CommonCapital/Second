@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { ModeEditorModal } from './ModeEditorModal'
 import { Eye, EyeOff, Settings, MessageSquarePlus, Layers, Search, FileText, Power, RefreshCw, WifiOff, Sparkles } from 'lucide-react'
-import ravenFullLogo from '../../../../../logo/raven_full.svg'
-import ravenLogo from '../../../../../logo/raven.svg'
+import secondFullLogo from '../../../../../logo/second_full.svg'
+import secondMark from '../../../../../logo/second-mark.svg'
+import { FEEDBACK_URL } from '../../../../shared/project'
 
 interface SearchResult {
   id: string
@@ -14,7 +15,7 @@ interface SearchResult {
 interface HeaderProps {
   stealth: boolean
   onToggleStealth: () => void
-  onStartRaven: () => void
+  onStartSecond: () => void
   isRecording: boolean
   onOpenSettings: () => void
   onReplayTour?: () => void
@@ -48,7 +49,7 @@ function getInitials(name: string): string {
   return parts[0][0].toUpperCase()
 }
 
-export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, onOpenSettings, onReplayTour, initialUserProfile, searchQuery, onSearchChange, onSearchSubmit, onSessionSelect, onOpenAsk }: HeaderProps) {
+export function Header({ stealth, onToggleStealth, onStartSecond, isRecording, onOpenSettings, onReplayTour, initialUserProfile, searchQuery, onSearchChange, onSearchSubmit, onSessionSelect, onOpenAsk }: HeaderProps) {
   const [modeEditorOpen, setModeEditorOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -79,13 +80,13 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
   }, [])
 
   async function loadProfile() {
-    const name = ((await window.raven.storeGet('displayName')) as string) || displayName
+    const name = ((await window.second.storeGet('displayName')) as string) || displayName
     setDisplayName(name)
     setUserEmail(userEmail)
 
-    const picPath = (await window.raven.storeGet('profilePicturePath')) as string
+    const picPath = (await window.second.storeGet('profilePicturePath')) as string
     if (picPath) {
-      const data = await window.raven.profileGetPictureData(picPath)
+      const data = await window.second.profileGetPictureData(picPath)
       setProfilePicData(data)
       setAvatarUrl(null)
     } else {
@@ -126,7 +127,7 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
     searchDebounceRef.current = setTimeout(async () => {
       try {
-        const results = await window.raven.sessions.search(searchQuery.trim())
+        const results = await window.second.sessions.search(searchQuery.trim())
         setSearchResults(results.slice(0, 5).map((s: { id: string; title: string; summary: string | null; startedAt: number }) => ({
           id: s.id,
           title: s.title,
@@ -149,8 +150,8 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
         {/* Left section - Logo */}
         <div className="flex items-center">
           <img
-            src={ravenFullLogo}
-            alt="Raven"
+            src={secondFullLogo}
+            alt="Second"
             className="h-7 object-contain"
             draggable={false}
           />
@@ -200,7 +201,7 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
               {stealth ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {stealth ? 'Raven is Undetectable' : 'Raven is Detectable'}
+              {stealth ? 'Second is Undetectable' : 'Second is Detectable'}
             </div>
           </div>
 
@@ -220,11 +221,11 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
             </div>
           ) : (
             <button
-              onClick={onStartRaven}
+              onClick={onStartSecond}
               className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white shadow-sm transition-all"
             >
-              <img src={ravenLogo} alt="" className="w-4 h-4 brightness-0 invert" draggable={false} />
-              <span>Start Raven</span>
+              <img src={secondMark} alt="" className="w-4 h-4 brightness-0 invert" draggable={false} />
+              <span>Start Second</span>
             </button>
           )}
 
@@ -265,7 +266,7 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">
-                      {displayName || 'Raven User'}
+                      {displayName || 'Second User'}
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5 truncate">
                       {userEmail || 'Local account'}
@@ -297,7 +298,7 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
                   <button
                     onClick={() => {
                       setUserMenuOpen(false)
-                      void window.raven.openExternal('https://laxcorphq.wixforms.com/f/7497329197333873820')
+                      void window.second.openExternal(FEEDBACK_URL)
                     }}
                     className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors"
                   >
@@ -322,12 +323,12 @@ export function Header({ stealth, onToggleStealth, onStartRaven, isRecording, on
                   <button
                     onClick={() => {
                       setUserMenuOpen(false)
-                      window.raven.quitApp()
+                      window.second.quitApp()
                     }}
                     className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                   >
                     <Power size={16} className="text-red-400 shrink-0" />
-                    <span>Quit Raven</span>
+                    <span>Quit Second</span>
                   </button>
                 </div>
               </div>

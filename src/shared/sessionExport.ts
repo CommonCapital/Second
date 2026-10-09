@@ -93,7 +93,7 @@ export function buildSessionMarkdown(data: SessionExportData): string {
   }
 
   lines.push('---')
-  lines.push('_Exported from Raven_')
+  lines.push('_Exported from Second_')
 
   return lines.join('\n')
 }
@@ -202,7 +202,7 @@ export function buildSessionHtml(data: SessionExportData): string {
   ${actionItemsHtml}
   ${summaryHtml}
   ${transcriptHtml}
-  <div class="footer">Exported from Raven</div>
+  <div class="footer">Exported from Second</div>
 </body>
 </html>`
 }

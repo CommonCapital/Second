@@ -34,23 +34,23 @@ vi.mock('../../logger', () => ({
 describe('Recall is removed', () => {
   const originalPlatform = process.platform
   const originalArch = process.arch
-  const originalWinFlag = process.env.RAVEN_ENABLE_RECALL_WIN
+  const originalWinFlag = process.env.SECOND_ENABLE_RECALL_WIN
 
   afterEach(() => {
     Object.defineProperty(process, 'platform', { value: originalPlatform, configurable: true })
     Object.defineProperty(process, 'arch', { value: originalArch, configurable: true })
     if (originalWinFlag === undefined) {
-      delete process.env.RAVEN_ENABLE_RECALL_WIN
+      delete process.env.SECOND_ENABLE_RECALL_WIN
     } else {
-      process.env.RAVEN_ENABLE_RECALL_WIN = originalWinFlag
+      process.env.SECOND_ENABLE_RECALL_WIN = originalWinFlag
     }
     vi.doUnmock('@recallai/desktop-sdk')
     vi.resetModules()
   })
 
-  it('isRecallSupported is false on Windows even with RAVEN_ENABLE_RECALL_WIN=1', async () => {
+  it('isRecallSupported is false on Windows even with SECOND_ENABLE_RECALL_WIN=1', async () => {
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true })
-    process.env.RAVEN_ENABLE_RECALL_WIN = '1'
+    process.env.SECOND_ENABLE_RECALL_WIN = '1'
     vi.resetModules()
     const { isRecallSupported } = await import('../recallService')
     expect(isRecallSupported()).toBe(false)
@@ -71,7 +71,7 @@ describe('Recall is removed', () => {
   it('initRecallSdk never loads @recallai/desktop-sdk', async () => {
     Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true })
     Object.defineProperty(process, 'arch', { value: 'arm64', configurable: true })
-    process.env.RAVEN_ENABLE_RECALL_WIN = '1'
+    process.env.SECOND_ENABLE_RECALL_WIN = '1'
     const sdkInit = vi.fn().mockResolvedValue(undefined)
     vi.doMock('@recallai/desktop-sdk', () => ({
       default: { init: sdkInit, requestPermission: vi.fn(), addEventListener: vi.fn() },

@@ -1,4 +1,4 @@
-# Raven Windows Audio Module
+# Second Windows Audio Module
 
 Native Windows audio capture module built with Rust and [NAPI-RS](https://napi.rs). Provides system audio (loopback) and microphone capture via the Windows Audio Session API (WASAPI).
 
@@ -39,14 +39,14 @@ napi build --platform --release
 cargo build --release
 ```
 
-This produces a file named `raven-windows-audio.win32-x64-msvc.node` in the current directory.
+This produces a file named `second-windows-audio.win32-x64-msvc.node` in the current directory.
 
 ## Development Setup
 
 For dev mode, the compiled `.node` file should be placed at:
 
 ```
-src/native/windows/raven-windows-audio.win32-x64-msvc.node
+src/native/windows/second-windows-audio.win32-x64-msvc.node
 ```
 
 The TypeScript layer (`src/main/systemAudioNative.ts`) looks for it at this path first, falling back to the packaged resources directory for production builds.

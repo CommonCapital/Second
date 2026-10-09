@@ -23,18 +23,18 @@ export function MacUpdateModal({ isRecording }: { isRecording: boolean }) {
 
   useEffect(() => {
     if (!isMac) return
-    void window.raven.storeGet('macUpdateDismissedVersion').then((value) => {
+    void window.second.storeGet('macUpdateDismissedVersion').then((value) => {
       if (typeof value === 'string') setDismissedVersion(value)
     })
-    void window.raven.getAppVersion().then((value) => {
+    void window.second.getAppVersion().then((value) => {
       if (typeof value === 'string') setCurrentVersion(value)
     })
-    void window.raven.updateGetState().then((state) => setUpdateState(state as UpdateState))
+    void window.second.updateGetState().then((state) => setUpdateState(state as UpdateState))
   }, [isMac])
 
   useEffect(() => {
     if (!isMac) return
-    return window.raven.onUpdateStateChanged((state) => {
+    return window.second.onUpdateStateChanged((state) => {
       const typed = state as UpdateState
       setUpdateState(typed)
       if (typed.status === 'checking') setLaterUntilNextCheck(false)
@@ -69,16 +69,16 @@ export function MacUpdateModal({ isRecording }: { isRecording: boolean }) {
     setDismissedVersion(version)
     setSettingsPrompt(false)
     setLaterUntilNextCheck(true)
-    await window.raven.storeSet('macUpdateDismissedVersion', version)
+    await window.second.storeSet('macUpdateDismissedVersion', version)
   }, [updateState.version])
 
   const handleDownload = useCallback(async () => {
     if (busy) return
     setBusy(true)
     try {
-      const result = await window.raven.updateDownload()
+      const result = await window.second.updateDownload()
       if (!result?.success && updateState.dmgUrl) {
-        await window.raven.openExternal(updateState.dmgUrl)
+        await window.second.openExternal(updateState.dmgUrl)
       }
     } finally {
       setBusy(false)
@@ -115,12 +115,12 @@ export function MacUpdateModal({ isRecording }: { isRecording: boolean }) {
           </div>
           <div>
             <h2 id="mac-update-title" className="text-lg font-semibold text-gray-900 leading-snug">
-              {version ? `Raven ${version} is ready` : 'An update is ready'}
+              {version ? `Second ${version} is ready` : 'An update is ready'}
             </h2>
             <p className="text-sm text-gray-500 mt-1 leading-relaxed">
               {currentVersion
-                ? `This window is Raven ${currentVersion}. Install from a disk image, then open the new app from Applications.`
-                : 'On Mac, install this update from a disk image. Drag Raven into Applications, then open it.'}
+                ? `This window is Second ${currentVersion}. Install from a disk image, then open the new app from Applications.`
+                : 'On Mac, install this update from a disk image. Drag Second into Applications, then open it.'}
             </p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export function MacUpdateModal({ isRecording }: { isRecording: boolean }) {
             </span>
             <p className="text-sm text-gray-700 leading-relaxed pt-0.5">
               Open the <span className="font-medium">.dmg</span> and drag{' '}
-              <span className="font-medium text-gray-900">Raven</span> into{' '}
+              <span className="font-medium text-gray-900">Second</span> into{' '}
               <span className="font-medium text-gray-900">Applications</span>. Choose Replace if
               macOS asks.
             </p>
@@ -151,7 +151,7 @@ export function MacUpdateModal({ isRecording }: { isRecording: boolean }) {
               3
             </span>
             <p className="text-sm text-gray-700 leading-relaxed pt-0.5">
-              Open <span className="font-medium text-gray-900">Raven</span> from Applications.
+              Open <span className="font-medium text-gray-900">Second</span> from Applications.
               Quit the old copy first if macOS says it is already running.
             </p>
           </li>

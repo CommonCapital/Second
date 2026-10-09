@@ -21,7 +21,7 @@ let initialized = false
 // crash dashboards with non-bugs - see Sentry issue 26944317 from
 // the v2.2.1 install (2026-05-08, "write EPIPE" fired ~18ms after
 // app.before-quit, all-internal Node net + writable + stream_base
-// stack frames, no Raven code in the trace).
+// stack frames, no Second code in the trace).
 let appQuitting = false
 
 export function initSentry(): void {
@@ -40,7 +40,7 @@ export function initSentry(): void {
       Sentry.init({
         dsn: SENTRY_DSN,
         environment: app.isPackaged ? 'production' : 'development',
-        release: `raven@${app.getVersion()}`,
+        release: `second@${app.getVersion()}`,
         beforeSend(event) {
           // Strip all PII
           if (event.user) {

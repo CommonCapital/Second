@@ -57,7 +57,7 @@ async function parseFile(filePath: string): Promise<string> {
       const { join } = await import('path');
       const { tmpdir } = await import('os');
       const { writeFileSync, existsSync } = await import('fs');
-      const helperPath = join(tmpdir(), 'raven-pdf-helper.cjs');
+      const helperPath = join(tmpdir(), 'second-pdf-helper.cjs');
       if (!existsSync(helperPath)) {
         writeFileSync(helperPath, `
           const { PDFParse, VerbosityLevel } = require(${JSON.stringify(pdfParsePath)});

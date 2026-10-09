@@ -51,7 +51,7 @@ an individual is officially representing the community in public spaces.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project maintainers at **hello@laxcorpresearch.com**.
+reported privately to the project maintainer through a [private report on GitHub](https://github.com/CommonCapital/second/security/advisories/new) or by contacting the maintainer listed on the repository profile.
 
 All complaints will be reviewed and investigated promptly and fairly.
 

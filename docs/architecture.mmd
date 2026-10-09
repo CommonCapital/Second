@@ -14,7 +14,7 @@ flowchart TB
       MEM["sessionMemory<br/>current recording only"]
       RAG["ragService<br/>Xenova/all-MiniLM-L6-v2"]
       SM["sessionManager<br/>autosave · incognito"]
-      DB[("database.ts — SQLite<br/>data/raven.db")]
+      DB[("database.ts — SQLite<br/>data/second.db")]
       CFG["store.ts — electron-store<br/>encrypted keys + settings"]
     end
     subgraph ui["Renderer"]
@@ -30,7 +30,7 @@ flowchart TB
     REG["ResidualEchoGate<br/>drop leftover speaker bleed before You STT"]
   end
 
-  subgraph byok["Your API keys — no Raven server"]
+  subgraph byok["Your API keys — no Second server"]
     DG["Deepgram nova-3"]
     AAI["AssemblyAI u3-rt-pro"]
     LLM["Anthropic or OpenAI"]

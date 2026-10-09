@@ -22,22 +22,22 @@ export function GeneralTab() {
 
   useEffect(() => {
     async function load() {
-      const settings = await window.raven.storeGetAll()
+      const settings = await window.second.storeGetAll()
       setStealth(settings.stealthEnabled as boolean)
       setOpenOnLogin(settings.openOnLogin as boolean)
       if (settings.meetingAutoStart) {
         setMeetingAutoStart(settings.meetingAutoStart as MeetingAutoStart)
       }
-      const v = await window.raven.getAppVersion()
+      const v = await window.second.getAppVersion()
       setAppVersion(v)
-      const state = await window.raven.updateGetState()
+      const state = await window.second.updateGetState()
       setUpdateState(state as UpdateState)
     }
     load()
   }, [])
 
   useEffect(() => {
-    const unsubscribe = window.raven.onUpdateStateChanged((state) => {
+    const unsubscribe = window.second.onUpdateStateChanged((state) => {
       setUpdateState(state as UpdateState)
     })
     return unsubscribe
@@ -45,17 +45,17 @@ export function GeneralTab() {
 
   const handleStealth = async (enabled: boolean) => {
     setStealth(enabled)
-    await window.raven.windowSetStealth(enabled)
+    await window.second.windowSetStealth(enabled)
   }
 
   const handleOpenOnLogin = async (enabled: boolean) => {
     setOpenOnLogin(enabled)
-    await window.raven.storeSet('openOnLogin', enabled)
+    await window.second.storeSet('openOnLogin', enabled)
   }
 
   const handleMeetingAutoStart = async (value: MeetingAutoStart) => {
     setMeetingAutoStart(value)
-    await window.raven.storeSet('meetingAutoStart', value)
+    await window.second.storeSet('meetingAutoStart', value)
   }
 
   const handleCheckUpdate = useCallback(async () => {
@@ -78,7 +78,7 @@ export function GeneralTab() {
     // immediately; the real status will arrive from the broadcast.
     setUpdateState({ status: 'checking' })
     try {
-      await window.raven.updateCheck()
+      await window.second.updateCheck()
     } catch {
       // If the IPC layer itself fails (not the updater - the updater
       // broadcasts 'error' via onUpdateStateChanged before the invoke
@@ -95,11 +95,11 @@ export function GeneralTab() {
       requestMacUpdatePrompt()
       return
     }
-    await window.raven.updateDownload()
+    await window.second.updateDownload()
   }, [updateState.install])
 
   const handleInstallUpdate = useCallback(async () => {
-    await window.raven.updateInstall()
+    await window.second.updateInstall()
   }, [])
 
   return (
@@ -122,8 +122,8 @@ export function GeneralTab() {
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
               {stealth
-                ? 'Raven is hidden from screen sharing'
-                : 'Raven is visible during screen sharing'}
+                ? 'Second is hidden from screen sharing'
+                : 'Second is visible during screen sharing'}
             </p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export function GeneralTab() {
       {/* Section label */}
       <div>
         <h3 className="text-sm font-semibold text-gray-900">General settings</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Customize how Raven works for you</p>
+        <p className="text-xs text-gray-400 mt-0.5">Customize how Second works for you</p>
       </div>
 
       {/* Settings rows */}
@@ -158,8 +158,8 @@ export function GeneralTab() {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">Open Raven when you log in</p>
-              <p className="text-xs text-gray-400 mt-0.5">Raven will open automatically when you log in to your computer</p>
+              <p className="text-sm font-medium text-gray-900">Open Second when you log in</p>
+              <p className="text-xs text-gray-400 mt-0.5">Second will open automatically when you log in to your computer</p>
             </div>
           </div>
           <button
@@ -187,7 +187,7 @@ export function GeneralTab() {
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">When a meeting starts</p>
               <p className="text-xs text-gray-400 mt-0.5 mb-3">
-                Raven can notice Zoom, Google Meet, Teams, or Webex meetings and offer to start. No bot joins your call.
+                Second can notice Zoom, Google Meet, Teams, or Webex meetings and offer to start. No bot joins your call.
               </p>
               <div className="flex flex-col gap-1.5" role="radiogroup" aria-label="Meeting auto-start">
                 {([
@@ -242,7 +242,7 @@ export function GeneralTab() {
                     ? `Version ${updateState.version} is ready to install`
                     : updateState.status === 'up-to-date'
                       ? `You're on the latest version (${appVersion})`
-                      : `You are currently using Raven version ${appVersion}`}
+                      : `You are currently using Second version ${appVersion}`}
               </p>
             </div>
           </div>

@@ -40,7 +40,7 @@ for plugin in "${CORE_PLUGINS[@]}"; do
     fi
 done
 
-# Shared libraries needed by raven-aec.node and the plugins
+# Shared libraries needed by second-aec.node and the plugins
 GST_LIB_DIR=$(pkg-config --variable=libdir gstreamer-1.0)
 GLIB_LIB_DIR=$(pkg-config --variable=libdir glib-2.0)
 

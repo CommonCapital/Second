@@ -17,14 +17,14 @@ describe('parseLatestMacYmlVersion', () => {
   it('reads the electron-builder latest-mac.yml version field', () => {
     const yml = `version: 2.4.0
 files:
-  - url: Raven-Mac-2.4.0-Installer.zip
-path: Raven-Mac-2.4.0-Installer.zip
+  - url: Second-Mac-2.4.0-Installer.zip
+path: Second-Mac-2.4.0-Installer.zip
 `
     expect(parseLatestMacYmlVersion(yml)).toBe('2.4.0')
   })
 
   it('returns null when version is missing', () => {
-    expect(parseLatestMacYmlVersion('path: Raven.zip\n')).toBeNull()
+    expect(parseLatestMacYmlVersion('path: Second.zip\n')).toBeNull()
   })
 })
 
@@ -140,7 +140,7 @@ describe('fetchMacFeedVersion', () => {
   it('reads version from the GitHub latest-mac.yml feed', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
-      text: async () => 'version: 2.4.0\npath: Raven.zip\n',
+      text: async () => 'version: 2.4.0\npath: Second.zip\n',
     })
     await expect(fetchMacFeedVersion(fetchImpl as typeof fetch)).resolves.toBe('2.4.0')
     expect(fetchImpl).toHaveBeenCalledWith(

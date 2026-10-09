@@ -1,12 +1,12 @@
 name: Feature request
-description: Suggest an idea or improvement for Raven
+description: Suggest an idea or improvement for Second
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the idea. Prefer not to use GitHub? Send it via the [feedback form](https://laxcorphq.wixforms.com/f/7497329197333873820) — no account needed.
+        Thanks for the idea.
   - type: textarea
     id: problem
     attributes:
@@ -17,7 +17,7 @@ body:
   - type: textarea
     id: proposal
     attributes:
-      label: What would you like Raven to do?
+      label: What would you like Second to do?
     validations:
       required: true
   - type: input

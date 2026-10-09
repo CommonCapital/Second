@@ -27,7 +27,7 @@ vi.mock('electron', () => ({
     decryptString: mockDecryptString,
   },
   app: {
-    getPath: vi.fn(() => '/tmp/raven-store-test'),
+    getPath: vi.fn(() => '/tmp/second-store-test'),
   },
 }))
 

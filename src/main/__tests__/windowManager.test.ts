@@ -112,7 +112,7 @@ describe('windowManager', () => {
     mockBrowserWindowInstance.isVisible.mockReturnValue(false)
     ;(app as { isPackaged: boolean }).isPackaged = false
     delete (mockBrowserWindowInstance.webContents.session as Record<symbol, unknown>)[
-      Symbol.for('raven.cspApplied')
+      Symbol.for('second.cspApplied')
     ]
     Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true })
   })
@@ -379,7 +379,7 @@ describe('windowManager', () => {
     it('keeps the dock hidden when the dashboard becomes ready while stealth is ON', () => {
       // Before the fix, ready-to-show called app.dock.show() unconditionally,
       // re-revealing the icon after setStealthMode had hidden it - the exact
-      // "Raven is undetectable but still visible in the dock" report.
+      // "Second is undetectable but still visible in the dock" report.
       mockGetSetting.mockImplementation(((key: unknown) =>
         key === 'stealthEnabled' ? true : null) as () => null)
       createDashboardWindow('/preload.js', null)

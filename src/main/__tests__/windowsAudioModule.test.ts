@@ -1,6 +1,6 @@
 /**
  * Regression test for the Windows native audio module
- * (`src/native/windows/raven-windows-audio.win32-x64-msvc.node`).
+ * (`src/native/windows/second-windows-audio.win32-x64-msvc.node`).
  *
  * Why this exists: the v2.2.0 Windows .exe shipped from S3 is
  * MISSING this .node file. The release-electron.yml CI never built
@@ -58,7 +58,7 @@ const MODULE_PATH = join(
   'src',
   'native',
   'windows',
-  'raven-windows-audio.win32-x64-msvc.node',
+  'second-windows-audio.win32-x64-msvc.node',
 );
 
 describe('Windows native audio module (W4)', () => {

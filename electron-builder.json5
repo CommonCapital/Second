@@ -1,20 +1,20 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "com.laxcorpresearch.raven",
+  "appId": "com.nursan.second",
   "asar": true,
   "asarUnpack": [
     "**/*.node",
     "**/audiocapture"
   ],
-  "productName": "Raven",
+  "productName": "Second",
   "directories": {
     "output": "release/${version}"
   },
   "protocols": [
     {
-      "name": "Raven",
-      "schemes": ["raven"]
+      "name": "Second",
+      "schemes": ["second"]
     }
   ],
   "files": [
@@ -44,8 +44,12 @@
     "gatekeeperAssess": false,
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.plist",
+    // Usage strings shown in macOS permission prompts. NSAudioCaptureUsageDescription
+    // must be present or system audio capture can yield a silent stream with no error.
     "extendInfo": {
-      "NSScreenCaptureUsageDescription": "This app needs Screen Recording to capture system audio and screenshots."
+      "NSMicrophoneUsageDescription": "Second listens to your microphone so it can transcribe what you say during a meeting.",
+      "NSAudioCaptureUsageDescription": "Second captures system audio so it can transcribe the other side of your meeting.",
+      "NSScreenCaptureUsageDescription": "Second uses Screen Recording to capture meeting audio and, when you ask for Assist, a screenshot of your screen."
     },
     "extraResources": [
       {
@@ -57,8 +61,8 @@
         "to": "swift/audiocapture"
       },
       {
-        "from": "src/native/aec/build/Release/raven-aec.node",
-        "to": "raven-aec.node"
+        "from": "src/native/aec/build/Release/second-aec.node",
+        "to": "second-aec.node"
       },
       // GStreamer plugin (webrtcdsp + webrtcechoprobe)
       {
@@ -96,12 +100,12 @@
         "to": "tray"
       },
       {
-        "from": "src/native/windows/raven-windows-audio.win32-x64-msvc.node",
-        "to": "raven-windows-audio.win32-x64-msvc.node"
+        "from": "src/native/windows/second-windows-audio.win32-x64-msvc.node",
+        "to": "second-windows-audio.win32-x64-msvc.node"
       },
       {
-        "from": "src/native/aec/build/Release/raven-aec.node",
-        "to": "raven-aec.node"
+        "from": "src/native/aec/build/Release/second-aec.node",
+        "to": "second-aec.node"
       },
       // GStreamer plugins (webrtcdsp + core pipeline plugins)
       {

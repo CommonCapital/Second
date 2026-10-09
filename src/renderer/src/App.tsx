@@ -11,7 +11,7 @@ type AppView = 'loading' | 'overlay' | 'onboarding-free' | 'permissions-gate' | 
 
 async function permissionsAllGranted(): Promise<boolean> {
   try {
-    const status = await window.raven.permissionsGetStatus()
+    const status = await window.second.permissionsGetStatus()
     return (
       status.microphone === 'granted' &&
       status.screen === 'granted' &&
@@ -29,7 +29,7 @@ function App(): JSX.Element {
   useEffect(() => {
     async function init() {
       try {
-        const type = await window.raven.windowGetType()
+        const type = await window.second.windowGetType()
         setWindowType(type)
 
         if (type === 'overlay') {
@@ -37,9 +37,9 @@ function App(): JSX.Element {
           return
         }
 
-        const settings = await window.raven.storeGetAll()
+        const settings = await window.second.storeGetAll()
         const onboarded = settings.onboardingComplete as boolean
-        const hasKeys = await window.raven.apiKeysHas()
+        const hasKeys = await window.second.apiKeysHas()
         if (!onboarded || !hasKeys) {
           setView('onboarding-free')
           return
@@ -86,7 +86,7 @@ function App(): JSX.Element {
       <PermissionsGate
         onAllGranted={() => {
           setView('dashboard')
-          void window.raven.windowShowOverlay()
+          void window.second.windowShowOverlay()
         }}
       />
     )
@@ -97,7 +97,7 @@ function App(): JSX.Element {
       <Onboarding
         onComplete={() => {
           setView('dashboard')
-          window.raven.sendOnboardingCompleted()
+          window.second.sendOnboardingCompleted()
         }}
       />
     )

@@ -1,6 +1,6 @@
 /**
  * Regression: unsigned Mac builds left Identifier=Electron so Screen
- * Recording stayed denied after the user toggled Raven ON in Settings.
+ * Recording stayed denied after the user toggled Second ON in Settings.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -38,16 +38,16 @@ describe('scripts/afterPack-mac-identity.cjs', () => {
     existsSync = vi.fn(() => true)
   })
 
-  it('uses the Raven bundle id, not Electron', () => {
-    expect(hook._BUNDLE_ID).toBe('com.laxcorpresearch.raven')
+  it('uses the Second bundle id, not Electron', () => {
+    expect(hook._BUNDLE_ID).toBe('com.nursan.second')
   })
 
   it('adhoc-signs the .app with --identifier and without --deep', () => {
-    hook._adhocSignMacApp('/tmp/Raven.app', { execFileSync, existsSync })
+    hook._adhocSignMacApp('/tmp/Second.app', { execFileSync, existsSync })
 
     expect(execFileSync).toHaveBeenCalledWith(
       'codesign',
-      ['--force', '--sign', '-', '--identifier', 'com.laxcorpresearch.raven', '/tmp/Raven.app'],
+      ['--force', '--sign', '-', '--identifier', 'com.nursan.second', '/tmp/Second.app'],
       expect.any(Object),
     )
     const args = execFileSync.mock.calls[0][1] as string[]

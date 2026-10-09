@@ -14,12 +14,12 @@ export function ProfileTab() {
   }, [])
 
   async function loadProfile() {
-    const picPath = (await window.raven.storeGet('profilePicturePath')) as string
+    const picPath = (await window.second.storeGet('profilePicturePath')) as string
     if (picPath) {
-      const data = await window.raven.profileGetPictureData(picPath)
+      const data = await window.second.profileGetPictureData(picPath)
       setProfilePicData(data)
     }
-    const name = (await window.raven.storeGet('displayName')) as string
+    const name = (await window.second.storeGet('displayName')) as string
     setDisplayName(name || '')
     setSavedName(name || '')
   }
@@ -27,7 +27,7 @@ export function ProfileTab() {
   async function handleSave() {
     setSaving(true)
     const trimmed = displayName.trim()
-    await window.raven.storeSet('displayName', trimmed)
+    await window.second.storeSet('displayName', trimmed)
     setSavedName(trimmed)
     setSaving(false)
     setSaved(true)
@@ -36,7 +36,7 @@ export function ProfileTab() {
   }
 
   async function handleSelectPicture() {
-    const rawData = await window.raven.profileSelectPictureRaw()
+    const rawData = await window.second.profileSelectPictureRaw()
     if (rawData) {
       setCropImageSrc(rawData)
     }
@@ -44,16 +44,16 @@ export function ProfileTab() {
 
   async function handleCropApply(croppedDataUrl: string) {
     setCropImageSrc(null)
-    const path = await window.raven.profileSavePictureData(croppedDataUrl)
+    const path = await window.second.profileSavePictureData(croppedDataUrl)
     if (path) {
-      const data = await window.raven.profileGetPictureData(path)
+      const data = await window.second.profileGetPictureData(path)
       setProfilePicData(data)
       window.dispatchEvent(new Event('profile-updated'))
     }
   }
 
   async function handleRemovePicture() {
-    await window.raven.profileRemovePicture()
+    await window.second.profileRemovePicture()
     setProfilePicData(null)
     window.dispatchEvent(new Event('profile-updated'))
   }
