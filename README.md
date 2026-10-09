@@ -740,3 +740,4 @@ Issues and pull requests are welcome. This project is in active development. See
 [MIT](LICENSE) © Nursan Omarov.
 
 Second began as a fork of [Project Raven](https://github.com/Laxcorp-Research/project-raven) (MIT); its original copyright notice is kept in [LICENSE](LICENSE).
+# Second
