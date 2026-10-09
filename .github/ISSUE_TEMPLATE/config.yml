@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Documentation
-    url: https://github.com/CommonCapital/second#readme
+    url: https://github.com/CommonCapital/Second#readme
     about: Setup guide, features, and troubleshooting.
   - name: Security issue
-    url: https://github.com/CommonCapital/second/security/advisories/new
+    url: https://github.com/CommonCapital/Second/security/advisories/new
     about: Report vulnerabilities privately, not as a public issue.

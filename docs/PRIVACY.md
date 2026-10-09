@@ -55,4 +55,4 @@ Recording or transcribing a conversation may require the consent of everyone in 
 
 ## Questions
 
-Open an issue at <https://github.com/CommonCapital/second/issues>, or report security problems privately via <https://github.com/CommonCapital/second/security/advisories/new>.
+Open an issue at <https://github.com/CommonCapital/Second/issues>, or report security problems privately via <https://github.com/CommonCapital/Second/security/advisories/new>.

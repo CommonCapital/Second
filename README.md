@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/CommonCapital/second/releases/latest"><img src="https://img.shields.io/github/v/release/CommonCapital/second?label=release&color=B08A4A" alt="Latest release" /></a>
+  <a href="https://github.com/CommonCapital/Second/releases/latest"><img src="https://img.shields.io/github/v/release/CommonCapital/Second?label=release&color=B08A4A" alt="Latest release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-B08A4A" alt="License: MIT" /></a>
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-141B2D" alt="Platforms: macOS and Windows" />
 </p>
@@ -40,7 +40,7 @@ See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what leaves your machine and 
 
 ## Download
 
-Prebuilt installers are published on [GitHub Releases](https://github.com/CommonCapital/second/releases/latest). Enter your own API keys on first launch.
+Prebuilt installers are published on [GitHub Releases](https://github.com/CommonCapital/Second/releases/latest). Enter your own API keys on first launch.
 
 | Platform | Installer |
 |----------|-----------|
@@ -346,8 +346,8 @@ pkg-config --modversion gstreamer-1.0
 **Step 4 — Clone the repo and install dependencies**
 
 ```bash
-git clone https://github.com/CommonCapital/second.git
-cd second
+git clone https://github.com/CommonCapital/Second.git
+cd Second
 npm install
 ```
 
@@ -553,8 +553,8 @@ cmake --version
 **Step 7 — Clone the repo and install dependencies**
 
 ```
-git clone https://github.com/CommonCapital/second.git
-cd second
+git clone https://github.com/CommonCapital/Second.git
+cd Second
 npm install
 ```
 
@@ -740,4 +740,3 @@ Issues and pull requests are welcome. This project is in active development. See
 [MIT](LICENSE) © Nursan Omarov.
 
 Second began as a fork of [Project Raven](https://github.com/Laxcorp-Research/project-raven) (MIT); its original copyright notice is kept in [LICENSE](LICENSE).
-# Second

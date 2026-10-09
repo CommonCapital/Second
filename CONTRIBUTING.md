@@ -16,8 +16,8 @@ Thanks for your interest in contributing to Second! This guide will help you get
 
 ```bash
 # Clone the repo
-git clone https://github.com/CommonCapital/second.git
-cd second
+git clone https://github.com/CommonCapital/Second.git
+cd Second
 
 # Install dependencies
 npm install
@@ -35,8 +35,8 @@ npm run dev
 
 ```bash
 # Clone the repo
-git clone https://github.com/CommonCapital/second.git
-cd second
+git clone https://github.com/CommonCapital/Second.git
+cd Second
 
 # Install dependencies
 npm install
@@ -261,4 +261,4 @@ Open a GitHub Discussion or Issue with:
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/CommonCapital/second/discussions) — we're happy to help.
+Open a [GitHub Discussion](https://github.com/CommonCapital/Second/discussions) — we're happy to help.

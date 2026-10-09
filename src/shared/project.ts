@@ -8,7 +8,7 @@ export const PRODUCT_NAME = 'Second'
 export const PRODUCT_TAGLINE = 'A private live meeting intelligence layer for high-stakes conversations.'
 export const AUTHOR_NAME = 'Nursan Omarov'
 
-export const GITHUB_REPO = 'CommonCapital/second'
+export const GITHUB_REPO = 'CommonCapital/Second'
 export const REPO_URL = `https://github.com/${GITHUB_REPO}`
 export const ISSUES_URL = `${REPO_URL}/issues`
 export const FEEDBACK_URL = `${REPO_URL}/issues/new/choose`

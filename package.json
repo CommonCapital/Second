@@ -5,13 +5,13 @@
   "description": "Second: an open-source, private live meeting intelligence layer for interviews, founder and investor calls, negotiations, and high-stakes meetings. Bring your own keys; everything stays on your machine.",
   "author": "Nursan Omarov",
   "license": "MIT",
-  "homepage": "https://github.com/CommonCapital/second",
+  "homepage": "https://github.com/CommonCapital/Second",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CommonCapital/second.git"
+    "url": "https://github.com/CommonCapital/Second.git"
   },
   "bugs": {
-    "url": "https://github.com/CommonCapital/second/issues"
+    "url": "https://github.com/CommonCapital/Second/issues"
   },
   "keywords": [
     "meeting-assistant",

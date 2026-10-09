@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/CommonCapital/second/schemas/meeting_state.json",
+  "$id": "https://github.com/CommonCapital/Second/schemas/meeting_state.json",
   "title": "Second meeting state",
   "description": "Canonical meeting state produced by the deterministic reducer in src/shared/second/meetingState.ts. The coach proposes changes via state_updates; the reducer enforces provenance (facts need a source turn), keeps inferences out of facts, normalizes numbers to detect contradictions, and flags commitments without a due date.",
   "type": "object",

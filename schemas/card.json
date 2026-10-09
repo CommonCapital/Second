@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/CommonCapital/second/schemas/card.json",
+  "$id": "https://github.com/CommonCapital/Second/schemas/card.json",
   "title": "Second coach response",
   "description": "What the live coach model must return for each qualifying turn (snake_case). Parsed and enforced by src/shared/second/card.ts.",
   "type": "object",
