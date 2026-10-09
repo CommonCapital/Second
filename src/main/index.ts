@@ -1,3 +1,4 @@
+import './appIdentity'
 import { app, BrowserWindow, globalShortcut, ipcMain, desktopCapturer, Menu } from 'electron'
 import { join, dirname } from 'path'
 import { existsSync } from 'fs'
