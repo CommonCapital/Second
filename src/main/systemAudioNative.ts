@@ -9,7 +9,7 @@
  * after AEC (YouTube on speakers otherwise lands in "You").
  */
 
-import { ipcMain, systemPreferences } from 'electron'
+import { app, ipcMain, systemPreferences } from 'electron'
 import { spawn, type ChildProcessByStdio } from 'child_process'
 import type { Readable } from 'stream'
 import { existsSync } from 'fs'
@@ -257,6 +257,20 @@ function ensureGstLibsOnPath(): void {
   }
 }
 
+/**
+ * Packaged Mac app: use only the plugins bundled in the app (never a
+ * Homebrew install that may also exist on this Mac, whose GLib/GStreamer
+ * would conflict with ours), keep our own plugin registry, and scan plugins
+ * in-process since gst-plugin-scanner is not bundled.
+ */
+function isolateBundledGstreamer(pluginPath: string): void {
+  if (!isMac || !app.isPackaged || !pluginPath.startsWith(process.resourcesPath)) return
+  process.env.GST_PLUGIN_SYSTEM_PATH = pluginPath
+  process.env.GST_PLUGIN_PATH = ''
+  process.env.GST_REGISTRY = join(app.getPath('userData'), 'gstreamer-registry.bin')
+  process.env.GST_REGISTRY_FORK = 'no'
+}
+
 function initAec(): void {
   if (aecInitialized) return
 
@@ -265,6 +279,7 @@ function initAec(): void {
     try {
       const pluginPath = getGstPluginPath()
       log.info(`GStreamer plugin path: ${pluginPath || '(system default)'}`)
+      isolateBundledGstreamer(pluginPath)
       mod.init(pluginPath)
       aecInitialized = true
       aecBypassed = false

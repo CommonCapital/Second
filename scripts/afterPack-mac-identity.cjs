@@ -52,11 +52,14 @@ function adhocSignMacApp(appPath, deps) {
  */
 async function afterPack(context) {
   if (context.electronPlatformName !== 'darwin') return
-  if (!shouldAdhocSignMacApp()) return
   const appPath = path.join(
     context.appOutDir,
     `${context.packager.appInfo.productFilename}.app`,
   )
+  // Bundle GStreamer's dependencies inside the app and point every
+  // reference at them, so echo cancellation works without Homebrew.
+  require('./relocate-gstreamer-mac.cjs').relocate(path.join(appPath, 'Contents', 'Resources'))
+  if (!shouldAdhocSignMacApp()) return
   adhocSignMacApp(appPath)
 }
 
