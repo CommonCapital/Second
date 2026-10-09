@@ -34,8 +34,32 @@ permissions:
   actions: write
 
 jobs:
+  # Releases published before Apple signing is set up (e.g. a manually
+  # uploaded unsigned build) skip the signed build instead of failing.
+  check-signing:
+    name: Check signing secrets
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          MAC_CERTIFICATE: ${{ secrets.MAC_CERTIFICATE }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$MAC_CERTIFICATE" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Signed Mac build skipped::Add MAC_CERTIFICATE, MAC_CERTIFICATE_PASSWORD, APPLE_ID, APPLE_PASSWORD and APPLE_TEAM_ID repository secrets to build signed, notarized Mac releases automatically."
+          fi
+
   build-mac:
     name: Build macOS
+    needs: check-signing
+    if: needs.check-signing.outputs.ready == 'true'
     runs-on: macos-15
     timeout-minutes: 120
 

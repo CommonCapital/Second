@@ -40,10 +40,29 @@ See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what leaves your machine and 
 
 ## Download
 
-Prebuilt installers are published on [GitHub Releases](https://github.com/CommonCapital/Second/releases/latest). Enter your own API keys on first launch.
+<p>
+  <a href="https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.dmg"><img src="https://img.shields.io/badge/Download-macOS%20(Apple%20Silicon)-141B2D?logo=apple&logoColor=white" alt="Download Second for macOS" /></a>
+</p>
 
-| Platform | Installer |
-|----------|-----------|
+| Platform | Installer | Size |
+|----------|-----------|------|
+| **macOS 12+ (Apple Silicon)** | [Second-Mac-0.1.0-Installer.dmg](https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.dmg) | 235 MB |
+| **macOS 12+ (Apple Silicon)**, zip | [Second-Mac-0.1.0-Installer.zip](https://github.com/CommonCapital/Second/releases/download/Installation/Second-Mac-0.1.0-Installer.zip) | 227 MB |
+
+All builds: [GitHub Releases](https://github.com/CommonCapital/Second/releases). Intel Macs and Windows: build from source ([Getting Started](#getting-started)).
+
+### Install on macOS
+
+1. Open the **DMG** and drag **Second** into **Applications**. (Using the zip: double-click it, then drag **Second.app** into Applications.)
+2. **First launch only:** right-click **Second** in Applications → **Open** → **Open**. This build is not yet signed with an Apple Developer ID, so a plain double-click is blocked the first time. If macOS still refuses, go to **System Settings → Privacy & Security** and click **Open Anyway**.
+3. Follow onboarding: add your own API keys (Deepgram or AssemblyAI for transcription; Anthropic or OpenAI for intelligence) and allow **Microphone** and **Screen Recording** (Screen Recording is how macOS exposes system audio).
+4. **Settings → Second → Run test** to confirm both *You* and *Them* are heard before your first real meeting.
+
+> **Early build (0.1.0).** Echo cancellation uses GStreamer. On a Mac without Homebrew's GStreamer (`brew install gstreamer`), Second still works but runs without echo cancellation; use headphones so the other side doesn't leak into your own transcript. A fully self-contained build is on the roadmap.
+
+Installed copies check GitHub Releases for updates (`latest-mac.yml`) and only offer a build **newer** than the one you have. Maintainers: see [Releasing](CONTRIBUTING.md#releasing).
+
+----------|-----------|
 | **macOS 12+ (Apple Silicon)** | `Second-Mac-<version>-Installer.dmg` |
 | **Windows 10/11 (x64)** | `Second-Windows-<version>-Setup.exe` |
 
