@@ -59,6 +59,20 @@ Installed copies check GitHub Releases for updates (`latest-mac.yml` on macOS, `
 
 ## Features (shipping today)
 
+### The live judgment layer
+
+- **One card at a time** — SAY, ASK, WATCH, WAIT, or CLOSE, usually 22 words or fewer, only when it beats silence. Each card shows its mode and expires when it stops being actionable. Keep, dismiss, or ask the deeper model to think again. `Cmd/Ctrl + Shift + Enter` asks for the best move now.
+- **Meeting state, not a giant prompt** — A deterministic reducer tracks the objective, topic, facts (with the turn they came from), numbers (contradictions flagged automatically), open questions, objections, commitments (missing dates flagged), capture gaps, and the next best action. The coach sees this state plus the last few turns, never the whole transcript. See the **State** tab in the overlay.
+- **Intervention engine** — Coaching runs only after meaningful finalized turns. Cards are held back when confidence is low, they repeat, the current card is still being used, the other side is mid-answer, or a question you just asked is still pending.
+- **Meeting modes** — General executive, Founder / investment, LP / allocator, Interview, Banker / sponsor, Negotiation, IC / portfolio, Relationship. A mode changes the objective, guardrails, close target, and how often Second speaks.
+- **Prepare meeting** — Type, who, objective, ideal outcome, what must not happen, and pasted context produce a 90-second brief: three facts to remember, three questions to land, likely hard questions, and the close target.
+- **Your professional profile** — Edited in Settings, versioned on every save. Dynamic context (deals, workstreams) is used only when a meeting mentions it, and flagged stale after 30 days.
+- **Post-meeting report** — Outcome, decisions, commitments, open questions, risks, next step, a short follow-up draft, and proposed profile updates you approve before anything is saved.
+- **No false green** — A status rail per channel (mic, meeting audio, both transcripts, coach, network) with plain-English failures ("I can hear you, not the meeting"). A dual-audio self test in Settings proves both sides before a call. Sleep and network loss are marked as gaps.
+- **Private by default** — Transcripts are deleted after notes are written unless you turn retention on. API keys never reach the UI process. Diagnostics carry no content.
+
+### Capture, transcription, and history
+
 - **Dual-stream capture** — System audio + microphone. macOS uses ScreenCaptureKit + CoreAudio; Windows uses WASAPI loopback + capture (Rust/NAPI).
 - **Echo cancellation** — GStreamer `webrtcechoprobe` / `webrtcdsp` (WebRTC AEC3), then a **residual echo gate** that drops mic chunks that still look like speaker bleed before they reach STT.
 - **Real-time transcription** — Two streams: **You** (cleaned mic) and **Them** (system audio). Deepgram `nova-3` and/or AssemblyAI `u3-rt-pro`. Auto-routing prefers AssemblyAI for English, Spanish, French, German, Portuguese, and Italian when that key is present; otherwise Deepgram. Settings can force either engine.
@@ -80,7 +94,7 @@ Live recording uses the **OS default** mic and playback devices. The Settings mi
 
 ## Roadmap
 
-Second is built in phases. Each phase has an exit condition; the next starts only when it is met.
+Second is built in phases. Each phase has an exit condition; the next starts only when it is met. Current status: [docs/PRODUCT_SOURCE_OF_TRUTH.md](docs/PRODUCT_SOURCE_OF_TRUTH.md#status-against-the-build-sequence). Release bar: [RELEASE_GATE.md](RELEASE_GATE.md).
 
 | Phase | Work | Exit condition |
 |-------|------|----------------|
@@ -194,6 +208,13 @@ src/
 │   ├── store.ts                  #   electron-store (encrypted keys + settings)
 │   ├── meetingDetector.ts        #   Meeting auto-start from window titles
 │   ├── index.ts                  #   App lifecycle, hotkeys, IPC
+│   ├── second/                   #   Second live engine
+│   │   ├── liveEngine.ts         #     Turns -> state -> gated coach -> one card
+│   │   ├── coachService.ts       #     Compact prompt + structured card call
+│   │   ├── healthMonitor.ts      #     Per-channel truth state for the status rail
+│   │   ├── briefingService.ts    #     Pre-meeting brief, post-meeting report
+│   │   ├── diagnostics.ts        #     Content-free local telemetry
+│   │   └── secondMain.ts         #     Wiring: sessions, audio taps, IPC, retention
 │   └── services/
 │       ├── database.ts           #   SQLite (sessions, modes, RAG chunks, Ask index + chats)
 │       ├── sessionManager.ts     #   Session lifecycle, incognito, autosave
@@ -208,13 +229,23 @@ src/
 │       └── ai/
 │           ├── providerFactory.ts
 │           └── sessionMemory.ts  #   In-recording compression / pins
-├── shared/sttCapabilities.ts     # STT language + engine routing
+├── shared/
+│   ├── second/                   # Pure, tested core: meeting state reducer, card
+│   │                             #   contract, voicebook, intervention gates,
+│   │                             #   playbooks, profile, health truth table, evals
+│   └── sttCapabilities.ts        # STT language + engine routing
 ├── renderer/                     # React UI (Vite + Tailwind)
 ├── preload/                      # Context bridge
 └── native/
     ├── swift/AudioCapture/       # macOS capture
     ├── windows/                  # Windows WASAPI (Rust/NAPI)
     └── aec/                      # GStreamer AEC addon
+
+prompts/second_core.md            # Versioned core coach prompt
+schemas/                          # card.json, meeting_state.json
+evals/                            # Scenario corpus + live replay runner
+diagnostics/README.md             # Failure signatures, safe log fields
+RELEASE_GATE.md                   # Acceptance checklist
 ```
 
 ## Platform Support
@@ -648,6 +679,7 @@ These match `registerGlobalHotkeys` in `src/main/index.ts`. On Windows use `Ctrl
 |--------|----------|
 | Toggle overlay | `Cmd + \` |
 | AI Assist | `Cmd + Enter` |
+| Second: best card now | `Cmd + Shift + Enter` |
 | Start/Stop recording | `Cmd + Shift + Space` |
 | Clear conversation | `Cmd + Shift + Backspace` |
 | Move overlay | `Cmd + Arrow Keys` |
@@ -656,7 +688,8 @@ These match `registerGlobalHotkeys` in `src/main/index.ts`. On Windows use `Ctrl
 ## Testing
 
 ```bash
-npm test              # Unit + integration tests
+npm test              # Typecheck (renderer + main) + unit + integration tests
+npm run eval          # Live replay of evals/scenarios against your model (needs ANTHROPIC_API_KEY or OPENAI_API_KEY)
 npm run test:coverage # With coverage report
 npm run test:e2e      # End-to-end (requires npm run build first)
 npm run test:all      # Everything

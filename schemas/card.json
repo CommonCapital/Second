@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CommonCapital/second/schemas/card.json",
+  "title": "Second coach response",
+  "description": "What the live coach model must return for each qualifying turn (snake_case). Parsed and enforced by src/shared/second/card.ts.",
+  "type": "object",
+  "required": ["mode"],
+  "properties": {
+    "mode": { "enum": ["SAY", "ASK", "WATCH", "WAIT", "CLOSE", "NONE"] },
+    "text": { "type": "string", "description": "The card. Usually <= 22 words; rejected above 40. Empty for NONE." },
+    "why": { "type": "string", "description": "<= 8 words on why now." },
+    "urgency": { "enum": ["low", "medium", "high"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "grounding": { "type": "array", "items": { "type": "string", "pattern": "^(turn_\\d+|packet:.+|context:.+|user:.+|doc:.+)$" } },
+    "expires_after_seconds": { "type": "number", "minimum": 5, "maximum": 120 },
+    "replace_policy": { "enum": ["normal", "interrupt"] },
+    "state_updates": { "$ref": "meeting_state.json#/$defs/state_updates" }
+  }
+}

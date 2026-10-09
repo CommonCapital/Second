@@ -155,6 +155,16 @@ src/main/__tests__/
     ragPipeline.test.ts
 ```
 
+### Model evaluation
+
+Any change to `prompts/second_core.md`, the card contract, the gates, or a default model must be replayed against the corpus:
+
+```bash
+SECOND_EVAL_PROVIDER=anthropic ANTHROPIC_API_KEY=... npm run eval
+```
+
+The run writes `evals/results/scorecard-latest.csv` (fill in the human columns) and `summary-latest.json`. Bump the version in the prompt's header comment whenever you change it. Add a scenario to `evals/scenarios/` for every coaching failure you fix; the corpus is validated offline in `npm test`.
+
 ### E2E Tests
 
 E2E tests use Playwright for Electron and require a built app:

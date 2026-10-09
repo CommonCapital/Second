@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CommonCapital/second/schemas/meeting_state.json",
+  "title": "Second meeting state",
+  "description": "Canonical meeting state produced by the deterministic reducer in src/shared/second/meetingState.ts. The coach proposes changes via state_updates; the reducer enforces provenance (facts need a source turn), keeps inferences out of facts, normalizes numbers to detect contradictions, and flags commitments without a due date.",
+  "type": "object",
+  "required": ["meetingId", "startedAt", "mode", "phase", "facts", "numbers", "questionsOpen", "commitments", "gaps"],
+  "properties": {
+    "meetingId": { "type": "string" },
+    "startedAt": { "type": "number" },
+    "mode": { "enum": ["general", "founder", "lp", "interview", "banker", "negotiation", "ic", "relationship"] },
+    "phase": { "enum": ["opening", "body", "closing"] },
+    "objective": { "type": "string" },
+    "idealOutcome": { "type": "string" },
+    "avoid": { "type": "array", "items": { "type": "string" } },
+    "people": { "type": "array", "items": { "type": "string" } },
+    "organizations": { "type": "array", "items": { "type": "string" } },
+    "currentTopic": { "type": "string" },
+    "agendaDone": { "type": "array", "items": { "type": "string" } },
+    "agendaParked": { "type": "array", "items": { "type": "string" } },
+    "facts": { "type": "array", "items": { "type": "object", "required": ["claim", "source", "confidence", "at"], "properties": { "claim": { "type": "string" }, "value": { "type": "string" }, "source": { "type": "string" }, "confidence": { "type": "number" }, "at": { "type": "number" } } } },
+    "numbers": { "type": "array", "items": { "type": "object", "required": ["metric", "value", "source"], "properties": { "metric": { "type": "string" }, "value": { "type": "number" }, "unit": { "type": "string" }, "period": { "type": "string" }, "source": { "type": "string" }, "at": { "type": "number" } } } },
+    "contradictions": { "type": "array", "items": { "type": "object", "properties": { "metric": { "type": "string" }, "period": { "type": "string" }, "previous": { "type": "number" }, "current": { "type": "number" }, "sources": { "type": "array", "items": { "type": "string" } } } } },
+    "questionsOpen": { "type": "array", "items": { "type": "object", "required": ["question", "owner"], "properties": { "question": { "type": "string" }, "priority": { "enum": ["low", "medium", "high"] }, "owner": { "enum": ["you", "them"] }, "firstAskedAt": { "type": "number" }, "source": { "type": "string" } } } },
+    "questionsResolved": { "type": "array", "items": { "type": "object", "properties": { "question": { "type": "string" }, "answerRef": { "type": "string" } } } },
+    "objections": { "type": "array", "items": { "type": "object", "properties": { "topic": { "type": "string" }, "severity": { "enum": ["low", "medium", "high"] }, "resolved": { "type": "boolean" }, "evidence": { "type": "string" } } } },
+    "commitments": { "type": "array", "items": { "type": "object", "required": ["who", "action", "missingDue"], "properties": { "who": { "type": "string" }, "action": { "type": "string" }, "due": { "type": "string" }, "confidence": { "type": "number" }, "missingDue": { "type": "boolean" }, "source": { "type": "string" } } } },
+    "signals": { "type": "array", "description": "Inferences. Never presented as facts.", "items": { "type": "object", "properties": { "type": { "type": "string" }, "evidence": { "type": "string" }, "confidence": { "type": "number" } } } },
+    "gaps": { "type": "array", "description": "Periods not captured (sleep, network, capture).", "items": { "type": "object", "properties": { "from": { "type": "number" }, "to": { "type": "number" }, "reason": { "enum": ["sleep", "network", "capture"] } } } },
+    "relationshipState": { "type": "string" },
+    "lastUserIntent": { "type": "string" },
+    "currentCard": { "type": ["object", "null"] },
+    "closeTarget": { "type": "string" },
+    "nextBestAction": { "type": "string" },
+    "turnCount": { "type": "number" },
+    "endedAt": { "type": ["number", "null"] }
+  },
+  "$defs": {
+    "state_updates": {
+      "type": "object",
+      "description": "Model-proposed changes (snake_case). Mapped by parseStateUpdates in src/shared/second/card.ts.",
+      "properties": {
+        "phase": { "enum": ["opening", "body", "closing"] },
+        "current_topic": { "type": "string" },
+        "agenda_done": { "type": "array", "items": { "type": "string" } },
+        "agenda_parked": { "type": "array", "items": { "type": "string" } },
+        "facts": { "type": "array", "items": { "type": "object", "required": ["claim", "source"], "properties": { "claim": { "type": "string" }, "value": { "type": ["string", "number"] }, "source": { "type": "string" }, "confidence": { "type": "number" } } } },
+        "numbers": { "type": "array", "items": { "type": "object", "required": ["metric", "value", "source"], "properties": { "metric": { "type": "string" }, "value": { "type": ["number", "string"] }, "unit": { "type": "string" }, "period": { "type": "string" }, "source": { "type": "string" } } } },
+        "questions_open": { "type": "array", "items": { "type": "object", "required": ["question"], "properties": { "question": { "type": "string" }, "priority": { "enum": ["low", "medium", "high"] }, "owner": { "enum": ["you", "them"] }, "source": { "type": "string" } } } },
+        "questions_resolved": { "type": "array", "items": { "type": "object", "required": ["question"], "properties": { "question": { "type": "string" }, "answer_ref": { "type": "string" } } } },
+        "objections": { "type": "array", "items": { "type": "object", "required": ["topic"], "properties": { "topic": { "type": "string" }, "severity": { "enum": ["low", "medium", "high"] }, "resolved": { "type": "boolean" }, "evidence": { "type": "string" } } } },
+        "objections_resolved": { "type": "array", "items": { "type": "string" } },
+        "commitments": { "type": "array", "items": { "type": "object", "required": ["who", "action"], "properties": { "who": { "type": "string" }, "action": { "type": "string" }, "due": { "type": "string" }, "confidence": { "type": "number" }, "source": { "type": "string" } } } },
+        "signals": { "type": "array", "items": { "type": "object", "required": ["type", "evidence"], "properties": { "type": { "type": "string" }, "evidence": { "type": "string" }, "confidence": { "type": "number" } } } },
+        "people": { "type": "array", "items": { "type": "string" } },
+        "organizations": { "type": "array", "items": { "type": "string" } },
+        "relationship_state": { "type": "string" },
+        "last_user_intent": { "type": "string" },
+        "next_best_action": { "type": "string" }
+      }
+    }
+  }
+}
