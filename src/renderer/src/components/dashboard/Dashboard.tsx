@@ -12,6 +12,7 @@ import { AskView } from './AskView'
 import { UpdateBanner } from './UpdateBanner'
 import { MacUpdateModal } from './MacUpdateModal'
 import { MeetingPrepModal } from './MeetingPrepModal'
+import type { CalendarEvent } from '../../../../shared/second/google'
 import { OverlayTour } from '../OverlayTour'
 import { detectMacPlatform } from '../../lib/shortcutLabels'
 
@@ -181,6 +182,13 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
   }
 
   const [prepOpen, setPrepOpen] = useState(false)
+  const [prepEvent, setPrepEvent] = useState<CalendarEvent | null>(null)
+
+  // "Prepare now" reminder (Google Calendar) opens prep for that meeting.
+  useEffect(() => window.second.google.onPrepareEvent((event) => {
+    setPrepEvent(event)
+    setPrepOpen(true)
+  }), [])
 
   const handleStartSecond = async () => {
     if (!isRecording) {
@@ -253,7 +261,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
         stealth={stealth}
         onToggleStealth={handleToggleStealth}
         onStartSecond={handleStartSecond}
-        onPrepareMeeting={() => setPrepOpen(true)}
+        onPrepareMeeting={() => { setPrepEvent(null); setPrepOpen(true) }}
         isRecording={isRecording}
         onOpenSettings={handleOpenSettings}
         onReplayTour={() => setShowOverlayTour(true)}
@@ -318,6 +326,7 @@ export function Dashboard({ initialUserProfile }: DashboardProps = {}) {
 
       <MeetingPrepModal
         isOpen={prepOpen}
+        initialEvent={prepEvent}
         onClose={() => setPrepOpen(false)}
         onStart={() => { void handleStartSecond() }}
       />

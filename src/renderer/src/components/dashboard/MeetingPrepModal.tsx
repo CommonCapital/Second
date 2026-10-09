@@ -5,16 +5,60 @@
  */
 
 import { useEffect, useState } from 'react'
-import { X, Sparkles, Loader2 } from 'lucide-react'
+import { X, Sparkles, Loader2, Calendar, Mail, FileText, ExternalLink } from 'lucide-react'
 import type { MeetingBrief, MeetingSetupInput } from '../../../../shared/second/briefing'
 import type { MeetingModeId } from '../../../../shared/second/playbooks'
-import type { PlaybookSummary } from '../../../../shared/second/views'
+import type { GoogleStatus, PlaybookSummary } from '../../../../shared/second/views'
+import {
+  externalAttendees,
+  formatPacket,
+  organizationFromAttendees,
+  type CalendarEvent,
+  type ContextSource,
+} from '../../../../shared/second/google'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
   onStart: () => void
+  /** Calendar event to prepare for (e.g. from the "starting soon" reminder). */
+  initialEvent?: CalendarEvent | null
 }
+
+type PacketItem = ContextSource & { included: boolean }
+
+interface EventContext {
+  title: string
+  people: string
+  organization: string
+  sources: PacketItem[]
+  errors: string[]
+}
+
+/** Pull invite, email with the attendees, and matching docs for one event. */
+async function loadEventContext(event: CalendarEvent, selfEmail: string): Promise<EventContext> {
+  const attendees = externalAttendees(event)
+  const org = organizationFromAttendees(event.attendees, selfEmail)
+  const res = await window.second.google.gather({ eventId: event.id, emails: attendees.map((a) => a.email), terms: [org, event.title].filter(Boolean) })
+  return {
+    title: event.title,
+    people: attendees.map((a) => a.name).join(', '),
+    organization: res.organization || org,
+    sources: res.sources.map((x) => ({ ...x, included: true })),
+    errors: res.errors,
+  }
+}
+
+const calendarEnabled = (g: GoogleStatus | null) => !!g?.connected && g.services.calendar.enabled && g.services.calendar.granted
+
+function eventLabel(e: CalendarEvent): string {
+  const d = new Date(e.start)
+  const day = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+  const time = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  return `${day} ${time} · ${e.title}`
+}
+
+const KIND_ICON = { calendar: Calendar, gmail: Mail, drive: FileText } as const
 
 const EMPTY: MeetingSetupInput = {
   mode: 'general',
@@ -73,7 +117,7 @@ function SelfTestStatus({ result }: { result: { at: number; micOk: boolean; syst
   )
 }
 
-export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
+export function MeetingPrepModal({ isOpen, onClose, onStart, initialEvent }: Props) {
   const [playbooks, setPlaybooks] = useState<PlaybookSummary[]>([])
   const [setup, setSetup] = useState<MeetingSetupInput>(EMPTY)
   const [people, setPeople] = useState('')
@@ -82,6 +126,42 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selfTest, setSelfTest] = useState<{ at: number; micOk: boolean; systemOk: boolean } | null>(null)
+  const [google, setGoogle] = useState<GoogleStatus | null>(null)
+  const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [eventId, setEventId] = useState('')
+  const [sources, setSources] = useState<PacketItem[]>([])
+  const [gathering, setGathering] = useState(false)
+  const [gatherNote, setGatherNote] = useState<string | null>(null)
+
+  const applyContext = (ctx: EventContext) => {
+    setSetup((s) => ({ ...s, title: ctx.title, counterpartyOrg: ctx.organization || s.counterpartyOrg }))
+    if (ctx.people) setPeople(ctx.people)
+    setSources(ctx.sources)
+    setGatherNote(ctx.errors.length ? ctx.errors.join(' · ') : ctx.sources.length ? null : 'No related email or docs found.')
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    let alive = true
+    void window.second.google.status().then(async (g) => {
+      if (!alive) return
+      setGoogle(g)
+      if (!calendarEnabled(g)) return
+      const res = await window.second.google.upcoming()
+      if (alive) setEvents(res.events)
+      if (alive && initialEvent) {
+        setEventId(initialEvent.id)
+        setGathering(true)
+        try {
+          const ctx = await loadEventContext(initialEvent, g.email)
+          if (alive) applyContext(ctx)
+        } finally {
+          if (alive) setGathering(false)
+        }
+      }
+    }).catch(() => {})
+    return () => { alive = false }
+  }, [isOpen, initialEvent])
 
   useEffect(() => {
     if (!isOpen) return
@@ -102,7 +182,41 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
 
   if (!isOpen) return null
 
-  const current = (): MeetingSetupInput => ({ ...setup, counterpartyPeople: textToList(people), avoid: textToList(avoid) })
+  const packet = formatPacket(sources.filter((x) => x.included))
+  const current = (): MeetingSetupInput => ({
+    ...setup,
+    counterpartyPeople: textToList(people),
+    avoid: textToList(avoid),
+    notes: [setup.notes.trim(), packet].filter(Boolean).join('\n\n'),
+  })
+
+  const pickEvent = async (id: string) => {
+    setEventId(id)
+    const event = events.find((e) => e.id === id)
+    if (!event) return
+    setGathering(true)
+    setGatherNote(null)
+    try {
+      applyContext(await loadEventContext(event, google?.email ?? ''))
+    } catch (err) {
+      setGatherNote(err instanceof Error ? err.message : 'Could not load context')
+    } finally {
+      setGathering(false)
+    }
+  }
+
+  const searchContext = async () => {
+    setGathering(true)
+    setGatherNote(null)
+    try {
+      const emails = textToList(people).filter((p) => p.includes('@'))
+      const res = await window.second.google.gather({ emails, terms: [setup.counterpartyOrg, setup.title ?? ''].filter(Boolean) })
+      setSources(res.sources.map((x) => ({ ...x, included: true })))
+      setGatherNote(res.errors.length ? res.errors.join(' · ') : res.sources.length ? null : 'No related email or docs found.')
+    } finally {
+      setGathering(false)
+    }
+  }
   const field = (k: keyof MeetingSetupInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setSetup((s) => ({ ...s, [k]: e.target.value }))
 
@@ -150,6 +264,61 @@ export function MeetingPrepModal({ isOpen, onClose, onStart }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          {google?.connected ? (
+            <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                {calendarEnabled(google) && (
+                  <select
+                    className="flex-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-900"
+                    value={eventId}
+                    onChange={(e) => { void pickEvent(e.target.value) }}
+                  >
+                    <option value="">{events.length ? 'From your calendar…' : 'No upcoming meetings in the next 2 days'}</option>
+                    {events.map((e) => <option key={e.id} value={e.id}>{eventLabel(e)}</option>)}
+                  </select>
+                )}
+                <button
+                  onClick={() => { void searchContext() }}
+                  disabled={gathering}
+                  className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-sm border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  title="Search Gmail and Drive for the people and organization below"
+                >
+                  {gathering ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />} Find email & docs
+                </button>
+              </div>
+              {gatherNote && <p className="text-xs text-gray-500">{gatherNote}</p>}
+              {sources.length > 0 && (
+                <ul className="space-y-1">
+                  {sources.map((src, i) => {
+                    const Icon = KIND_ICON[src.kind]
+                    return (
+                      <li key={src.ref} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 accent-[#141B2D]"
+                          checked={src.included}
+                          onChange={(e) => setSources((all) => all.map((x, j) => (j === i ? { ...x, included: e.target.checked } : x)))}
+                        />
+                        <Icon size={14} className="text-gray-400 shrink-0" />
+                        <span className="truncate text-gray-800">{src.title}</span>
+                        <span className="truncate text-xs text-gray-400">{src.meta}</span>
+                        {src.url && (
+                          <button onClick={() => { void window.second.openExternal(src.url!) }} className="ml-auto text-gray-400 hover:text-gray-700" title="Open">
+                            <ExternalLink size={13} />
+                          </button>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+              {sources.length > 0 && (
+                <p className="text-[11px] text-gray-400">Ticked items are added to the context below when you generate the brief or start. Sent only to your AI provider.</p>
+              )}
+            </div>
+          ) : (
+            google && <p className="text-xs text-gray-400">Tip: connect Google in Settings → Second to pull the invite, recent email, and docs automatically.</p>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={label}>Meeting type</label>

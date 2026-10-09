@@ -9,6 +9,7 @@ import { Loader2, Plus, Trash2 } from 'lucide-react'
 import { MODEL_CATALOG, type AIProviderName } from '../../../lib/aiModels'
 import { emptyProfile, isDynamicStale, type DynamicContextItem, type UserProfile } from '../../../../../shared/second/profile'
 import type { SelfTestResult } from '../../../../../shared/second/views'
+import { GoogleIntegration } from './GoogleIntegration'
 
 type Sensitivity = 'auto' | 'quiet' | 'balanced' | 'active'
 
@@ -287,6 +288,11 @@ export function SecondTab() {
       <section>
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Your professional profile</h3>
         <ProfileEditor />
+      </section>
+
+      <section>
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Integrations</h3>
+        <GoogleIntegration />
       </section>
 
       <section>
