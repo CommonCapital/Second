@@ -1,7 +1,7 @@
 {
   "name": "second-desktop",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Second: an open-source, private live meeting intelligence layer for interviews, founder and investor calls, negotiations, and high-stakes meetings. Bring your own keys; everything stays on your machine.",
   "author": "Nursan Omarov",
   "license": "MIT",
